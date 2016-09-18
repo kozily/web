@@ -1,0 +1,74 @@
+{
+  "name": "kozily-web",
+  "version": "1.0.0",
+  "description": "Progressive web application for developing and interacting with an Oz program",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kozily/web.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kozily/admin/issues"
+  },
+  "homepage": "https://kozily.github.io",
+  "devDependencies": {
+    "babel-core": "^6.14.0",
+    "babel-loader": "^6.2.5",
+    "babel-preset-es2015": "^6.14.0",
+    "babel-preset-react": "^6.11.1",
+    "copy-webpack-plugin": "^3.0.1",
+    "css-loader": "^0.25.0",
+    "eslint": "^3.5.0",
+    "eslint-config-airbnb": "^11.0.0",
+    "eslint-loader": "^1.5.0",
+    "eslint-plugin-import": "^1.14.0",
+    "eslint-plugin-jsx-a11y": "^2.2.1",
+    "eslint-plugin-react": "^6.2.0",
+    "extract-text-webpack-plugin": "^1.0.1",
+    "file-loader": "^0.9.0",
+    "html-webpack-plugin": "^2.22.0",
+    "node-sass": "^3.9.3",
+    "react-hot-loader": "^3.0.0-beta.3",
+    "sass-loader": "^4.0.2",
+    "style-loader": "^0.13.1",
+    "webpack": "^1.13.2",
+    "webpack-dev-server": "^1.15.1"
+  },
+  "dependencies": {
+    "bootstrap-sass": "^3.3.7",
+    "bootswatch-sass": "^3.2.0",
+    "font-awesome": "^4.6.3",
+    "immutable": "^3.8.1",
+    "react": "^15.3.1",
+    "react-dom": "^15.3.1",
+    "react-router": "^2.8.0",
+    "rx": "^4.1.0"
+  },
+  "scripts": {
+    "start": "webpack-dev-server --config config/webpack.dev.js --hot --inline --host 0.0.0.0 --port 8080",
+    "build": "rm -rf build && NODE_ENV=production webpack --config config/webpack.prod.js --progress -p"
+  },
+  "eslintConfig": {
+    "extends": "airbnb",
+    "rules": {
+      "react/require-extension": "off"
+    },
+    "plugins": [
+      "react",
+      "jsx-a11y",
+      "import"
+    ],
+    "env": {
+      "browser": true
+    }
+  },
+  "babel": {
+    "presets": [
+      "es2015",
+      "react"
+    ],
+    "plugins": [
+      "react-hot-loader/babel"
+    ]
+  }
+}
