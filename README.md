@@ -1,5 +1,7 @@
 # Kozily web
 
+[![Build Status](https://travis-ci.org/kozily/web.svg?branch=master)](https://travis-ci.org/kozily/web)
+
 Kozily client, progressive web application for developing and interaction with
 an Oz program.
 
@@ -42,7 +44,10 @@ any development environment commands.
 The commands are defined in the `package.json` file:
 
 * `dev/run npm start`: Starts a development server at the local port 8080,
-  setup to autoreload if you change files.
+  setup to autoreload if you change files and lint your code on each save..
+
+* `dev/run npm test`: Runs the test suite for the project, linting your code
+  before doing so.
 
 * `dev/run npm run build`: Builds a bundle at the local `build` directory
   containing the whole application as a set of html, js and css files, ready to
