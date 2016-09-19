@@ -33,7 +33,6 @@
     "karma-phantomjs-launcher": "^1.0.2",
     "karma-webpack": "^1.8.0",
     "node-sass": "^3.9.3",
-    "react-hot-loader": "^3.0.0-beta.3",
     "sass-loader": "^4.0.2",
     "style-loader": "^0.13.1",
     "webpack": "^1.13.2",
@@ -42,10 +41,13 @@
   "dependencies": {
     "bootstrap-sass": "^3.3.7",
     "bootswatch-sass": "^3.2.0",
+    "brace": "^0.8.0",
+    "classnames": "^2.2.5",
     "font-awesome": "^4.6.3",
     "immutable": "^3.8.1",
     "react": "^15.3.1",
     "react-dom": "^15.3.1",
+    "react-hot-loader": "^3.0.0-beta.3",
     "react-router": "^2.8.0",
     "rx": "^4.1.0"
   },
@@ -58,7 +60,8 @@
   "eslintConfig": {
     "extends": "airbnb",
     "rules": {
-      "react/require-extension": "off"
+      "react/require-extension": "off",
+      "global-require": "off"
     },
     "plugins": [
       "react",
