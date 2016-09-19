@@ -7,7 +7,6 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 module.exports = {
   entry: {
     app: './app/index.jsx',
-    vendor: ['react', 'react-dom'],
   },
 
   resolve: {
@@ -50,6 +49,11 @@ module.exports = {
       template: './app/index.html',
     }),
 
+    new HtmlPlugin({
+      template: './app/index.html',
+      filename: '200.html',
+    }),
+
     new CopyPlugin([
       {from: './app/favicons', to: './'},
     ]),
@@ -64,10 +68,6 @@ module.exports = {
       "[name]-[contenthash].css",
       {allChunks: true}
     ),
-
-    new webpack.optimize.CommonsChunkPlugin({
-      names: ['vendor', 'manifest'],
-    }),
   ],
 };
 

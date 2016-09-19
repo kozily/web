@@ -1,3 +1,10 @@
 language: node_js
 node_js:
   - "6"
+
+deploy:
+  provider: surge
+  project: build
+  domain: https://kozily.surge.sh
+  skip_cleanup: true
+  on: master
