@@ -10,7 +10,7 @@
   "bugs": {
     "url": "https://github.com/kozily/admin/issues"
   },
-  "homepage": "https://kozily.github.io",
+  "homepage": "https://kozily.surge.sh",
   "devDependencies": {
     "babel-core": "^6.14.0",
     "babel-loader": "^6.2.5",
