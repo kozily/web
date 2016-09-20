@@ -1,13 +1,13 @@
 import React from 'react';
 import NavBar from './navbar';
-import Editor from './editor';
+import Ide from './ide';
 import './application.sass';
 
 export default function () {
   return (
     <div>
       <NavBar />
-      <Editor />
+      <Ide />
     </div>
   );
 }

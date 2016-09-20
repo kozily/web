@@ -4,10 +4,10 @@ import './navbar.sass';
 
 export default function () {
   return (
-    <nav className="navbar navbar-inverse">
+    <nav className="navbar navbar-default navbar-fixed-top">
       <div className="container-fluid">
         <div className="navbar-header">
-          <a className="navbar-brand">
+          <a className="navbar-brand" href="/">
             <IconStack>
               <Icon icon="home" stack="1x" />
               <Icon icon="square-o" stack="2x" />

@@ -35,6 +35,11 @@ module.exports = {
       },
 
       {
+        test: /\.css$/,
+        loader: 'style!css?sourceMap',
+      },
+
+      {
         test: /\.(ttf|eot|svg|woff|woff2)/,
         loader: 'file',
       }
