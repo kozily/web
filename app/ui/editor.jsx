@@ -1,34 +1,37 @@
 import React from 'react';
-import ace from 'brace';
-import 'brace/mode/javascript';
-import 'brace/theme/tomorrow';
+import CodeMirror from 'codemirror';
+import 'codemirror/mode/oz/oz';
+import 'codemirror/lib/codemirror.css';
+import 'codemirror/theme/base16-light.css';
+import 'codemirror/addon/dialog/dialog';
+import 'codemirror/addon/dialog/dialog.css';
+import 'codemirror/addon/search/search';
+import 'codemirror/addon/search/jump-to-line';
+import 'codemirror/addon/selection/active-line';
 
 export default class Editor extends React.Component {
   componentDidMount() {
-    this.ace = ace.edit(this.editor);
-    this.ace.getSession().setMode('ace/mode/javascript');
-    this.ace.setTheme('ace/theme/tomorrow');
-  }
+    const options = {
+      value: 'local X = 1 in\n  {Browse X}\n end',
+      mode: 'oz',
+      theme: 'base16-light',
+      tabSize: 2,
+      lineNumbers: true,
+      lineWrapping: true,
+      autofocus: true,
+      styleActiveLine: true,
+    };
 
-  componentWillUnmount() {
-    if (this.ace) {
-      this.ace.destroy();
-      this.ace = null;
+    this.editor = new CodeMirror(this.editorElement, options);
+
+    if (process.env.NODE_ENV !== 'production') {
+      setTimeout(() => this.editor.refresh(), 1000);
     }
   }
 
   render() {
-    const styles = {
-      position: 'absolute',
-      top: 70,
-      bottom: 0,
-      left: 0,
-      right: 0,
-      borderRadius: 5,
-    };
-
     return (
-      <div style={styles} ref={(editor) => { this.editor = editor; }} />
+      <div ref={(ref) => { this.editorElement = ref; }} />
     );
   }
 }
