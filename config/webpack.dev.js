@@ -5,6 +5,7 @@ const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   entry: [
+    'react-hot-loader/patch',
     './app/index.jsx',
   ],
 
@@ -17,8 +18,7 @@ module.exports = {
   },
 
   output: {
-    path: './build',
-    filename: 'bundle.js',
+    publicPath: 'http://localhost:8080/',
   },
 
   module: {
@@ -30,7 +30,7 @@ module.exports = {
       },
 
       {
-        test: /\.sass$/,
+        test: /\.(sass|scss)$/,
         loader: 'style!css?sourceMap!sass?sourceMap',
       },
 

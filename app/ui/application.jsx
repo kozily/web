@@ -1,9 +1,13 @@
 import React from 'react';
+import NavBar from './navbar';
+import Editor from './editor';
+import './application.sass';
 
 export default function () {
   return (
-    <div className="container">
-      <h1>This is a placeholder</h1>
+    <div>
+      <NavBar />
+      <Editor />
     </div>
   );
 }
