@@ -98,7 +98,7 @@ quoted_char -> "&" [^\\] {%
   }
 %}
 
-octal_char -> "&" "\" ([0-7][0-7][0-7]):+ {%
+octal_char -> "&" "\\" ([0-7] [0-7] [0-7]) {%
   function (d) {
     return makeNumberLiteral(parseInt(
       d[2].join(""), 8
@@ -106,7 +106,7 @@ octal_char -> "&" "\" ([0-7][0-7][0-7]):+ {%
   }
 %}
 
-hexal_char -> "&" "\" ("x" | "X") ([0-9a-fA-F][0-9a-fA-F]) {%
+hexal_char -> "&" "\\" ("x" | "X") ([0-9a-fA-F] [0-9a-fA-F]) {%
   function (d) {
     return makeNumberLiteral(parseInt(
       d[3].join(""), 16
@@ -116,12 +116,12 @@ hexal_char -> "&" "\" ("x" | "X") ([0-9a-fA-F][0-9a-fA-F]) {%
 
 @{%
   var escapedChars = {
-    "a": 7, "b": 8, "f": 12, "n": 10, "r": 13, "t": 9, "v": 11, "\": 92, "’": 39, "\"": 34, "`': 96, "&": 38
+    "a": 7, "b": 8, "f": 12, "n": 10, "r": 13, "t": 9, "v": 11, "\\": 92, "’": 39, "\"": 34, "`": 96, "&": 38
   }
 %}
 
-escaped_char -> "&" "\" ("a" | "b" | "f" | "n" | "r" | "t" | "v" | "\" | "’" | "\"" | "`" | "&") {%
+escaped_char -> "&" "\\" ("a" | "b" | "f" | "n" | "r" | "t" | "v" | "\\" | "’" | "\"" | "`" | "&") {%
   function (d) {
-    return makeNumberLiteral(escapedChars[d[2]);
+    return makeNumberLiteral(escapedChars[d[2]]);
   }
 %}

@@ -58,13 +58,22 @@ describe('Number parsing', () => {
     expect(parseOz('~1.54045E~2')).toBeLiteralNumber(-0.0154045);
   });
 
-  it('handles characters correctly', () => {
+  it('handles explicit characters correctly', () => {
     expect(parseOz('&a')).toBeLiteralNumber('a'.charCodeAt(0));
     expect(parseOz('& ')).toBeLiteralNumber(' '.charCodeAt(0));
+  });
+
+  it('handles octal characters correctly', () => {
     expect(parseOz('&\\101')).toBeLiteralNumber(65);
+  });
+
+  it('handles hexal characters correctly', () => {
     expect(parseOz('&\\xff')).toBeLiteralNumber(255);
     expect(parseOz('&\\X0A')).toBeLiteralNumber(10);
     expect(parseOz('&\\XfA')).toBeLiteralNumber(250);
+  });
+
+  it('handles escaped character correctly', () => {
     expect(parseOz('&\\a')).toBeLiteralNumber(7);
     expect(parseOz('&\\b')).toBeLiteralNumber(8);
     expect(parseOz('&\\f')).toBeLiteralNumber(12);
