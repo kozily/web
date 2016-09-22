@@ -12,7 +12,7 @@ module.exports = function(config) {
       'specs/*_spec.js': ['webpack'],
       'specs/**/*_spec.js': ['webpack'],
     },
-    reporters: ['dots'],
+    reporters: ['mocha'],
     browsers: ['PhantomJS'],
     webpack: {
       resolve: {
@@ -29,6 +29,11 @@ module.exports = function(config) {
             test: /\.jsx?$/,
             exclude: /node_modules/,
             loader: 'babel',
+          },
+
+          {
+            test: /\.nearley$/,
+            loader: 'nearley',
           },
         ]
       }

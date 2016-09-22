@@ -31,6 +31,11 @@ module.exports = {
       },
 
       {
+        test: /\.nearley$/,
+        loader: 'nearley',
+      },
+
+      {
         test: /\.(sass|scss)$/,
         loader: ExtractTextPlugin.extract('style', 'css?sourceMap!sass?sourceMap'),
       },
