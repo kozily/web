@@ -1,8 +1,18 @@
 import { Parser } from 'nearley';
-import grammar from './grammar.nearley';
+import Immutable from 'immutable';
+import ozGrammar from './grammar/index.nearley';
 
-export default function (input) {
-  const parser = new Parser(grammar.ParserRules, grammar.ParserStart);
-  parser.feed(input);
-  return parser.results;
+export function parserFor(grammar) {
+  return (input) => {
+    const parser = new Parser(grammar.ParserRules, grammar.ParserStart);
+    parser.feed(input);
+
+    if (parser.results.length > 1) {
+      throw new Error('Ambiguous parse tree');
+    }
+
+    return Immutable.fromJS(parser.results[0]);
+  };
 }
+
+export default parserFor(ozGrammar);

@@ -1,27 +1,12 @@
-##############################################################################
-# 1 Literals
-##############################################################################
-@{%
-  function makeLiteral(type, value) { return { node: 'literal', type: type, value: value }; }
-%}
-
-##############################################################################
-# 1.1 Numbers
-##############################################################################
-
 @{%
   function translateWeirdOzUnaryMinus(v) { return v === "~" ? "-" : "+"; }
-  function makeNumberLiteral(value) { return makeLiteral('number', value); }
+  function literalNumber(d) { return { node: 'literal', type: 'number', value: d[0] }; }
 %}
 
 number ->
-    integer {% id %}
-  | float {% id %}
-  | char {% id %}
-
-##############################################################################
-# 1.1.1 Integers
-##############################################################################
+    integer {% literalNumber %}
+  | float {% literalNumber %}
+  | char {% literalNumber %}
 
 integer ->
     decimal_int {% id %}
@@ -31,60 +16,52 @@ integer ->
 
 decimal_int -> "~":? [1-9] [0-9]:* {%
   function (d) {
-    return makeNumberLiteral(parseInt(
+    return parseInt(
       translateWeirdOzUnaryMinus(d[0]) +
       d[1] +
       d[2].join(""),
-      10));
+      10);
   }
 %}
 
 octal_int -> "~":? "0" [0-7]:+ {%
   function (d) {
-    return makeNumberLiteral(parseInt(
+    return parseInt(
       translateWeirdOzUnaryMinus(d[0]) +
       d[2].join(""),
-      8));
+      8);
   }
 %}
 
 hexal_int -> "~":? ("0x" | "0X") [a-fA-F0-7]:+ {%
   function (d) {
-    return makeNumberLiteral(parseInt(
+    return parseInt(
       translateWeirdOzUnaryMinus(d[0]) +
       d[2].join(""),
-      16));
+      16);
   }
 %}
 
 bin_int -> "~":? ("0b" | "0B") [0-1]:+ {%
   function (d) {
-    return makeNumberLiteral(parseInt(
+    return parseInt(
       translateWeirdOzUnaryMinus(d[0]) +
       d[2].join(""),
-      2));
+      2);
   }
 %}
 
-##############################################################################
-# 1.1.2 Floats
-##############################################################################
-
 float -> "~":? [0-9]:+ "." [0-9]:* (("e" | "E") "~":? [0-9]:+):? {%
   function(d) {
-    return makeNumberLiteral(parseFloat(
+    return parseFloat(
       translateWeirdOzUnaryMinus(d[0]) +
       d[1].join("") +
       "." +
       d[3].join("") +
       (d[4] ? "e" + (translateWeirdOzUnaryMinus(d[4][1]) + d[4][2].join("")) : "")
-    ));
+    );
   }
 %}
-
-##############################################################################
-# 1.1.3 Chars
-##############################################################################
 
 char ->
     quoted_char {% id %}
@@ -94,23 +71,23 @@ char ->
 
 quoted_char -> "&" [^\\] {%
   function (d) {
-    return makeNumberLiteral(d[1].charCodeAt(0));
+    return d[1].charCodeAt(0);
   }
 %}
 
 octal_char -> "&" "\\" ([0-7] [0-7] [0-7]) {%
   function (d) {
-    return makeNumberLiteral(parseInt(
+    return parseInt(
       d[2].join(""), 8
-    ));
+    );
   }
 %}
 
 hexal_char -> "&" "\\" ("x" | "X") ([0-9a-fA-F] [0-9a-fA-F]) {%
   function (d) {
-    return makeNumberLiteral(parseInt(
+    return parseInt(
       d[3].join(""), 16
-    ));
+    );
   }
 %}
 
@@ -122,6 +99,8 @@ hexal_char -> "&" "\\" ("x" | "X") ([0-9a-fA-F] [0-9a-fA-F]) {%
 
 escaped_char -> "&" "\\" ("a" | "b" | "f" | "n" | "r" | "t" | "v" | "\\" | "’" | "\"" | "`" | "&") {%
   function (d) {
-    return makeNumberLiteral(escapedChars[d[2]]);
+    return escapedChars[d[2]];
   }
 %}
+
+
