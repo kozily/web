@@ -4,6 +4,19 @@ const reducers = {
   skip(state) {
     return state;
   },
+
+  sequence(state, statement) {
+    return state.update('stack', stack => stack.push(
+      new Immutable.Map({
+        statement: statement.getIn(['statement', 'head']),
+        environment: statement.get('environment'),
+      }),
+      new Immutable.Map({
+        statement: statement.getIn(['statement', 'tail']),
+        environment: statement.get('environment'),
+      })
+    ));
+  },
 };
 
 function reduce(state, statement) {
