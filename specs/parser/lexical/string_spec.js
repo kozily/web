@@ -1,30 +1,41 @@
+import Immutable from 'immutable';
 import { parserFor } from '../../../app/oz/parser';
 import lexicalGrammar from '../../../app/oz/grammar/lexical.nearley';
 
 const parse = parserFor(lexicalGrammar);
 
-const customMatchers = {
-  toBeLexicalString() {
-    return {
-      compare(actual, expected) {
-        const pass = actual &&
-          actual.get('node') === 'lexical' &&
-          actual.get('type') === 'value|record|tuple|list|string' &&
-          actual.get('value') === expected;
-        return { pass };
+function makeLexicalString(value) {
+  if (value === '') {
+    return Immutable.fromJS({
+      node: 'value',
+      type: 'record',
+      value: {
+        label: 'nil',
+        features: {},
       },
-    };
-  },
-};
+    });
+  }
+
+  return Immutable.fromJS({
+    node: 'value',
+    type: 'record',
+    value: {
+      label: '|',
+      features: {
+        1: value.charCodeAt(0),
+        2: makeLexicalString(value.substring(1)),
+      },
+    },
+  });
+}
 
 describe('Parsing lexical string elements', () => {
   beforeEach(() => {
-    jasmine.addMatchers(customMatchers);
+    jasmine.addCustomEqualityTester(Immutable.is);
   });
 
   it('handles parsing correctly', () => {
-    expect(parse('"one quite interesting \\\\ \\n STRING"'))
-      .toBeLexicalString('one quite interesting \\ \n STRING');
+    expect(parse('"a \\\\\\nSTRING"')).toEqual(makeLexicalString('a \\\nSTRING'));
   });
 });
 

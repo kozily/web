@@ -5,16 +5,16 @@
 # a character sequence which has a given meaning, just as strings, variable
 # identifiers and numbers; they don't have a semantic meaning on their own (you
 # can't execute a variable identifier in any meaningful way, unless it's in the
-# context of a unification, a declaration, etc.
+# context of a unification, a declaration, etc.).
 ##############################################################################
 lexical_index ->
     lexical_variable {% id %}
   | lexical_atom {% id %}
+  | lexical_boolean {% id %}
   | lexical_string {% id %}
   | lexical_char {% id %}
   | lexical_integer {% id %}
   | lexical_float {% id %}
-  | lexical_boolean {% id %}
 
 ##############################################################################
 # Variable identifiers
@@ -22,8 +22,7 @@ lexical_index ->
 @{%
   function lexicalVariable(d) {
     return {
-      node: 'lexical',
-      type: 'variable',
+      node: 'variable',
       identifier: d[0],
     };
   }
@@ -46,15 +45,20 @@ lexical_variable_quoted -> "`" ([^`\\] | lexical_lib_pseudo_char):* "`" {%
 %}
 
 ##############################################################################
+# Generic records
+##############################################################################
+@{%
+  function lexicalRecord(label, features) {
+    return { node: 'value', type: 'record', value: { label: label, features: features } };
+  }
+%}
+
+##############################################################################
 # Atoms
 ##############################################################################
 @{%
   function lexicalAtom(d) {
-    return {
-      node: 'lexical',
-      type: 'value|record|tuple|literal|atom',
-      name: d[0],
-    };
+    return lexicalRecord(d[0], {});
   }
 
   LEXICAL_KEYWORDS = [
@@ -72,7 +76,7 @@ lexical_atom ->
     lexical_atom_unquoted {% lexicalAtom %}
   | lexical_atom_quoted {% lexicalAtom %}
 
-lexical_atom_unquoted -> [a-z] [a-zA-Z0_9_]:* {%
+lexical_atom_unquoted -> [a-z] [a-zA-Z0-9_]:* {%
   function(d, location, reject) {
     var name = "" + d[0] + d[1].join("");
     if (LEXICAL_KEYWORDS.indexOf(name) === -1) {
@@ -90,15 +94,43 @@ lexical_atom_quoted -> "'" ([^'\\] | lexical_lib_pseudo_char):* "'" {%
 %}
 
 ##############################################################################
+# Booleans
+##############################################################################
+@{%
+  function lexicalBoolean(d) {
+    return lexicalRecord(d.toString(), {});
+  }
+%}
+
+lexical_boolean ->
+    lexical_true_literal {% lexicalBoolean %}
+  | lexical_false_literal {% lexicalBoolean %}
+
+lexical_true_literal -> "true" {%
+  function (d) {
+    return true;
+  }
+%}
+
+lexical_false_literal -> "false" {%
+  function (d) {
+    return false;
+  }
+%}
+
+##############################################################################
 # Strings
 ##############################################################################
 @{%
   function lexicalString(d) {
-    return {
-      node: 'lexical',
-      type: 'value|record|tuple|list|string',
-      value: d[0],
-    };
+    if (d[0] === "") {
+      return lexicalRecord("nil", {});
+    } else {
+      return lexicalRecord("|", {
+        1: d[0].charCodeAt(0),
+        2: lexicalString([d[0].substring(1)]),
+      });
+    }
   }
 %}
 
@@ -109,22 +141,21 @@ lexical_string -> "\"" ([^"\\] | lexical_lib_pseudo_char):* "\"" {%
 %}
 
 ##############################################################################
-# Character
+# Generic numbers
 ##############################################################################
 @{%
-  function lexicalChar(d) {
-    return {
-      node: 'lexical',
-      type: 'value|number|int|char',
-      value: d[0],
-    };
+  function lexicalNumber(value) {
+    return { node: 'value', type: 'number', value: value[0] };
   }
 %}
 
+##############################################################################
+# Character
+##############################################################################
 lexical_char ->
-    lexical_numeric_char {% lexicalChar %}
-  | lexical_quoted_char {% lexicalChar %}
-  | lexical_escaped_char {% lexicalChar %}
+    lexical_numeric_char {% lexicalNumber %}
+  | lexical_quoted_char {% lexicalNumber %}
+  | lexical_escaped_char {% lexicalNumber %}
 
 lexical_numeric_char -> [1-9] [0-9]:* {%
   function(d, location, reject) {
@@ -152,21 +183,11 @@ lexical_escaped_char -> "&" lexical_lib_pseudo_char {%
 ##############################################################################
 # Integer
 ##############################################################################
-@{%
-  function lexicalInteger(d) {
-    return {
-      node: 'lexical',
-      type: 'value|number|int',
-      value: d[0],
-    };
-  }
-%}
-
 lexical_integer ->
-    lexical_decimal_int {% lexicalInteger %}
-  | lexical_octal_int {% lexicalInteger %}
-  | lexical_hexal_int {% lexicalInteger %}
-  | lexical_bin_int {% lexicalInteger %}
+    lexical_decimal_int {% lexicalNumber %}
+  | lexical_octal_int {% lexicalNumber %}
+  | lexical_hexal_int {% lexicalNumber %}
+  | lexical_bin_int {% lexicalNumber %}
 
 lexical_decimal_int -> "~":? [1-9] [0-9]:* {%
   function (d, location, reject) {
@@ -214,54 +235,15 @@ lexical_bin_int -> "~":? ("0b" | "0B") [0-1]:+ {%
 ##############################################################################
 # Float
 ##############################################################################
-@{%
-  function lexicalFloat(d) {
-    return {
-      node: 'lexical',
-      type: 'value|number|float',
-      value: d[0],
-    };
-  }
-%}
-
 lexical_float -> "~":? [0-9]:+ "." [0-9]:* (("e" | "E") "~":? [0-9]:+):? {%
   function(d) {
-    return lexicalFloat([parseFloat(
+    return lexicalNumber([parseFloat(
       translateWeirdOzUnaryMinus(d[0]) +
       d[1].join("") +
       "." +
       d[3].join("") +
       (d[4] ? "e" + (translateWeirdOzUnaryMinus(d[4][1]) + d[4][2].join("")) : "")
     )]);
-  }
-%}
-
-##############################################################################
-# Booleans
-##############################################################################
-@{%
-  function lexicalBoolean(d) {
-    return {
-      node: 'lexical',
-      type: 'value|record|tuple|literal|bool',
-      value: d[0],
-    };
-  }
-%}
-
-lexical_boolean ->
-    lexical_true_literal {% lexicalBoolean %}
-  | lexical_false_literal {% lexicalBoolean %}
-
-lexical_true_literal -> "true" {%
-  function (d) {
-    return true;
-  }
-%}
-
-lexical_false_literal -> "false" {%
-  function (d) {
-    return false;
   }
 %}
 

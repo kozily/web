@@ -1,32 +1,30 @@
+import Immutable from 'immutable';
 import { parserFor } from '../../../app/oz/parser';
 import lexicalGrammar from '../../../app/oz/grammar/lexical.nearley';
 
 const parse = parserFor(lexicalGrammar);
 
-const customMatchers = {
-  toBeLexicalBoolean() {
-    return {
-      compare(actual, expected) {
-        const pass =
-          actual.get('node') === 'lexical' &&
-          actual.get('type') === 'value|record|tuple|literal|bool' &&
-          actual.get('value') === expected;
-        return { pass };
-      },
-    };
-  },
-};
+function makeLexicalBoolean(value) {
+  return Immutable.fromJS({
+    node: 'value',
+    type: 'record',
+    value: {
+      label: value.toString(),
+      features: {},
+    },
+  });
+}
 
 describe('Parsing lexical boolean elements', () => {
   beforeEach(() => {
-    jasmine.addMatchers(customMatchers);
+    jasmine.addCustomEqualityTester(Immutable.is);
   });
 
   it('handles true correctly', () => {
-    expect(parse('true')).toBeLexicalBoolean(true);
+    expect(parse('true')).toEqual(makeLexicalBoolean(true));
   });
 
   it('handles false correctly', () => {
-    expect(parse('false')).toBeLexicalBoolean(false);
+    expect(parse('false')).toEqual(makeLexicalBoolean(false));
   });
 });
