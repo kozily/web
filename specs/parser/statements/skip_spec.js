@@ -1,10 +1,14 @@
+import Immutable from 'immutable';
+import statements from '../../samples/statements';
 import parse from '../../../app/oz/parser';
 
 describe('Parsing statements of type skip', () => {
+  beforeEach(() => {
+    jasmine.addCustomEqualityTester(Immutable.is);
+  });
+
   it('handles it correctly', () => {
-    const result = parse('skip');
-    expect(result.get('node')).toEqual('statement');
-    expect(result.get('statement')).toEqual('skip');
+    expect(parse('skip')).toEqual(statements.skip());
   });
 });
 
