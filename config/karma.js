@@ -1,6 +1,4 @@
-const path = require('path');
-
-module.exports = function(config) {
+module.exports = (config) => {
   config.set({
     basePath: '..',
     frameworks: ['jasmine'],
@@ -8,11 +6,13 @@ module.exports = function(config) {
       'specs/**/*_spec.js',
     ],
     preprocessors: {
-      'specs/**/*_spec.js': ['webpack'],
+      'specs/**/*_spec.js': ['webpack', 'sourcemap'],
     },
     reporters: ['mocha'],
     browsers: ['PhantomJS'],
     webpack: {
+      devtool: 'inline-source-map',
+
       resolve: {
         extensions: [
           '',
@@ -33,8 +33,9 @@ module.exports = function(config) {
             test: /\.nearley$/,
             loader: 'nearley',
           },
-        ]
-      }
+        ],
+      },
     },
   });
-}
+};
+

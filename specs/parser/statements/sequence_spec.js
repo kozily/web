@@ -1,9 +1,6 @@
-import { parserFor } from '../../app/oz/parser';
-import ozGrammar from '../../app/oz/grammar/index.nearley';
+import parse from '../../../app/oz/parser';
 
-const parse = parserFor(ozGrammar);
-
-describe('Parsing statement sequences', () => {
+describe('Parsing statement of type sequence', () => {
   it('handles a single space correctly', () => {
     const result = parse('skip skip');
     expect(result.get('node')).toEqual('statement');

@@ -1,5 +1,5 @@
 import parser from '../../app/oz/parser';
-import kernelizer from '../../app/oz/kernelizer.js';
+import kernelizer from '../../app/oz/kernelizer';
 import oz from '../../app/oz/machine';
 
 describe('Executing sequence statements', () => {

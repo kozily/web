@@ -1,5 +1,5 @@
 @builtin "whitespace.ne"
-@include "app/oz/grammar/literals.nearley"
+@include "app/oz/grammar/lexical.nearley"
 
 main -> _ sequence_statement _ {%
   function (d) {

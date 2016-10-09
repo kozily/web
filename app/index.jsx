@@ -12,6 +12,7 @@ ReactDOM.render(
 
 if (module.hot) {
   module.hot.accept('./ui/application', () => {
+    // eslint-disable-next-line global-require
     const NextApp = require('./ui/application').default;
 
     ReactDOM.render(
