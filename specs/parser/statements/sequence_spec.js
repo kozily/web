@@ -1,38 +1,43 @@
+import Immutable from 'immutable';
+import statements from '../../samples/statements';
 import parse from '../../../app/oz/parser';
 
 describe('Parsing statement of type sequence', () => {
-  it('handles a single space correctly', () => {
-    const result = parse('skip skip');
-    expect(result.get('node')).toEqual('statement');
-    expect(result.get('statement')).toEqual('sequence');
-    expect(result.getIn(['head', 'node'])).toEqual('statement');
-    expect(result.getIn(['head', 'statement'])).toEqual('skip');
-    expect(result.getIn(['tail', 'node'])).toEqual('statement');
-    expect(result.getIn(['tail', 'statement'])).toEqual('skip');
+  beforeEach(() => {
+    jasmine.addCustomEqualityTester(Immutable.is);
   });
 
-  it('handles multiple whitespaces correctly', () => {
-    const result = parse('skip\n\t  skip');
-    expect(result.get('node')).toEqual('statement');
-    expect(result.get('statement')).toEqual('sequence');
-    expect(result.getIn(['head', 'node'])).toEqual('statement');
-    expect(result.getIn(['head', 'statement'])).toEqual('skip');
-    expect(result.getIn(['tail', 'node'])).toEqual('statement');
-    expect(result.getIn(['tail', 'statement'])).toEqual('skip');
+  it('handles a single space between statements correctly', () => {
+    expect(parse('skip skip'))
+      .toEqual(
+        statements.sequence(
+          statements.skip(),
+          statements.skip()
+        )
+      );
+  });
+
+  it('handles multiple whitespace characters correctly', () => {
+    expect(parse('skip\n\t  skip'))
+      .toEqual(
+        statements.sequence(
+          statements.skip(),
+          statements.skip()
+        )
+      );
   });
 
   it('handles multiple nested sequences correctly', () => {
-    const result = parse('skip skip skip');
-    expect(result.get('node')).toEqual('statement');
-    expect(result.get('statement')).toEqual('sequence');
-    expect(result.getIn(['head', 'node'])).toEqual('statement');
-    expect(result.getIn(['head', 'statement'])).toEqual('skip');
-    expect(result.getIn(['tail', 'node'])).toEqual('statement');
-    expect(result.getIn(['tail', 'statement'])).toEqual('sequence');
-    expect(result.getIn(['tail', 'head', 'node'])).toEqual('statement');
-    expect(result.getIn(['tail', 'head', 'statement'])).toEqual('skip');
-    expect(result.getIn(['tail', 'tail', 'node'])).toEqual('statement');
-    expect(result.getIn(['tail', 'tail', 'statement'])).toEqual('skip');
+    expect(parse('skip skip skip'))
+      .toEqual(
+        statements.sequence(
+          statements.skip(),
+          statements.sequence(
+            statements.skip(),
+            statements.skip()
+          )
+        )
+      );
   });
 });
 

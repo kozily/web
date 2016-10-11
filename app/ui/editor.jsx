@@ -29,32 +29,32 @@ export default class Editor extends React.Component {
 
     this.editor.on('change', () => {
       const input = this.editor.getValue();
-      console.group(`Editor value ${input}`);
-      try {
-        const tree = parser(input);
-        console.log('Parse tree', tree ? tree.toJS() : null);
+      const tree = parser(input);
 
-        if (tree) {
+      if (tree) {
+        try {
           const kernel = kernelizer(tree);
-          console.log('Kernel', kernel.toJS());
-          let state = oz.build(kernel);
-          do {
-            console.log('Stepping through state', state.toJS());
-            state = oz.step(state);
-          } while (!oz.isFinal(state));
-
-          console.log('Final state', state.toJS());
+          const runtime = oz.build.fromKernelAST(kernel);
+          this.triggerSteps(kernel, oz.steps(runtime));
+        } catch (error) {
+          this.triggerSteps();
+          console.error(error);
         }
-      } catch (error) {
-        console.error(error);
-      } finally {
-        console.groupEnd();
+      } else {
+        this.triggerSteps();
       }
     });
 
     if (process.env.NODE_ENV !== 'production') {
       setTimeout(() => this.editor.refresh(), 1000);
     }
+  }
+
+  triggerSteps(kernel = {}, execution = []) {
+    this.props.onSteps({
+      kernel,
+      execution,
+    });
   }
 
   render() {
@@ -64,3 +64,6 @@ export default class Editor extends React.Component {
   }
 }
 
+Editor.propTypes = {
+  onSteps: React.PropTypes.func.isRequired,
+};

@@ -1,15 +1,9 @@
 import Immutable from 'immutable';
+import lexical from '../../samples/lexical';
 import { parserFor } from '../../../app/oz/parser';
 import lexicalGrammar from '../../../app/oz/grammar/lexical.nearley';
 
 const parse = parserFor(lexicalGrammar);
-
-function makeLexicalVariable(identifier) {
-  return Immutable.fromJS({
-    node: 'variable',
-    identifier,
-  });
-}
 
 describe('Parsing lexical variable elements', () => {
   beforeEach(() => {
@@ -17,13 +11,13 @@ describe('Parsing lexical variable elements', () => {
   });
 
   it('handles unquoted variables correctly', () => {
-    expect(parse('X')).toEqual(makeLexicalVariable('X'));
-    expect(parse('OneVariable')).toEqual(makeLexicalVariable('OneVariable'));
+    expect(parse('X')).toEqual(lexical.variable('X'));
+    expect(parse('OneVariable')).toEqual(lexical.variable('OneVariable'));
   });
 
   it('handles quoted variables correctly', () => {
-    expect(parse('`One Variable`')).toEqual(makeLexicalVariable('One Variable'));
-    expect(parse('`One\\\\Variable`')).toEqual(makeLexicalVariable('One\\Variable'));
+    expect(parse('`One Variable`')).toEqual(lexical.variable('One Variable'));
+    expect(parse('`One\\\\Variable`')).toEqual(lexical.variable('One\\Variable'));
   });
 });
 

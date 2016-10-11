@@ -1,19 +1,9 @@
 import Immutable from 'immutable';
+import lexical from '../../samples/lexical';
 import { parserFor } from '../../../app/oz/parser';
 import lexicalGrammar from '../../../app/oz/grammar/lexical.nearley';
 
 const parse = parserFor(lexicalGrammar);
-
-function makeLexicalAtom(name) {
-  return Immutable.fromJS({
-    node: 'value',
-    type: 'record',
-    value: {
-      label: name,
-      features: {},
-    },
-  });
-}
 
 describe('Parsing lexical atom elements', () => {
   beforeEach(() => {
@@ -21,27 +11,27 @@ describe('Parsing lexical atom elements', () => {
   });
 
   it('handles unquoted atoms correctly', () => {
-    expect(parse('a')).toEqual(makeLexicalAtom('a'));
-    expect(parse('foo')).toEqual(makeLexicalAtom('foo'));
-    expect(parse('a_person')).toEqual(makeLexicalAtom('a_person'));
-    expect(parse('donkeyKong3')).toEqual(makeLexicalAtom('donkeyKong3'));
+    expect(parse('a')).toEqual(lexical.atom('a'));
+    expect(parse('foo')).toEqual(lexical.atom('foo'));
+    expect(parse('a_person')).toEqual(lexical.atom('a_person'));
+    expect(parse('donkeyKong3')).toEqual(lexical.atom('donkeyKong3'));
   });
 
   it('handles quoted atoms correctly', () => {
-    expect(parse('\'=\'')).toEqual(makeLexicalAtom('='));
-    expect(parse('\':=\'')).toEqual(makeLexicalAtom(':='));
-    expect(parse('\'Oz 3.0\'')).toEqual(makeLexicalAtom('Oz 3.0'));
-    expect(parse('\'Hello World\'')).toEqual(makeLexicalAtom('Hello World'));
-    expect(parse('\'if\'')).toEqual(makeLexicalAtom('if'));
-    expect(parse('\'\n,\n \'')).toEqual(makeLexicalAtom('\n,\n '));
-    expect(parse('\'#### hello ####\'')).toEqual(makeLexicalAtom('#### hello ####'));
-    expect(parse('\'true\'')).toEqual(makeLexicalAtom('true'));
-    expect(parse('\'false\'')).toEqual(makeLexicalAtom('false'));
+    expect(parse('\'=\'')).toEqual(lexical.atom('='));
+    expect(parse('\':=\'')).toEqual(lexical.atom(':='));
+    expect(parse('\'Oz 3.0\'')).toEqual(lexical.atom('Oz 3.0'));
+    expect(parse('\'Hello World\'')).toEqual(lexical.atom('Hello World'));
+    expect(parse('\'if\'')).toEqual(lexical.atom('if'));
+    expect(parse('\'\n,\n \'')).toEqual(lexical.atom('\n,\n '));
+    expect(parse('\'#### hello ####\'')).toEqual(lexical.atom('#### hello ####'));
+    expect(parse('\'true\'')).toEqual(lexical.atom('true'));
+    expect(parse('\'false\'')).toEqual(lexical.atom('false'));
   });
 
   it('handles special keywords not atoms', () => {
-    expect(parse('unit')).not.toEqual(makeLexicalAtom('unit'));
-    expect(parse('andthen')).not.toEqual(makeLexicalAtom('andthen'));
+    expect(parse('unit')).not.toEqual(lexical.atom('unit'));
+    expect(parse('andthen')).not.toEqual(lexical.atom('andthen'));
   });
 });
 

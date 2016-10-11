@@ -1,60 +1,117 @@
 import Immutable from 'immutable';
+import reducerSkip from './reducers/skip';
+import reducerSequence from './reducers/sequence';
+import reducerLocal from './reducers/local';
 
 const reducers = {
-  skip(state) {
-    return state;
-  },
-
-  sequence(state, statement) {
-    return state.update('stack', stack => stack.push(
-      new Immutable.Map({
-        statement: statement.getIn(['statement', 'head']),
-        environment: statement.get('environment'),
-      }),
-      new Immutable.Map({
-        statement: statement.getIn(['statement', 'tail']),
-        environment: statement.get('environment'),
-      })
-    ));
-  },
+  skip: reducerSkip,
+  sequence: reducerSequence,
+  local: reducerLocal,
 };
 
-function reduce(state, statement) {
-  const nodeType = statement.getIn(['statement', 'node']);
-  if (nodeType !== 'statement') {
-    throw new Error(`Unable to execute statement ${nodeType}`);
+function validate(condition, message) {
+  if (!condition) {
+    throw new Error(message);
   }
+}
 
-  const statementType = statement.getIn(['statement', 'statement']);
-  const reducer = reducers[statementType];
+function validateSemanticStatement(semanticStatement) {
+  validate(
+    semanticStatement.getIn(['statement', 'node']) === 'statement',
+    'Semantic statement has non-executable node'
+  );
+  validate(
+    semanticStatement.getIn(['statement', 'type']) !== undefined,
+    'Semantic statement has undefined type'
+  );
+  return semanticStatement;
+}
 
-  if (!reducer) {
-    throw new Error(`Unable to find reducer for statement ${statementType}`);
-  }
-
-  return reducer(state, statement);
+function validateReducer(reducer) {
+  validate(
+    reducer !== undefined,
+    'Semantic statement has unrecognized type'
+  );
+  return reducer;
 }
 
 export default {
-  build(ast) {
-    return new Immutable.Map({
-      stack: new Immutable.Stack().push(new Immutable.Map({
-        statement: ast,
-        environment: new Immutable.Map(),
-      })),
-      store: new Immutable.Map(),
-    });
-  },
-
   isFinal(state) {
     return state.get('stack').isEmpty();
   },
 
   step(state) {
-    return reduce(
-      state.update('stack', stack => stack.pop()),
-      state.get('stack').peek()
-    );
+    try {
+      const semanticStatement = validateSemanticStatement(
+        state.get('stack').peek()
+      );
+      const reducer = validateReducer(
+        reducers[semanticStatement.getIn(['statement', 'type'])]
+      );
+      const reducibleState = state.update('stack', stack => stack.pop());
+
+      return reducer(reducibleState, semanticStatement);
+    } catch (error) {
+      throw new Error(`${error.message}: ${state.toString()}`);
+    }
+  },
+
+  steps(state, result = new Immutable.List()) {
+    const updatedResult = result.push(state);
+
+    if (this.isFinal(state)) {
+      return updatedResult;
+    }
+
+    return this.steps(this.step(state), updatedResult);
+  },
+
+  build: {
+    fromKernelAST(ast) {
+      return this.state(
+        this.stack(this.semanticStatement(ast))
+      );
+    },
+
+    state(stack = this.stack(), store = this.store()) {
+      return new Immutable.Map({
+        stack,
+        store,
+      });
+    },
+
+    store(...equivalenceClasses) {
+      return new Immutable.List(equivalenceClasses);
+    },
+
+    equivalenceClass(value, ...variables) {
+      return new Immutable.Map({
+        value,
+        variables: new Immutable.List(variables),
+      });
+    },
+
+    variable(name, sequence) {
+      return new Immutable.Map({
+        name,
+        sequence,
+      });
+    },
+
+    stack(...semanticStatements) {
+      return new Immutable.Stack(semanticStatements);
+    },
+
+    semanticStatement(statement, environment = this.environment()) {
+      return new Immutable.Map({
+        statement,
+        environment,
+      });
+    },
+
+    environment(contents = {}) {
+      return new Immutable.Map(contents);
+    },
   },
 };
 

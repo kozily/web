@@ -49,6 +49,10 @@ The commands are defined in the `package.json` file:
 * `dev/run npm test`: Runs the test suite for the project, linting your code
   before doing so.
 
+* `dev/run npm run test:watch`: Runs the test suite for the project, linting
+  your code before doing so, and keeps watching for changes on any files to
+rerun everything.
+
 * `dev/run npm run build`: Builds a bundle at the local `build` directory
   containing the whole application as a set of html, js and css files, ready to
   deploy to any static file server.
