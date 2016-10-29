@@ -1,13 +1,14 @@
 language: node_js
 node_js:
-  - "6"
-
+- '6'
 before_deploy:
-  - npm run build
-
+- npm run build
 deploy:
   provider: surge
   project: build
   domain: https://kozily.surge.sh
   skip_cleanup: true
   on: master
+notifications:
+  slack:
+    secure: lqIew5ODAmx8/Hwgh1UCjYsQmTTqIiYsUSMFCmrfwb4juDqPLOU8f8p8ZXD4gbm9vtIN2GUjHwSx6ecyyNtK3D6Kbz20bRFhvkrPYCS+6iuE+zXMPKtr+IIGf1qOc3C7IK0BJn4U+KzDFEGIzXE/uHU0hrMe+IOzbwCHUs4UGz268D6M1nV4zwF5eZEdvbGwPSZUh0qMrghxZGa/85Z/xk/fumLtlVEMNB4b8lsDhhET5VwRu6lRtEY0fCqUdX1qDQrU21DMw06vVYxO3nsqfeFbYgKDRFXVU3l9CVw9lGpgkqfgVbU9FmzZmDoAnBHhxIIHl9ydf3o2B84S9FUHFjvVApcXOrpbuGuNFZvUPcjdXOBO7eoJGwrwEFdOEVxIaVjy59sf1mmXyhv7gjmGITaEIbWB2PNnTadPu6wV+NqglXD5pWlBoYIhbaZ192+Bk/lIq31wM8wwoysWJ1GnaKtdUho82PqXf0nM/0r43oflnKBixVtGsEoOJAOLvGuj6vGoLGv7Qd0OCtAJ1aj9T4NIezXkckMt3Yh79sq+1fbOMDFalL1WbqzzC2hF8a2VR6nLkix4STdQa0xviwFI8Wr855zxLqJcegENE67UdyjnMO/IstINU0tTpRQvFDly0dmBseOb4Ffgz2c4Tz1XTU8FAMwqFN3r4lnWvM1dIhw=
