@@ -25,4 +25,13 @@ export default {
       statement,
     });
   },
+
+  binding(lhs, rhs) {
+    return new Immutable.Map({
+      node: 'statement',
+      type: 'binding',
+      lhs,
+      rhs,
+    });
+  },
 };

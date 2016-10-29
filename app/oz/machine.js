@@ -1,13 +1,5 @@
 import Immutable from 'immutable';
-import reducerSkip from './reducers/skip';
-import reducerSequence from './reducers/sequence';
-import reducerLocal from './reducers/local';
-
-const reducers = {
-  skip: reducerSkip,
-  sequence: reducerSequence,
-  local: reducerLocal,
-};
+import reducers from './reducers/index';
 
 function validate(condition, message) {
   if (!condition) {
