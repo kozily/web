@@ -1,3 +1,5 @@
+@builtin "whitespace.ne"
+
 ##############################################################################
 # LEXICAL SYNTAX
 ##############################################################################
@@ -9,6 +11,7 @@
 ##############################################################################
 lexical_index ->
     lexical_variable {% id %}
+  | lexical_record {% id %}
   | lexical_atom {% id %}
   | lexical_boolean {% id %}
   | lexical_string {% id %}
@@ -29,8 +32,12 @@ lexical_index ->
 %}
 
 lexical_variable ->
-    lexical_variable_unquoted {% lexicalVariable %}
-  | lexical_variable_quoted {% lexicalVariable %}
+    lexical_variable_syntax {% lexicalVariable %}
+
+lexical_variable_syntax ->
+    lexical_variable_unquoted {% id %}
+  | lexical_variable_quoted {% id %}
+
 
 lexical_variable_unquoted -> [A-Z] [A-Za-z0-9_]:* {%
   function(d) {
@@ -50,6 +57,27 @@ lexical_variable_quoted -> "`" ([^`\\] | lexical_lib_pseudo_char):* "`" {%
 @{%
   function lexicalRecord(label, features) {
     return { node: 'value', type: 'record', value: { label: label, features: features } };
+  }
+%}
+
+lexical_record -> lexical_atom_syntax "(" _ lexical_record_feature_list _ ")" {%
+  function(d, position, reject) {
+    var label = d[0];
+    var features = d[3].reduce(function(result, item) {
+      result[item.name] = item.value;
+      return result;
+    }, {});
+    return lexicalRecord(label, features);
+  }
+%}
+
+lexical_record_feature_list -> 
+    lexical_record_feature_list __ lexical_record_feature {% function(d) { return d[0].concat(d[2]); } %}
+  | lexical_record_feature
+
+lexical_record_feature -> lexical_atom_syntax ":" lexical_variable {%
+  function(d, position, reject) {
+    return {name: d[0][0], value: d[2]};
   }
 %}
 
@@ -73,8 +101,11 @@ lexical_variable_quoted -> "`" ([^`\\] | lexical_lib_pseudo_char):* "`" {%
 %}
 
 lexical_atom ->
-    lexical_atom_unquoted {% lexicalAtom %}
-  | lexical_atom_quoted {% lexicalAtom %}
+    lexical_atom_syntax {% lexicalAtom %}
+
+lexical_atom_syntax ->
+    lexical_atom_unquoted {% id %}
+  | lexical_atom_quoted {% id %}
 
 lexical_atom_unquoted -> [a-z] [a-zA-Z0-9_]:* {%
   function(d, location, reject) {
@@ -103,8 +134,11 @@ lexical_atom_quoted -> "'" ([^'\\] | lexical_lib_pseudo_char):* "'" {%
 %}
 
 lexical_boolean ->
-    lexical_true_literal {% lexicalBoolean %}
-  | lexical_false_literal {% lexicalBoolean %}
+    lexical_boolean_syntax {% lexicalBoolean %}
+
+lexical_boolean_syntax ->
+    lexical_true_literal {% id %}
+  | lexical_false_literal {% id %}
 
 lexical_true_literal -> "true" {%
   function (d) {
@@ -134,9 +168,12 @@ lexical_false_literal -> "false" {%
   }
 %}
 
-lexical_string -> "\"" ([^"\\] | lexical_lib_pseudo_char):* "\"" {%
+lexical_string ->
+    lexical_string_syntax {% lexicalString %}
+
+lexical_string_syntax -> "\"" ([^"\\] | lexical_lib_pseudo_char):* "\"" {%
   function(d) {
-    return lexicalString([d[1].join("")]);
+    return d[1].join("");
   }
 %}
 
