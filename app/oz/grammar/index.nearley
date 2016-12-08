@@ -18,10 +18,14 @@ sequence_statement ->
 statement ->
     skip_statement {% id %}
   | local_statement {% id %}
+  | binding_statement {% id %}
 
 skip_statement -> "skip" {%
   function (d) {
-    return { node: 'statement', type: 'skip' };
+    return {
+      node: 'statement',
+      type: 'skip'
+    };
   }
 %}
 
@@ -32,6 +36,17 @@ local_statement -> "local" __ lexical_variable __ "in" __ sequence_statement __ 
       type: 'local',
       variable: d[2],
       statement: d[6],
+    };
+  }
+%}
+
+binding_statement -> lexical_variable _ "=" _ lexical_variable {%
+  function(d, position, reject) {
+    return {
+      node: 'statement',
+      type: 'binding',
+      lhs: d[0],
+      rhs: d[4],
     };
   }
 %}

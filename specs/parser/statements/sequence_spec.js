@@ -2,7 +2,7 @@ import Immutable from 'immutable';
 import statements from '../../samples/statements';
 import parse from '../../../app/oz/parser';
 
-describe('Parsing statement of type sequence', () => {
+describe('Parsing sequence statements', () => {
   beforeEach(() => {
     jasmine.addCustomEqualityTester(Immutable.is);
   });
