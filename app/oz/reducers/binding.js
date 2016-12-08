@@ -24,8 +24,8 @@ const mergeEquivalenceClasses = (store, target, from) => {
   }
 
   return store
-    .delete(fromIndex)
-    .updateIn([targetIndex, 'variables'], pushVariablesFrom(from));
+    .updateIn([targetIndex, 'variables'], pushVariablesFrom(from))
+    .delete(fromIndex);
 };
 
 const isBound = equivalenceClass => (

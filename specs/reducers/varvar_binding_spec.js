@@ -122,5 +122,51 @@ describe('Reducing X=Y statements', () => {
       ),
     );
   });
+
+  it('reduces correctly when variables unbound and in reverse order', () => {
+    const state = machine.build.state(
+      machine.build.stack(
+        machine.build.semanticStatement(statements.skip()),
+      ),
+      machine.build.store(
+        machine.build.equivalenceClass(
+          undefined,
+          machine.build.variable('x', 0),
+          machine.build.variable('y', 0),
+        ),
+        machine.build.equivalenceClass(
+          undefined,
+          machine.build.variable('z', 0),
+        ),
+      ),
+    );
+
+    const statement = machine.build.semanticStatement(
+      statements.binding(
+        lexical.variable('Z'),
+        lexical.variable('X')
+      ),
+      machine.build.environment({
+        Z: machine.build.variable('z', 0),
+        X: machine.build.variable('y', 0),
+      }),
+    );
+
+    expect(reduce(state, statement)).toEqual(
+      machine.build.state(
+        machine.build.stack(
+          machine.build.semanticStatement(statements.skip()),
+        ),
+        machine.build.store(
+          machine.build.equivalenceClass(
+            undefined,
+            machine.build.variable('z', 0),
+            machine.build.variable('x', 0),
+            machine.build.variable('y', 0),
+          ),
+        ),
+      ),
+    );
+  });
 });
 
