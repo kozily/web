@@ -1,0 +1,14 @@
+version: '2'
+services:
+  dev:
+    image: kozily/web
+    build: .
+    command: npm start
+    volumes:
+      - "./app:/opt/project/app"
+      - "./config:/opt/project/config"
+      - "./package.json:/opt/project/package.json"
+      - "./specs:/opt/project/specs"
+    ports:
+      - "8080:8080"
+
