@@ -54,16 +54,14 @@
     "react": "^15.3.1",
     "react-dom": "^15.3.1",
     "react-hot-loader": "^3.0.0-beta.3",
-    "react-json-tree": "^0.10.0",
-    "react-router": "^2.8.0",
-    "rx": "^4.1.0"
+    "react-json-tree": "^0.10.0"
   },
   "scripts": {
     "start": "webpack-dev-server --config config/webpack.dev.js --hot --inline --host 0.0.0.0 --port 8080",
     "pretest": "eslint 'app/*.js' 'app/*.jsx' 'app/**/*.js' 'app/**/*.jsx'",
     "test": "karma start config/karma.js --single-run",
     "test:watch": "karma start config/karma.js --no-single-run",
-    "build": "rm -rf build && NODE_ENV=production webpack --config config/webpack.prod.js --progress -p"
+    "build": "rm -rf ./build/* && NODE_ENV=production webpack --config config/webpack.prod.js --progress -p"
   },
   "eslintConfig": {
     "extends": [

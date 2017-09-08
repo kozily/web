@@ -57,6 +57,7 @@ module.exports = {
   plugins: [
     new HtmlPlugin({
       template: './app/index.html',
+      filename: 'index.html'
     }),
 
     new HtmlPlugin({

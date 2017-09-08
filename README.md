@@ -27,35 +27,8 @@ basics of program execution.
 
 ## Development
 
-TL;DR: Install docker and run `dev/run npm start` to get the application
-running in development mode at your local port 8080.
-
-This project is a SPA built with [webpack](http://webpack.github.io/), running
-on [nodejs](https://nodejs.org/en/). However, we use
-[docker](https://www.docker.com/) to manage our development and production
-enviroments, so docker is the only dependency you really need setup in your
-system.
-
-Once you have docker installed, we provide a helper script in the project,
-`dev/run`, which executes commands inside the docker instance, handling image
-downloading and setup. This means that you only need to prepend `dev/run` to
-any development environment commands.
-
-The commands are defined in the `package.json` file:
-
-* `dev/run npm start`: Starts a development server at the local port 8080,
-  setup to autoreload if you change files and lint your code on each save..
-
-* `dev/run npm test`: Runs the test suite for the project, linting your code
-  before doing so.
-
-* `dev/run npm run test:watch`: Runs the test suite for the project, linting
-  your code before doing so, and keeps watching for changes on any files to
-rerun everything.
-
-* `dev/run npm run build`: Builds a bundle at the local `build` directory
-  containing the whole application as a set of html, js and css files, ready to
-  deploy to any static file server.
+Install docker, docker-compose and run `docker-compose up` to get the
+application running in development mode at your local port 8080.
 
 ## License
 

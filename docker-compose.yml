@@ -1,9 +1,10 @@
 version: '2'
 services:
-  dev:
+  npm:
     image: kozily/web
     build: .
-    command: npm start
+    entrypoint: npm
+    command: start
     volumes:
       - "./app:/opt/project/app"
       - "./config:/opt/project/config"
@@ -11,4 +12,3 @@ services:
       - "./specs:/opt/project/specs"
     ports:
       - "8080:8080"
-
