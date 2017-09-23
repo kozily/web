@@ -43,10 +43,6 @@ export default class Editor extends React.Component {
         this.triggerSteps();
       }
     });
-
-    if (process.env.NODE_ENV !== 'production') {
-      setTimeout(() => this.editor.refresh(), 1000);
-    }
   }
 
   clearSteps() {

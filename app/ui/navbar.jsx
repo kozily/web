@@ -2,7 +2,7 @@ import React from 'react';
 import { default as Icon, IconStack } from './icons';
 import './navbar.sass';
 
-export default function () {
+export const NavBar = () => {
   return (
     <nav className="navbar navbar-default navbar-fixed-top">
       <div className="container-fluid">
@@ -19,3 +19,5 @@ export default function () {
     </nav>
   );
 }
+
+export default NavBar;

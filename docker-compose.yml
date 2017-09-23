@@ -7,10 +7,15 @@ services:
     command: start
     tty: true
     volumes:
+      # Source code
       - "./app:/opt/project/app"
       - "./config:/opt/project/config"
       - "./specs:/opt/project/specs"
+      # Package config
       - "./package.json:/opt/project/package.json"
+      # Linter and compiler config
       - "./.flowconfig:/opt/project/.flowconfig"
+      - "./.eslintrc.js:/opt/project/.eslintrc.js"
+      - "./.babelrc:/opt/project/.babelrc"
     ports:
       - "8080:8080"
