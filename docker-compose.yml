@@ -5,10 +5,12 @@ services:
     build: .
     entrypoint: npm
     command: start
+    tty: true
     volumes:
       - "./app:/opt/project/app"
       - "./config:/opt/project/config"
-      - "./package.json:/opt/project/package.json"
       - "./specs:/opt/project/specs"
+      - "./package.json:/opt/project/package.json"
+      - "./.flowconfig:/opt/project/.flowconfig"
     ports:
       - "8080:8080"

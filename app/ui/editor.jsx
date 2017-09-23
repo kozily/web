@@ -37,8 +37,7 @@ export default class Editor extends React.Component {
           const runtime = oz.build.fromKernelAST(kernel);
           this.triggerSteps(kernel, oz.steps(runtime));
         } catch (error) {
-          this.triggerSteps();
-          console.error(error);
+          this.clearSteps();
         }
       } else {
         this.triggerSteps();
@@ -48,6 +47,10 @@ export default class Editor extends React.Component {
     if (process.env.NODE_ENV !== 'production') {
       setTimeout(() => this.editor.refresh(), 1000);
     }
+  }
+
+  clearSteps() {
+    this.props.onSteps({ kernel: {}, execution: [] });
   }
 
   triggerSteps(kernel = {}, execution = []) {

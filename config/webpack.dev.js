@@ -11,7 +11,6 @@ module.exports = {
 
   resolve: {
     extensions: [
-      '',
       '.js',
       '.jsx'
     ],
@@ -19,36 +18,6 @@ module.exports = {
 
   output: {
     publicPath: 'http://localhost:8080/',
-  },
-
-  module: {
-    loaders: [
-      {
-        test: /\.jsx?$/,
-        exclude: /node_modules/,
-        loader: 'babel!eslint',
-      },
-
-      {
-        test: /\.nearley$/,
-        loader: 'nearley',
-      },
-
-      {
-        test: /\.(sass|scss)$/,
-        loader: 'style!css?sourceMap!sass?sourceMap',
-      },
-
-      {
-        test: /\.css$/,
-        loader: 'style!css?sourceMap',
-      },
-
-      {
-        test: /\.(ttf|eot|svg|woff|woff2)/,
-        loader: 'file',
-      }
-    ]
   },
 
   devtool: 'cheap-module-eval-source-map',
@@ -62,5 +31,66 @@ module.exports = {
       {from: './app/favicons', to: './'},
     ]),
   ],
+
+  module: {
+    rules: [
+      {
+        test: /\.jsx?$/,
+        exclude: /node_modules/,
+        use: [
+          'babel-loader',
+          {
+            loader: 'eslint-loader',
+            options: {
+              failOnWarning: true,
+              failOnError: true,
+            },
+          },
+        ],
+      },
+      {
+        test: /\.nearley$/,
+        use: [
+          'nearley-loader',
+        ],
+      },
+      {
+        test: /\.(sass|scss)$/,
+        use: [
+          'style-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              sourceMap: true,
+            },
+          },
+          {
+            loader: 'sass-loader',
+            options: {
+              sourceMap: true,
+            },
+          },
+        ],
+      },
+      {
+        test: /\.css$/,
+        use: [
+          'style-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              sourceMap: true,
+            },
+          },
+        ],
+      },
+      {
+        test: /\.(ttf|eot|svg|woff|woff2)/,
+        use: [
+          'file-loader',
+        ],
+      },
+    ],
+  },
 };
 
