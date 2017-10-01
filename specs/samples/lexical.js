@@ -35,6 +35,16 @@ export default {
     return this.tuple('|', head, tail);
   },
 
+  complexList(array) {
+    while (array.length > 0) {
+      if (array.length === 1) {
+        return this.list(this.variable(array.shift()), this.nil());
+      }
+      return this.list(this.variable(array.shift()), this.complexList(array));
+    }
+    return null; // to avoid linetern error
+  },
+
   string(value) {
     if (value === '') {
       return this.nil();

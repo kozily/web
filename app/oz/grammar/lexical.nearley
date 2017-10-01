@@ -18,6 +18,7 @@ lexical_index ->
   | lexical_char {% id %}
   | lexical_integer {% id %}
   | lexical_float {% id %}
+  | lexical_list {% id %}
 
 ##############################################################################
 # Variable identifiers
@@ -283,6 +284,53 @@ lexical_float -> "~":? [0-9]:+ "." [0-9]:* (("e" | "E") "~":? [0-9]:+):? {%
     )]);
   }
 %}
+
+##############################################################################
+# List
+##############################################################################
+
+lexical_list ->
+    empty_list {% id %}
+  | particular_list {% id %}
+
+particular_list -> "[" _ list_items _ "]" {%
+  function(d) {
+    var currentBlock = JSON.stringify(d[2]);
+    var nil = JSON.stringify(lexicalRecord("nil", {}));
+    var hasNil = currentBlock.indexOf(nil) > 0;
+
+    if (hasNil) {
+      return d[2];
+    } else {
+      return lexicalRecord('|', {1: d[2], 2:lexicalRecord("nil", {})});
+    }
+  }
+%}
+
+empty_list -> "[" _ "]" {%
+  function(d) {
+    return lexicalRecord("nil", {});
+  }
+%}
+
+list_items ->
+    lexical_variable {% id %}
+  | lexical_variable __ list_items {%
+      function(d) {
+        //busco condicion de corte
+        var currentBlock = JSON.stringify(d[2]);
+        var nil = JSON.stringify(lexicalRecord("nil", {}));
+        var hasNil = currentBlock.indexOf(nil) > 0;
+
+        if (!hasNil) {
+          //el ultimo elemento deberia pasar para agregar el nil
+          return lexicalRecord('|', {1:d[0], 2:lexicalRecord('|', {1: d[2], 2:lexicalRecord("nil", {})})});
+        } else {
+          //el resto no
+          return lexicalRecord('|', {1:d[0], 2: d[2]});
+        }
+      }
+    %}
 
 ##############################################################################
 # Library of helpful terminals and functions
