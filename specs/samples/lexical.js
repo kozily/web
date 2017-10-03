@@ -35,6 +35,13 @@ export default {
     return this.tuple('|', head, tail);
   },
 
+  complexList(array) {
+    return array.reduceRight(
+      (result, item) => this.list(this.variable(item), result),
+      this.nil()
+    );
+  },
+
   string(value) {
     if (value === '') {
       return this.nil();

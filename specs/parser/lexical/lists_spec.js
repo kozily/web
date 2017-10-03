@@ -1,6 +1,7 @@
 import Immutable from 'immutable';
 import { parserFor } from '../../../app/oz/parser';
 import lexicalGrammar from '../../../app/oz/grammar/lexical.nearley';
+import lexical from '../../samples/lexical';
 
 const parse = parserFor(lexicalGrammar);
 
@@ -9,28 +10,24 @@ describe('Parsing lists', () => {
     jasmine.addCustomEqualityTester(Immutable.is);
   });
 
-  xit('handles empty lists correctly', () => {
-    expect(parse('nil')).toBeLiteralLists('nil');
+  it('handles lists correctly', () => {
+    expect(parse('[]')).toEqual(lexical.nil());
+    expect(parse('[ ]')).toEqual(lexical.nil());
   });
 
-  xit('handles lists correctly', () => {
-    expect(parse('´|´(H T)')).toBeLiteralLists('´|´(H T)');
+  it('handles lists with one element', () => {
+    expect(parse('[X]')).toEqual(lexical.complexList(['X']));
+    expect(parse('[ X ]')).toEqual(lexical.complexList(['X']));
   });
 
-  xit('handles lists with more than 1 element correctly', () => {
-    expect(parse('´|´(H ´|´(M N))')).toBeLiteralLists('´|´(H ´|´(M N))');
+  it('handles lists with more than 1 element correctly', () => {
+    const aux = lexical.complexList(['X', 'Y', 'Z']);
+    expect(parse('[X Y Z]')).toEqual(aux);
+    expect(parse('[X   Y Z]')).toEqual(aux);
+    expect(parse('[X Y Z A]')).toEqual(lexical.complexList(['X', 'Y', 'Z', 'A']));
   });
 
-  xit('handles syntactic sugar ´|´ label can be written as an infix operator', () => {
-    expect(parse('H|T')).toBeLiteralLists('´|´(H T)');
-  });
-
-  xit('handles syntactic sugar ´|´ operator associates to the right', () => {
-    expect(parse('1|2|3|nil')).toBeLiteralLists('´|´(1 ´|´(2 ´|´(3 nil)))');
-    expect(parse('1|(2|(3|nil))')).toBeLiteralLists('´|´(1 ´|´(2 ´|´(3 nil)))');
-  });
-
-  xit('handles syntactic sugar complete lists, when ends in nil can be written with brackets', () => {
-    expect(parse('[1 2 3]')).toBeLiteralLists('´|´(1 ´|´(2 ´|´(3 nil)))');
+  it('handles lists with more than 1 same element correctly', () => {
+    expect(parse('[X A Y Z Z A]')).toEqual(lexical.complexList(['X', 'A', 'Y', 'Z', 'Z', 'A']));
   });
 });

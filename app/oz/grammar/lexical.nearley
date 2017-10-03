@@ -18,6 +18,7 @@ lexical_index ->
   | lexical_char {% id %}
   | lexical_integer {% id %}
   | lexical_float {% id %}
+  | lexical_list {% id %}
 
 ##############################################################################
 # Variable identifiers
@@ -283,6 +284,39 @@ lexical_float -> "~":? [0-9]:+ "." [0-9]:* (("e" | "E") "~":? [0-9]:+):? {%
     )]);
   }
 %}
+
+##############################################################################
+# List
+##############################################################################
+
+lexical_list ->
+    empty_list {% id %}
+  | normal_list {% id %}
+
+normal_list -> "[" _ list_items _ "]" {%
+  function(d) {
+    return d[2].reduce(
+      function(a, b) {
+        return lexicalRecord('|', {1: b, 2:a}); 
+      }, 
+      lexicalRecord("nil", {})
+    );
+  }
+%}
+
+empty_list -> "[" _ "]" {%
+  function(d) {
+    return lexicalRecord("nil", {});
+  }
+%}
+
+list_items ->
+    lexical_variable
+  | lexical_variable __ list_items {%
+      function(d) {
+        return d[2].concat(d[0]);
+      }
+    %}
 
 ##############################################################################
 # Library of helpful terminals and functions
