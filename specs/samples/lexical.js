@@ -36,13 +36,10 @@ export default {
   },
 
   complexList(array) {
-    while (array.length > 0) {
-      if (array.length === 1) {
-        return this.list(this.variable(array.shift()), this.nil());
-      }
-      return this.list(this.variable(array.shift()), this.complexList(array));
-    }
-    return null; // to avoid linetern error
+    return array.reduceRight(
+      (result, item) => this.list(this.variable(item), result),
+      this.nil()
+    );
   },
 
   string(value) {

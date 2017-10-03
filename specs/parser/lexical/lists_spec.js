@@ -1,3 +1,4 @@
+import Immutable from 'immutable';
 import { parserFor } from '../../../app/oz/parser';
 import lexicalGrammar from '../../../app/oz/grammar/lexical.nearley';
 import lexical from '../../samples/lexical';
@@ -5,8 +6,8 @@ import lexical from '../../samples/lexical';
 const parse = parserFor(lexicalGrammar);
 
 describe('Parsing lists', () => {
-  it('handles empty lists correctly', () => {
-    expect(parse('nil')).toEqual(lexical.nil());
+  beforeEach(() => {
+    jasmine.addCustomEqualityTester(Immutable.is);
   });
 
   it('handles lists correctly', () => {
