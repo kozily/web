@@ -1,3 +1,3 @@
-export default function (ast) {
+export default function(ast) {
   return ast;
 }

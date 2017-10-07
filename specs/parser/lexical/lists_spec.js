@@ -5,7 +5,7 @@ import lexical from '../../samples/lexical';
 
 const parse = parserFor(lexicalGrammar);
 
-describe('Parsing lists', () => {
+describe("Parsing lists", () => {
   beforeEach(() => {
     jasmine.addCustomEqualityTester(Immutable.is);
   });

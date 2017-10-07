@@ -1,5 +1,5 @@
-import Immutable from 'immutable';
-import reducers from './reducers/index';
+import Immutable from "immutable";
+import reducers from "./reducers/index";
 
 function validate(condition, message) {
   if (!condition) {
@@ -9,38 +9,35 @@ function validate(condition, message) {
 
 function validateSemanticStatement(semanticStatement) {
   validate(
-    semanticStatement.getIn(['statement', 'node']) === 'statement',
-    'Semantic statement has non-executable node'
+    semanticStatement.getIn(["statement", "node"]) === "statement",
+    "Semantic statement has non-executable node",
   );
   validate(
-    semanticStatement.getIn(['statement', 'type']) !== undefined,
-    'Semantic statement has undefined type'
+    semanticStatement.getIn(["statement", "type"]) !== undefined,
+    "Semantic statement has undefined type",
   );
   return semanticStatement;
 }
 
 function validateReducer(reducer) {
-  validate(
-    reducer !== undefined,
-    'Semantic statement has unrecognized type'
-  );
+  validate(reducer !== undefined, "Semantic statement has unrecognized type");
   return reducer;
 }
 
 export default {
   isFinal(state) {
-    return state.get('stack').isEmpty();
+    return state.get("stack").isEmpty();
   },
 
   step(state) {
     try {
       const semanticStatement = validateSemanticStatement(
-        state.get('stack').peek()
+        state.get("stack").peek(),
       );
       const reducer = validateReducer(
-        reducers[semanticStatement.getIn(['statement', 'type'])]
+        reducers[semanticStatement.getIn(["statement", "type"])],
       );
-      const reducibleState = state.update('stack', stack => stack.pop());
+      const reducibleState = state.update("stack", stack => stack.pop());
 
       return reducer(reducibleState, semanticStatement);
     } catch (error) {
@@ -60,9 +57,7 @@ export default {
 
   build: {
     fromKernelAST(ast) {
-      return this.state(
-        this.stack(this.semanticStatement(ast))
-      );
+      return this.state(this.stack(this.semanticStatement(ast)));
     },
 
     state(stack = this.stack(), store = this.store()) {
@@ -106,4 +101,3 @@ export default {
     },
   },
 };
-

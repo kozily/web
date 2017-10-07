@@ -15,23 +15,32 @@ module.exports = (config) => {
 
       resolve: {
         extensions: [
-          '',
           '.js',
           '.jsx',
         ],
       },
 
       module: {
-        loaders: [
+        rules: [
           {
             test: /\.jsx?$/,
             exclude: /node_modules/,
-            loader: 'babel!eslint',
+            use: [
+              'babel-loader',
+              {
+                loader: 'eslint-loader',
+                options: {
+                  failOnWarning: true,
+                  failOnError: true,
+                },
+              },
+            ],
           },
-
           {
             test: /\.nearley$/,
-            loader: 'nearley',
+            use: [
+              'nearley-loader',
+            ],
           },
         ],
       },

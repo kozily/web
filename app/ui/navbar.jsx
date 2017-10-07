@@ -1,6 +1,6 @@
-import React from 'react';
-import { default as Icon, IconStack } from './icons';
-import './navbar.sass';
+import React from "react";
+import { default as Icon, IconStack } from "./icons";
+import "./navbar.sass";
 
 export const NavBar = () => {
   return (
@@ -18,6 +18,6 @@ export const NavBar = () => {
       </div>
     </nav>
   );
-}
+};
 
 export default NavBar;

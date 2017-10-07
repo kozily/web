@@ -2,6 +2,7 @@ module.exports = {
   extends: [
     "eslint:recommended",
     "plugin:react/recommended",
+    "prettier",
   ],
   env: {
     browser: true,
@@ -17,8 +18,10 @@ module.exports = {
   },
   rules: {
     "react/prop-types": "off",
+    "prettier/prettier": "error",
   },
   "plugins": [
     "react",
-  ]
+    "prettier",
+  ],
 };

@@ -16,6 +16,7 @@ services:
       # Linter and compiler config
       - "./.flowconfig:/opt/project/.flowconfig"
       - "./.eslintrc.js:/opt/project/.eslintrc.js"
+      - "./.prettierrc:/opt/project/.prettierrc"
       - "./.babelrc:/opt/project/.babelrc"
     ports:
       - "8080:8080"

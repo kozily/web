@@ -1,7 +1,7 @@
-import React from 'react';
-import NavBar from './navbar';
-import Ide from './ide';
-import './application.sass';
+import React from "react";
+import NavBar from "./navbar";
+import Ide from "./ide";
+import "./application.sass";
 
 export const Application = () => {
   return (
@@ -13,4 +13,3 @@ export const Application = () => {
 };
 
 export default Application;
-
