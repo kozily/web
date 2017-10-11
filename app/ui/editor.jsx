@@ -3,10 +3,6 @@ import CodeMirror from "codemirror";
 import "codemirror/mode/oz/oz";
 import "codemirror/lib/codemirror.css";
 import "codemirror/theme/base16-light.css";
-import "codemirror/addon/dialog/dialog";
-import "codemirror/addon/dialog/dialog.css";
-import "codemirror/addon/search/search";
-import "codemirror/addon/search/jump-to-line";
 import "codemirror/addon/selection/active-line";
 import parser from "../oz/parser";
 import kernelizer from "../oz/kernelizer";
@@ -44,6 +40,8 @@ export default class Editor extends React.Component {
         this.triggerSteps();
       }
     });
+
+    setTimeout(() => this.editor.refresh(), 1000);
   }
 
   clearSteps() {
