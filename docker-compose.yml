@@ -14,7 +14,6 @@ services:
       # Package config
       - "./package.json:/opt/project/package.json"
       # Linter and compiler config
-      - "./.flowconfig:/opt/project/.flowconfig"
       - "./.eslintrc.js:/opt/project/.eslintrc.js"
       - "./.prettierrc:/opt/project/.prettierrc"
       - "./.babelrc:/opt/project/.babelrc"
