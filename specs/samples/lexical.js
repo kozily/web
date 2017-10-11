@@ -38,7 +38,7 @@ export default {
   complexList(array) {
     return array.reduceRight(
       (result, item) => this.list(this.variable(item), result),
-      this.nil()
+      this.nil(),
     );
   },
 
