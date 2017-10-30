@@ -1,6 +1,6 @@
 import Immutable from "immutable";
-import statements from "../samples/statements";
-import lexical from "../samples/lexical";
+import { skipStatement, bindingStatement } from "../samples/statements";
+import { lexicalVariable } from "../samples/lexical";
 import {
   buildState,
   buildStack,
@@ -19,7 +19,7 @@ describe("Reducing X=Y statements", () => {
 
   it("reduces correctly when variables unbound and in different equivalence sets", () => {
     const state = buildState(
-      buildStack(buildSemanticStatement(statements.skip())),
+      buildStack(buildSemanticStatement(skipStatement())),
       buildStore(
         buildEquivalenceClass(
           undefined,
@@ -40,7 +40,7 @@ describe("Reducing X=Y statements", () => {
     );
 
     const statement = buildSemanticStatement(
-      statements.binding(lexical.variable("X"), lexical.variable("Y")),
+      bindingStatement(lexicalVariable("X"), lexicalVariable("Y")),
       buildEnvironment({
         X: buildVariable("x", 0),
         Y: buildVariable("y", 0),
@@ -49,7 +49,7 @@ describe("Reducing X=Y statements", () => {
 
     expect(reduce(state, statement)).toEqual(
       buildState(
-        buildStack(buildSemanticStatement(statements.skip())),
+        buildStack(buildSemanticStatement(skipStatement())),
         buildStore(
           buildEquivalenceClass(
             undefined,
@@ -70,7 +70,7 @@ describe("Reducing X=Y statements", () => {
 
   it("reduces correctly when variables unbound and in the same equivalence sets", () => {
     const state = buildState(
-      buildStack(buildSemanticStatement(statements.skip())),
+      buildStack(buildSemanticStatement(skipStatement())),
       buildStore(
         buildEquivalenceClass(
           undefined,
@@ -88,7 +88,7 @@ describe("Reducing X=Y statements", () => {
     );
 
     const statement = buildSemanticStatement(
-      statements.binding(lexical.variable("X"), lexical.variable("Y")),
+      bindingStatement(lexicalVariable("X"), lexicalVariable("Y")),
       buildEnvironment({
         X: buildVariable("x", 0),
         Y: buildVariable("y", 0),
@@ -97,7 +97,7 @@ describe("Reducing X=Y statements", () => {
 
     expect(reduce(state, statement)).toEqual(
       buildState(
-        buildStack(buildSemanticStatement(statements.skip())),
+        buildStack(buildSemanticStatement(skipStatement())),
         buildStore(
           buildEquivalenceClass(
             undefined,
@@ -118,7 +118,7 @@ describe("Reducing X=Y statements", () => {
 
   it("reduces correctly when variables unbound and in reverse order", () => {
     const state = buildState(
-      buildStack(buildSemanticStatement(statements.skip())),
+      buildStack(buildSemanticStatement(skipStatement())),
       buildStore(
         buildEquivalenceClass(
           undefined,
@@ -130,7 +130,7 @@ describe("Reducing X=Y statements", () => {
     );
 
     const statement = buildSemanticStatement(
-      statements.binding(lexical.variable("Z"), lexical.variable("X")),
+      bindingStatement(lexicalVariable("Z"), lexicalVariable("X")),
       buildEnvironment({
         Z: buildVariable("z", 0),
         X: buildVariable("y", 0),
@@ -139,7 +139,7 @@ describe("Reducing X=Y statements", () => {
 
     expect(reduce(state, statement)).toEqual(
       buildState(
-        buildStack(buildSemanticStatement(statements.skip())),
+        buildStack(buildSemanticStatement(skipStatement())),
         buildStore(
           buildEquivalenceClass(
             undefined,

@@ -1,5 +1,5 @@
 import Immutable from "immutable";
-import lexical from "../../samples/lexical";
+import { lexicalBoolean } from "../../samples/lexical";
 import { parserFor } from "../../../app/oz/parser";
 import lexicalGrammar from "../../../app/oz/grammar/lexical.nearley";
 
@@ -11,10 +11,10 @@ describe("Parsing lexical boolean elements", () => {
   });
 
   it("handles true correctly", () => {
-    expect(parse("true")).toEqual(lexical.boolean(true));
+    expect(parse("true")).toEqual(lexicalBoolean(true));
   });
 
   it("handles false correctly", () => {
-    expect(parse("false")).toEqual(lexical.boolean(false));
+    expect(parse("false")).toEqual(lexicalBoolean(false));
   });
 });

@@ -1,5 +1,5 @@
 import Immutable from "immutable";
-import lexical from "../../samples/lexical";
+import { lexicalNumber } from "../../samples/lexical";
 import { parserFor } from "../../../app/oz/parser";
 import lexicalGrammar from "../../../app/oz/grammar/lexical.nearley";
 
@@ -11,37 +11,37 @@ describe("Parsing lexical char elements", () => {
   });
 
   it("handles numeric characters correclty", () => {
-    expect(parse("40")).toEqual(lexical.number(40));
-    expect(parse("255")).toEqual(lexical.number(255));
+    expect(parse("40")).toEqual(lexicalNumber(40));
+    expect(parse("255")).toEqual(lexicalNumber(255));
   });
 
   it("handles explicit characters correctly", () => {
-    expect(parse("&a")).toEqual(lexical.number("a".charCodeAt(0)));
-    expect(parse("& ")).toEqual(lexical.number(" ".charCodeAt(0)));
+    expect(parse("&a")).toEqual(lexicalNumber("a".charCodeAt(0)));
+    expect(parse("& ")).toEqual(lexicalNumber(" ".charCodeAt(0)));
   });
 
   it("handles octal characters correctly", () => {
-    expect(parse("&\\101")).toEqual(lexical.number(65));
+    expect(parse("&\\101")).toEqual(lexicalNumber(65));
   });
 
   it("handles hexal characters correctly", () => {
-    expect(parse("&\\xff")).toEqual(lexical.number(255));
-    expect(parse("&\\X0A")).toEqual(lexical.number(10));
-    expect(parse("&\\XfA")).toEqual(lexical.number(250));
+    expect(parse("&\\xff")).toEqual(lexicalNumber(255));
+    expect(parse("&\\X0A")).toEqual(lexicalNumber(10));
+    expect(parse("&\\XfA")).toEqual(lexicalNumber(250));
   });
 
   it("handles escaped character correctly", () => {
-    expect(parse("&\\a")).toEqual(lexical.number(7));
-    expect(parse("&\\b")).toEqual(lexical.number(8));
-    expect(parse("&\\f")).toEqual(lexical.number(12));
-    expect(parse("&\\n")).toEqual(lexical.number(10));
-    expect(parse("&\\r")).toEqual(lexical.number(13));
-    expect(parse("&\\t")).toEqual(lexical.number(9));
-    expect(parse("&\\v")).toEqual(lexical.number(11));
-    expect(parse("&\\\\")).toEqual(lexical.number(92));
-    expect(parse("&\\'")).toEqual(lexical.number(39));
-    expect(parse('&\\"')).toEqual(lexical.number(34));
-    expect(parse("&\\`")).toEqual(lexical.number(96));
-    expect(parse("&\\&")).toEqual(lexical.number(38));
+    expect(parse("&\\a")).toEqual(lexicalNumber(7));
+    expect(parse("&\\b")).toEqual(lexicalNumber(8));
+    expect(parse("&\\f")).toEqual(lexicalNumber(12));
+    expect(parse("&\\n")).toEqual(lexicalNumber(10));
+    expect(parse("&\\r")).toEqual(lexicalNumber(13));
+    expect(parse("&\\t")).toEqual(lexicalNumber(9));
+    expect(parse("&\\v")).toEqual(lexicalNumber(11));
+    expect(parse("&\\\\")).toEqual(lexicalNumber(92));
+    expect(parse("&\\'")).toEqual(lexicalNumber(39));
+    expect(parse('&\\"')).toEqual(lexicalNumber(34));
+    expect(parse("&\\`")).toEqual(lexicalNumber(96));
+    expect(parse("&\\&")).toEqual(lexicalNumber(38));
   });
 });

@@ -1,5 +1,5 @@
 import Immutable from "immutable";
-import statements from "../samples/statements";
+import { sequenceStatement, skipStatement } from "../samples/statements";
 import {
   buildState,
   buildStack,
@@ -14,18 +14,18 @@ describe("Reducing sequence statements", () => {
 
   it("reduces correctly", () => {
     const state = buildState(
-      buildStack(buildSemanticStatement(statements.skip())),
+      buildStack(buildSemanticStatement(skipStatement())),
     );
     const statement = buildSemanticStatement(
-      statements.sequence(statements.skip(), statements.skip()),
+      sequenceStatement(skipStatement(), skipStatement()),
     );
 
     expect(reduce(state, statement)).toEqual(
       buildState(
         buildStack(
-          buildSemanticStatement(statements.skip()),
-          buildSemanticStatement(statements.skip()),
-          buildSemanticStatement(statements.skip()),
+          buildSemanticStatement(skipStatement()),
+          buildSemanticStatement(skipStatement()),
+          buildSemanticStatement(skipStatement()),
         ),
       ),
     );

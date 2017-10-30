@@ -28,6 +28,7 @@ export default function(state, semanticStatement) {
   const [target, source] = isEquivalenceClassBound(second)
     ? [second, first]
     : [first, second];
+
   return state.update("store", store =>
     mergeEquivalenceClasses(store, target, source),
   );

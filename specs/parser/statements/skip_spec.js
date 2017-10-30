@@ -1,5 +1,5 @@
 import Immutable from "immutable";
-import statements from "../../samples/statements";
+import { skipStatement } from "../../samples/statements";
 import parse from "../../../app/oz/parser";
 
 describe("Parsing skip statements", () => {
@@ -8,6 +8,6 @@ describe("Parsing skip statements", () => {
   });
 
   it("handles it correctly", () => {
-    expect(parse("skip")).toEqual(statements.skip());
+    expect(parse("skip")).toEqual(skipStatement());
   });
 });

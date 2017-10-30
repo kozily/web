@@ -1,5 +1,5 @@
 import Immutable from "immutable";
-import lexical from "../../samples/lexical";
+import { lexicalString } from "../../samples/lexical";
 import { parserFor } from "../../../app/oz/parser";
 import lexicalGrammar from "../../../app/oz/grammar/lexical.nearley";
 
@@ -11,6 +11,6 @@ describe("Parsing lexical string elements", () => {
   });
 
   it("handles parsing correctly", () => {
-    expect(parse('"a \\\\\\nSTRING"')).toEqual(lexical.string("a \\\nSTRING"));
+    expect(parse('"a \\\\\\nSTRING"')).toEqual(lexicalString("a \\\nSTRING"));
   });
 });
