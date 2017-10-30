@@ -1,16 +1,15 @@
-import Immutable from "immutable";
+import { buildSemanticStatement } from "../machine/build";
 
 export default function(state, semanticStatement) {
+  const statement = semanticStatement.get("statement");
+  const environment = semanticStatement.get("environment");
+  const head = statement.get("head");
+  const tail = statement.get("tail");
+
   return state.update("stack", stack =>
     stack.push(
-      new Immutable.Map({
-        statement: semanticStatement.getIn(["statement", "head"]),
-        environment: semanticStatement.get("environment"),
-      }),
-      new Immutable.Map({
-        statement: semanticStatement.getIn(["statement", "tail"]),
-        environment: semanticStatement.get("environment"),
-      }),
+      buildSemanticStatement(head, environment),
+      buildSemanticStatement(tail, environment),
     ),
   );
 }

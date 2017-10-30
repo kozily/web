@@ -50,3 +50,14 @@ binding_statement -> lexical_variable _ "=" _ lexical_variable {%
     };
   }
 %}
+
+value_creation_statement -> lexical_variable _ "=" _ lexical_value {%
+  function(d, position, reject) {
+    return {
+      node: 'statement',
+      type: 'value',
+      lhs: d[0],
+      rhs: d[4],
+    };
+  }
+%}

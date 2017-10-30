@@ -1,47 +1,34 @@
 import Immutable from "immutable";
-
-const equivalenceClassContains = variable => equivalenceClass =>
-  equivalenceClass.get("variables").some(x => Immutable.is(x, variable));
-
-const lookupEquivalenceClass = (state, semanticStatement, side) => {
-  const identifier = semanticStatement.getIn(["statement", side, "identifier"]);
-  const variable = semanticStatement.getIn(["environment", identifier]);
-
-  return state.get("store").find(equivalenceClassContains(variable));
-};
-
-const pushVariablesFrom = equivalenceClass => variables =>
-  variables.concat(equivalenceClass.get("variables"));
-
-const mergeEquivalenceClasses = (store, target, from) => {
-  const targetIndex = store.findKey(x => Immutable.is(target, x));
-  const fromIndex = store.findKey(x => Immutable.is(from, x));
-
-  if (targetIndex === fromIndex) {
-    return store;
-  }
-
-  return store
-    .updateIn([targetIndex, "variables"], pushVariablesFrom(from))
-    .delete(fromIndex);
-};
-
-const isBound = equivalenceClass => equivalenceClass.get("value") !== undefined;
+import {
+  isEquivalenceClassBound,
+  lookupVariableInStore,
+  mergeEquivalenceClasses,
+} from "../machine/store";
 
 export default function(state, semanticStatement) {
-  const lhs = lookupEquivalenceClass(state, semanticStatement, "lhs");
-  const lhsBound = isBound(lhs);
-  const rhs = lookupEquivalenceClass(state, semanticStatement, "rhs");
-  const rhsBound = isBound(rhs);
+  const store = state.get("store");
+  const statement = semanticStatement.get("statement");
+  const environment = semanticStatement.get("environment");
 
-  if (lhsBound && rhsBound) {
-    // TODO: Unify this two partial values. This requires us implementing
-    // variable-value bindings
+  const operands = Immutable.List([statement.get("lhs"), statement.get("rhs")]);
+
+  const equivalenceClasses = operands
+    .map(x => x.get("identifier"))
+    .map(identifier => environment.get(identifier))
+    .map(x => lookupVariableInStore(store, x));
+
+  const first = equivalenceClasses.get(0);
+  const second = equivalenceClasses.get(1);
+
+  if (isEquivalenceClassBound(first) && isEquivalenceClassBound(second)) {
+    // TODO: Unify these two partial values
     return state;
   }
 
-  const [target, from] = rhsBound ? [rhs, lhs] : [lhs, rhs];
+  const [target, source] = isEquivalenceClassBound(second)
+    ? [second, first]
+    : [first, second];
   return state.update("store", store =>
-    mergeEquivalenceClasses(store, target, from),
+    mergeEquivalenceClasses(store, target, source),
   );
 }

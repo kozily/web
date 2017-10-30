@@ -1,6 +1,10 @@
 import Immutable from "immutable";
 import statements from "../samples/statements";
-import machine from "../../app/oz/machine";
+import {
+  buildState,
+  buildStack,
+  buildSemanticStatement,
+} from "../../app/oz/machine/build";
 import reduce from "../../app/oz/reducers/skip";
 
 describe("Reducing skip statements", () => {
@@ -9,15 +13,13 @@ describe("Reducing skip statements", () => {
   });
 
   it("reduces correclty", () => {
-    const state = machine.build.state(
-      machine.build.stack(machine.build.semanticStatement(statements.skip())),
+    const state = buildState(
+      buildStack(buildSemanticStatement(statements.skip())),
     );
-    const statement = machine.build.semanticStatement(statements.skip());
+    const statement = buildSemanticStatement(statements.skip());
 
     expect(reduce(state, statement)).toEqual(
-      machine.build.state(
-        machine.build.stack(machine.build.semanticStatement(statements.skip())),
-      ),
+      buildState(buildStack(buildSemanticStatement(statements.skip()))),
     );
   });
 });

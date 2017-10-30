@@ -24,28 +24,33 @@ export default class Editor extends React.Component {
 
     this.editor.on("change", () => {
       const input = this.editor.getValue();
-      const tree = parser(input);
 
-      if (tree) {
-        try {
+      try {
+        const tree = parser(input);
+
+        if (tree) {
           const kernel = kernelizer(tree);
-          const runtime = oz.build.fromKernelAST(kernel);
-          this.triggerSteps(kernel, oz.steps(runtime));
-        } catch (error) {
-          // eslint-disable-next-line no-console
-          console.error(error);
-          this.clearSteps();
+          this.triggerSteps(kernel);
+          try {
+            const runtime = oz.build.fromKernelAST(kernel);
+            const steps = oz.steps(runtime);
+            this.triggerSteps(kernel, steps);
+          } catch (error) {
+            // eslint-disable-next-line no-console
+            console.error(error);
+            this.triggerSteps(kernel);
+          }
+        } else {
+          this.triggerSteps();
         }
-      } else {
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error(error);
         this.triggerSteps();
       }
     });
 
     setTimeout(() => this.editor.refresh(), 1000);
-  }
-
-  clearSteps() {
-    this.props.onSteps({ kernel: {}, execution: [] });
   }
 
   triggerSteps(kernel = {}, execution = []) {

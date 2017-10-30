@@ -1,6 +1,10 @@
 import Immutable from "immutable";
 import statements from "../samples/statements";
-import machine from "../../app/oz/machine";
+import {
+  buildState,
+  buildStack,
+  buildSemanticStatement,
+} from "../../app/oz/machine/build";
 import reduce from "../../app/oz/reducers/sequence";
 
 describe("Reducing sequence statements", () => {
@@ -9,19 +13,19 @@ describe("Reducing sequence statements", () => {
   });
 
   it("reduces correctly", () => {
-    const state = machine.build.state(
-      machine.build.stack(machine.build.semanticStatement(statements.skip())),
+    const state = buildState(
+      buildStack(buildSemanticStatement(statements.skip())),
     );
-    const statement = machine.build.semanticStatement(
+    const statement = buildSemanticStatement(
       statements.sequence(statements.skip(), statements.skip()),
     );
 
     expect(reduce(state, statement)).toEqual(
-      machine.build.state(
-        machine.build.stack(
-          machine.build.semanticStatement(statements.skip()),
-          machine.build.semanticStatement(statements.skip()),
-          machine.build.semanticStatement(statements.skip()),
+      buildState(
+        buildStack(
+          buildSemanticStatement(statements.skip()),
+          buildSemanticStatement(statements.skip()),
+          buildSemanticStatement(statements.skip()),
         ),
       ),
     );

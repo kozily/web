@@ -2,7 +2,7 @@ import { Parser } from "nearley";
 import Immutable from "immutable";
 import ozGrammar from "./grammar/index.nearley";
 
-export function parserFor(grammar) {
+export const parserFor = grammar => {
   return input => {
     const parser = new Parser(grammar.ParserRules, grammar.ParserStart);
     parser.feed(input);
@@ -13,6 +13,6 @@ export function parserFor(grammar) {
 
     return Immutable.fromJS(parser.results[0]);
   };
-}
+};
 
 export default parserFor(ozGrammar);

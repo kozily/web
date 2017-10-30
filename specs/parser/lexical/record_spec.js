@@ -27,6 +27,14 @@ describe("Parsing lexical record elements", () => {
     );
   });
 
+  it("handles the standard syntax with a single multicharacter feature", () => {
+    expect(parse("label(feature:X)")).toEqual(
+      lexical.record("label", {
+        feature: lexical.variable("X"),
+      }),
+    );
+  });
+
   it("handles the standard syntax with whitespaces", () => {
     expect(parse("label(\n  a:X\n  b:Y\n)")).toEqual(
       lexical.record("label", {
