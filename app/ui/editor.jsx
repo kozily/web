@@ -6,7 +6,8 @@ import "codemirror/theme/base16-light.css";
 import "codemirror/addon/selection/active-line";
 import parser from "../oz/parser";
 import kernelizer from "../oz/kernelizer";
-import oz from "../oz/machine";
+import { buildFromKernelAST } from "../oz/machine/build";
+import { executeAllSteps } from "../oz/runtime";
 
 export default class Editor extends React.Component {
   componentDidMount() {
@@ -32,8 +33,8 @@ export default class Editor extends React.Component {
           const kernel = kernelizer(tree);
           this.triggerSteps(kernel);
           try {
-            const runtime = oz.build.fromKernelAST(kernel);
-            const steps = oz.steps(runtime);
+            const runtime = buildFromKernelAST(kernel);
+            const steps = executeAllSteps(runtime);
             this.triggerSteps(kernel, steps);
           } catch (error) {
             // eslint-disable-next-line no-console
