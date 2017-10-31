@@ -1,10 +1,10 @@
-import Immutable from 'immutable';
+import Immutable from "immutable";
 
 export default {
   record(label, features = {}) {
     return Immutable.fromJS({
-      node: 'value',
-      type: 'record',
+      node: "value",
+      type: "record",
       value: {
         label,
         features,
@@ -28,44 +28,40 @@ export default {
   },
 
   nil() {
-    return this.record('nil');
+    return this.record("nil");
   },
 
   list(head, tail) {
-    return this.tuple('|', head, tail);
+    return this.tuple("|", head, tail);
   },
 
   complexList(array) {
     return array.reduceRight(
       (result, item) => this.list(this.variable(item), result),
-      this.nil()
+      this.nil(),
     );
   },
 
   string(value) {
-    if (value === '') {
+    if (value === "") {
       return this.nil();
     }
 
-    return this.list(
-      value.charCodeAt(0),
-      this.string(value.substring(1))
-    );
+    return this.list(value.charCodeAt(0), this.string(value.substring(1)));
   },
 
   number(value) {
     return Immutable.fromJS({
-      node: 'value',
-      type: 'number',
+      node: "value",
+      type: "number",
       value,
     });
   },
 
   variable(identifier) {
     return Immutable.fromJS({
-      node: 'variable',
+      node: "variable",
       identifier,
     });
   },
 };
-

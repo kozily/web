@@ -11,48 +11,75 @@ module.exports = {
 
   resolve: {
     extensions: [
-      '',
       '.js',
       '.jsx'
     ],
   },
 
   output: {
-    path: './build',
+    path: path.resolve(__dirname, '../build'),
     filename: '[name]-[chunkhash].js',
   },
 
+  devtool: 'source-map',
+
   module: {
-    loaders: [
+    rules: [
       {
         test: /\.jsx?$/,
         exclude: /node_modules/,
-        loader: 'babel!eslint',
+        use: [
+          'babel-loader',
+        ],
       },
-
       {
         test: /\.nearley$/,
-        loader: 'nearley',
+        use: [
+          'nearley-loader',
+        ],
       },
-
       {
         test: /\.(sass|scss)$/,
-        loader: ExtractTextPlugin.extract('style', 'css?sourceMap!sass?sourceMap'),
+        use: ExtractTextPlugin.extract({
+          fallback: 'style-loader',
+          use: [
+            {
+              loader: 'css-loader',
+              options: {
+                sourceMap: true,
+              },
+            },
+            {
+              loader: 'sass-loader',
+              options: {
+                sourceMap: true,
+              },
+            },
+          ]
+        })
       },
-
       {
         test: /\.css$/,
-        loader: ExtractTextPlugin.extract('style', 'css?sourceMap'),
+        use: ExtractTextPlugin.extract({
+          fallback: 'style-loader',
+          use: [
+            {
+              loader: 'css-loader',
+              options: {
+                sourceMap: true,
+              },
+            },
+          ]
+        })
       },
-
       {
         test: /\.(ttf|eot|svg|woff|woff2)/,
-        loader: 'file',
-      }
-    ]
+        use: [
+          'file-loader',
+        ],
+      },
+    ],
   },
-
-  devtool: 'source-map',
 
   plugins: [
     new HtmlPlugin({

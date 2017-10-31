@@ -1,10 +1,10 @@
-import Immutable from 'immutable';
+import Immutable from "immutable";
 
 export default {
   sequence(head, tail) {
     return Immutable.fromJS({
-      node: 'statement',
-      type: 'sequence',
+      node: "statement",
+      type: "sequence",
       head,
       tail,
     });
@@ -12,15 +12,15 @@ export default {
 
   skip() {
     return Immutable.fromJS({
-      node: 'statement',
-      type: 'skip',
+      node: "statement",
+      type: "skip",
     });
   },
 
   local(variable, statement) {
     return new Immutable.Map({
-      node: 'statement',
-      type: 'local',
+      node: "statement",
+      type: "local",
       variable,
       statement,
     });
@@ -28,8 +28,8 @@ export default {
 
   binding(lhs, rhs) {
     return new Immutable.Map({
-      node: 'statement',
-      type: 'binding',
+      node: "statement",
+      type: "binding",
       lhs,
       rhs,
     });

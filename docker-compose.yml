@@ -5,10 +5,17 @@ services:
     build: .
     entrypoint: npm
     command: start
+    tty: true
     volumes:
+      # Source code
       - "./app:/opt/project/app"
       - "./config:/opt/project/config"
-      - "./package.json:/opt/project/package.json"
       - "./specs:/opt/project/specs"
+      # Package config
+      - "./package.json:/opt/project/package.json"
+      # Linter and compiler config
+      - "./.eslintrc.js:/opt/project/.eslintrc.js"
+      - "./.prettierrc:/opt/project/.prettierrc"
+      - "./.babelrc:/opt/project/.babelrc"
     ports:
       - "8080:8080"
