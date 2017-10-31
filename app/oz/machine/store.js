@@ -26,3 +26,20 @@ export const mergeEquivalenceClasses = (store, target, source) => {
     )
     .delete(sourceIndex);
 };
+
+export const unify = (store, x, y) => {
+  const equivalenceClassX = lookupVariableInStore(store, x);
+  const isXBound = isEquivalenceClassBound(equivalenceClassX);
+  const equivalenceClassY = lookupVariableInStore(store, y);
+  const isYBound = isEquivalenceClassBound(equivalenceClassY);
+
+  if (!isXBound && !isYBound) {
+    return mergeEquivalenceClasses(store, equivalenceClassX, equivalenceClassY);
+  } else if (!isXBound && isYBound) {
+    return mergeEquivalenceClasses(store, equivalenceClassY, equivalenceClassX);
+  } else if (isXBound && !isYBound) {
+    return mergeEquivalenceClasses(store, equivalenceClassX, equivalenceClassY);
+  } else {
+    // TODO: Handle value unification
+  }
+};

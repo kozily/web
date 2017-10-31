@@ -33,3 +33,12 @@ export const bindingStatement = (lhs, rhs) => {
     rhs,
   });
 };
+
+export const valueCreationStatement = (lhs, rhs) => {
+  return new Immutable.Map({
+    node: "statement",
+    type: "valueCreation",
+    lhs,
+    rhs,
+  });
+};

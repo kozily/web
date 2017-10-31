@@ -19,6 +19,7 @@ statement ->
     skip_statement {% id %}
   | local_statement {% id %}
   | binding_statement {% id %}
+  | value_creation_statement {% id %}
 
 skip_statement -> "skip" {%
   function (d) {
@@ -55,7 +56,7 @@ value_creation_statement -> lexical_variable _ "=" _ lexical_value {%
   function(d, position, reject) {
     return {
       node: 'statement',
-      type: 'value',
+      type: 'valueCreation',
       lhs: d[0],
       rhs: d[4],
     };
