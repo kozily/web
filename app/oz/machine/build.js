@@ -28,12 +28,12 @@ export const buildVariable = (name, sequence) => {
 export const buildEquivalenceClass = (value, ...variables) => {
   return new Immutable.Map({
     value,
-    variables: new Immutable.List(variables),
+    variables: new Immutable.Set(variables),
   });
 };
 
 export const buildStore = (...equivalenceClasses) => {
-  return new Immutable.List(equivalenceClasses);
+  return new Immutable.Set(equivalenceClasses);
 };
 
 export const buildState = (stack = buildStack(), store = buildStore()) => {

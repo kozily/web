@@ -14,7 +14,7 @@ import {
   buildVariable,
   buildEnvironment,
 } from "../../app/oz/machine/build";
-import reduce from "../../app/oz/reducers/binding";
+import reduce from "../../app/oz/reducers/value_creation";
 
 describe("Reducing X=VALUE statements", () => {
   beforeEach(() => {
@@ -64,6 +64,7 @@ describe("Reducing X=VALUE statements", () => {
         ),
       );
     });
+<<<<<<< HEAD
 
     it("when variable is bound to the same value", () => {
       const state = buildState(
