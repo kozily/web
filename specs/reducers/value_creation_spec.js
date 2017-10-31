@@ -64,7 +64,6 @@ describe("Reducing X=VALUE statements", () => {
         ),
       );
     });
-<<<<<<< HEAD
 
     it("when variable is bound to the same value", () => {
       const state = buildState(
@@ -133,7 +132,9 @@ describe("Reducing X=VALUE statements", () => {
         }),
       );
 
-      expect(() => reduce(state, statement)).toThrow("Uncompatible values");
+      expect(() => reduce(state, statement)).toThrowError(
+        "Incompatible values 24 and 155",
+      );
     });
   });
 
@@ -200,6 +201,7 @@ describe("Reducing X=VALUE statements", () => {
               buildVariable("y", 0),
               buildVariable("y", 1),
             ),
+            buildEquivalenceClass(undefined, buildVariable("w", 0)),
           ),
         );
 
@@ -320,7 +322,9 @@ describe("Reducing X=VALUE statements", () => {
           }),
         );
 
-        expect(() => reduce(state, statement)).toThrow("Uncompatible values");
+        expect(() => reduce(state, statement)).toThrowError(
+          "Incompatible value types record and number",
+        );
       });
 
       it("with same label, same features and different value in features", () => {
@@ -352,7 +356,9 @@ describe("Reducing X=VALUE statements", () => {
           }),
         );
 
-        expect(() => reduce(state, statement)).toThrow("Uncompatible values");
+        expect(() => reduce(state, statement)).toThrowError(
+          "Incompatible values 10 and 24",
+        );
       });
 
       it("with same label, different features", () => {
@@ -383,7 +389,9 @@ describe("Reducing X=VALUE statements", () => {
           }),
         );
 
-        expect(() => reduce(state, statement)).toThrow("Uncompatible values");
+        expect(() => reduce(state, statement)).toThrowError(
+          "Incompatible features name and lastname",
+        );
       });
 
       it("with same label, different amount of features", () => {
@@ -418,7 +426,9 @@ describe("Reducing X=VALUE statements", () => {
           }),
         );
 
-        expect(() => reduce(state, statement)).toThrow("Uncompatible values");
+        expect(() => reduce(state, statement)).toThrowError(
+          "Incompatible features name and name,lastname",
+        );
       });
 
       it("with different labels", () => {
@@ -450,7 +460,9 @@ describe("Reducing X=VALUE statements", () => {
           }),
         );
 
-        expect(() => reduce(state, statement)).toThrow("Uncompatible values");
+        expect(() => reduce(state, statement)).toThrowError(
+          "Incompatible labels person and address",
+        );
       });
     });
   });
