@@ -11,7 +11,10 @@
 ##############################################################################
 lexical_index ->
     lexical_variable {% id %}
-  | lexical_record {% id %}
+  | lexical_value {% id %}
+
+lexical_value ->
+    lexical_record {% id %}
   | lexical_atom {% id %}
   | lexical_boolean {% id %}
   | lexical_string {% id %}
@@ -72,13 +75,13 @@ lexical_record -> lexical_atom_syntax "(" _ lexical_record_feature_list _ ")" {%
   }
 %}
 
-lexical_record_feature_list -> 
+lexical_record_feature_list ->
     lexical_record_feature_list __ lexical_record_feature {% function(d) { return d[0].concat(d[2]); } %}
   | lexical_record_feature
 
 lexical_record_feature -> lexical_atom_syntax ":" lexical_variable {%
   function(d, position, reject) {
-    return {name: d[0][0], value: d[2]};
+    return {name: d[0], value: d[2]};
   }
 %}
 
@@ -297,8 +300,8 @@ normal_list -> "[" _ list_items _ "]" {%
   function(d) {
     return d[2].reduce(
       function(a, b) {
-        return lexicalRecord('|', {1: b, 2:a}); 
-      }, 
+        return lexicalRecord('|', {1: b, 2:a});
+      },
       lexicalRecord("nil", {})
     );
   }

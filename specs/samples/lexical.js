@@ -1,67 +1,65 @@
 import Immutable from "immutable";
 
-export default {
-  record(label, features = {}) {
-    return Immutable.fromJS({
-      node: "value",
-      type: "record",
-      value: {
-        label,
-        features,
-      },
-    });
-  },
+export const lexicalRecord = (label, features = {}) => {
+  return Immutable.fromJS({
+    node: "value",
+    type: "record",
+    value: {
+      label,
+      features,
+    },
+  });
+};
 
-  atom(name) {
-    return this.record(name);
-  },
+export const lexicalAtom = name => {
+  return lexicalRecord(name);
+};
 
-  boolean(value) {
-    return this.record(value.toString());
-  },
+export const lexicalBoolean = value => {
+  return lexicalRecord(value.toString());
+};
 
-  tuple(label, first, second) {
-    return this.record(label, {
-      1: first,
-      2: second,
-    });
-  },
+export const lexicalTuple = (label, first, second) => {
+  return lexicalRecord(label, {
+    1: first,
+    2: second,
+  });
+};
 
-  nil() {
-    return this.record("nil");
-  },
+export const lexicalNil = () => {
+  return lexicalRecord("nil");
+};
 
-  list(head, tail) {
-    return this.tuple("|", head, tail);
-  },
+export const lexicalList = (head, tail) => {
+  return lexicalTuple("|", head, tail);
+};
 
-  complexList(array) {
-    return array.reduceRight(
-      (result, item) => this.list(this.variable(item), result),
-      this.nil(),
-    );
-  },
+export const lexicalComplexList = array => {
+  return array.reduceRight(
+    (result, item) => lexicalList(lexicalVariable(item), result),
+    lexicalNil(),
+  );
+};
 
-  string(value) {
-    if (value === "") {
-      return this.nil();
-    }
+export const lexicalString = value => {
+  if (value === "") {
+    return lexicalNil();
+  }
 
-    return this.list(value.charCodeAt(0), this.string(value.substring(1)));
-  },
+  return lexicalList(value.charCodeAt(0), lexicalString(value.substring(1)));
+};
 
-  number(value) {
-    return Immutable.fromJS({
-      node: "value",
-      type: "number",
-      value,
-    });
-  },
+export const lexicalNumber = value => {
+  return Immutable.fromJS({
+    node: "value",
+    type: "number",
+    value,
+  });
+};
 
-  variable(identifier) {
-    return Immutable.fromJS({
-      node: "variable",
-      identifier,
-    });
-  },
+export const lexicalVariable = identifier => {
+  return Immutable.fromJS({
+    node: "variable",
+    identifier,
+  });
 };

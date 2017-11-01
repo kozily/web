@@ -1,47 +1,14 @@
-import Immutable from "immutable";
-
-const equivalenceClassContains = variable => equivalenceClass =>
-  equivalenceClass.get("variables").some(x => Immutable.is(x, variable));
-
-const lookupEquivalenceClass = (state, semanticStatement, side) => {
-  const identifier = semanticStatement.getIn(["statement", side, "identifier"]);
-  const variable = semanticStatement.getIn(["environment", identifier]);
-
-  return state.get("store").find(equivalenceClassContains(variable));
-};
-
-const pushVariablesFrom = equivalenceClass => variables =>
-  variables.concat(equivalenceClass.get("variables"));
-
-const mergeEquivalenceClasses = (store, target, from) => {
-  const targetIndex = store.findKey(x => Immutable.is(target, x));
-  const fromIndex = store.findKey(x => Immutable.is(from, x));
-
-  if (targetIndex === fromIndex) {
-    return store;
-  }
-
-  return store
-    .updateIn([targetIndex, "variables"], pushVariablesFrom(from))
-    .delete(fromIndex);
-};
-
-const isBound = equivalenceClass => equivalenceClass.get("value") !== undefined;
+import { unify } from "../machine/store";
 
 export default function(state, semanticStatement) {
-  const lhs = lookupEquivalenceClass(state, semanticStatement, "lhs");
-  const lhsBound = isBound(lhs);
-  const rhs = lookupEquivalenceClass(state, semanticStatement, "rhs");
-  const rhsBound = isBound(rhs);
+  const statement = semanticStatement.get("statement");
+  const environment = semanticStatement.get("environment");
 
-  if (lhsBound && rhsBound) {
-    // TODO: Unify this two partial values. This requires us implementing
-    // variable-value bindings
-    return state;
-  }
+  const lhsIdentifier = statement.getIn(["lhs", "identifier"]);
+  const lhsVariable = environment.get(lhsIdentifier);
 
-  const [target, from] = rhsBound ? [rhs, lhs] : [lhs, rhs];
-  return state.update("store", store =>
-    mergeEquivalenceClasses(store, target, from),
-  );
+  const rhsIdentifier = statement.getIn(["rhs", "identifier"]);
+  const rhsVariable = environment.get(rhsIdentifier);
+
+  return state.update("store", store => unify(store, lhsVariable, rhsVariable));
 }

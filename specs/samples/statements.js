@@ -1,37 +1,44 @@
 import Immutable from "immutable";
 
-export default {
-  sequence(head, tail) {
-    return Immutable.fromJS({
-      node: "statement",
-      type: "sequence",
-      head,
-      tail,
-    });
-  },
+export const sequenceStatement = (head, tail) => {
+  return Immutable.fromJS({
+    node: "statement",
+    type: "sequence",
+    head,
+    tail,
+  });
+};
 
-  skip() {
-    return Immutable.fromJS({
-      node: "statement",
-      type: "skip",
-    });
-  },
+export const skipStatement = () => {
+  return Immutable.fromJS({
+    node: "statement",
+    type: "skip",
+  });
+};
 
-  local(variable, statement) {
-    return new Immutable.Map({
-      node: "statement",
-      type: "local",
-      variable,
-      statement,
-    });
-  },
+export const localStatement = (variable, statement) => {
+  return new Immutable.Map({
+    node: "statement",
+    type: "local",
+    variable,
+    statement,
+  });
+};
 
-  binding(lhs, rhs) {
-    return new Immutable.Map({
-      node: "statement",
-      type: "binding",
-      lhs,
-      rhs,
-    });
-  },
+export const bindingStatement = (lhs, rhs) => {
+  return new Immutable.Map({
+    node: "statement",
+    type: "binding",
+    lhs,
+    rhs,
+  });
+};
+
+export const valueCreationStatement = (lhs, rhs) => {
+  return new Immutable.Map({
+    node: "statement",
+    type: "valueCreation",
+    lhs,
+    rhs,
+  });
 };

@@ -1,7 +1,15 @@
 import Immutable from "immutable";
-import statements from "../samples/statements";
-import lexical from "../samples/lexical";
-import machine from "../../app/oz/machine";
+import { skipStatement, localStatement } from "../samples/statements";
+import { lexicalVariable, lexicalNumber } from "../samples/lexical";
+import {
+  buildState,
+  buildStack,
+  buildSemanticStatement,
+  buildStore,
+  buildEquivalenceClass,
+  buildVariable,
+  buildEnvironment,
+} from "../../app/oz/machine/build";
 import reduce from "../../app/oz/reducers/local";
 
 describe("Reducing local X in ... end statements", () => {
@@ -10,90 +18,64 @@ describe("Reducing local X in ... end statements", () => {
   });
 
   it("reduces correctly when the store is empty", () => {
-    const state = machine.build.state(
-      machine.build.stack(machine.build.semanticStatement(statements.skip())),
+    const state = buildState(
+      buildStack(buildSemanticStatement(skipStatement())),
     );
 
-    const statement = machine.build.semanticStatement(
-      statements.local(lexical.variable("X"), statements.skip()),
+    const statement = buildSemanticStatement(
+      localStatement(lexicalVariable("X"), skipStatement()),
     );
 
     expect(reduce(state, statement)).toEqual(
-      machine.build.state(
-        machine.build.stack(
-          machine.build.semanticStatement(
-            statements.skip(),
-            machine.build.environment({
-              X: machine.build.variable("x", 0),
+      buildState(
+        buildStack(
+          buildSemanticStatement(
+            skipStatement(),
+            buildEnvironment({
+              X: buildVariable("x", 0),
             }),
           ),
-          machine.build.semanticStatement(statements.skip()),
+          buildSemanticStatement(skipStatement()),
         ),
-        machine.build.store(
-          machine.build.equivalenceClass(
-            undefined,
-            machine.build.variable("x", 0),
-          ),
-        ),
+        buildStore(buildEquivalenceClass(undefined, buildVariable("x", 0))),
       ),
     );
   });
 
   it("reduces correctly when there are previous variables in the store", () => {
-    const state = machine.build.state(
-      machine.build.stack(machine.build.semanticStatement(statements.skip())),
-      machine.build.store(
-        machine.build.equivalenceClass(
-          lexical.number(10),
-          machine.build.variable("y", 0),
-        ),
-        machine.build.equivalenceClass(
-          lexical.number(20),
-          machine.build.variable("x", 0),
-        ),
-        machine.build.equivalenceClass(
-          lexical.number(30),
-          machine.build.variable("x", 1),
-        ),
+    const state = buildState(
+      buildStack(buildSemanticStatement(skipStatement())),
+      buildStore(
+        buildEquivalenceClass(lexicalNumber(10), buildVariable("y", 0)),
+        buildEquivalenceClass(lexicalNumber(20), buildVariable("x", 0)),
+        buildEquivalenceClass(lexicalNumber(30), buildVariable("x", 1)),
       ),
     );
-    const statement = machine.build.semanticStatement(
-      statements.local(lexical.variable("X"), statements.skip()),
-      machine.build.environment({
-        Y: machine.build.variable("y", 0),
+    const statement = buildSemanticStatement(
+      localStatement(lexicalVariable("X"), skipStatement()),
+      buildEnvironment({
+        Y: buildVariable("y", 0),
       }),
     );
 
     expect(reduce(state, statement)).toEqual(
-      machine.build.state(
-        machine.build.stack(
-          machine.build.semanticStatement(
-            statements.skip(),
-            machine.build.environment({
-              Y: machine.build.variable("y", 0),
-              X: machine.build.variable("x", 2),
+      buildState(
+        buildStack(
+          buildSemanticStatement(
+            skipStatement(),
+            buildEnvironment({
+              Y: buildVariable("y", 0),
+              X: buildVariable("x", 2),
             }),
           ),
-          machine.build.semanticStatement(statements.skip()),
+          buildSemanticStatement(skipStatement()),
         ),
 
-        machine.build.store(
-          machine.build.equivalenceClass(
-            lexical.number(10),
-            machine.build.variable("y", 0),
-          ),
-          machine.build.equivalenceClass(
-            lexical.number(20),
-            machine.build.variable("x", 0),
-          ),
-          machine.build.equivalenceClass(
-            lexical.number(30),
-            machine.build.variable("x", 1),
-          ),
-          machine.build.equivalenceClass(
-            undefined,
-            machine.build.variable("x", 2),
-          ),
+        buildStore(
+          buildEquivalenceClass(lexicalNumber(10), buildVariable("y", 0)),
+          buildEquivalenceClass(lexicalNumber(20), buildVariable("x", 0)),
+          buildEquivalenceClass(lexicalNumber(30), buildVariable("x", 1)),
+          buildEquivalenceClass(undefined, buildVariable("x", 2)),
         ),
       ),
     );
