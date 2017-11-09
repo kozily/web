@@ -64,14 +64,14 @@ value_creation_statement -> lexical_variable _ "=" _ lexical_value {%
   }
 %}
 
-conditional_statement -> "if" _ lexical_variable _ "then" __ sequence_statement __ ( "else" __ sequence_statement __ ):? "end" {%
+conditional_statement -> "if" _ lexical_variable _ "then" __ sequence_statement __ "else" __ sequence_statement __ "end" {%
   function(d, position, reject) {
     return {
       node: "statement",
       type: "conditional",
       condition: d[2],
       true_statement: d[6],
-      false_statement: (Array.isArray(d[8]) && d[8][0] === "else")? d[8][2] : undefined,
+      false_statement: d[10],
     }
   }
 %}

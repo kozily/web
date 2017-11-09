@@ -1,14 +1,11 @@
 import Immutable from "immutable";
 
+import { lexicalVariable } from "../../samples/lexical";
 import {
-  lexicalVariable,
-  /*
-  lexicalNumber,
-  lexicalRecord,
-  */
-} from "../../samples/lexical";
-
-import { skipStatement, conditionalStatement } from "../../samples/statements";
+  sequenceStatement,
+  skipStatement,
+  conditionalStatement,
+} from "../../samples/statements";
 import parse from "../../../app/oz/parser";
 
 describe("Parsing conditional statements", () => {
@@ -16,10 +13,14 @@ describe("Parsing conditional statements", () => {
     jasmine.addCustomEqualityTester(Immutable.is);
   });
 
-  describe("when condition is true", () => {
-    it("when is composed by true statement and without a false statement", () => {
-      expect(parse("if X then skip end")).toEqual(
-        conditionalStatement(lexicalVariable("X"), skipStatement()),
+  describe("when condition is a variable", () => {
+    it("when is composed by two statement in true statement", () => {
+      expect(parse("if X then skip skip else skip end")).toEqual(
+        conditionalStatement(
+          lexicalVariable("X"),
+          sequenceStatement(skipStatement(), skipStatement()),
+          skipStatement(),
+        ),
       );
     });
 
@@ -32,15 +33,13 @@ describe("Parsing conditional statements", () => {
         ),
       );
     });
-  });
 
-  describe("when condition is false", () => {
     it("when is composed by true statement and a false statement", () => {
-      expect(parse("if X then skip else skip end")).toEqual(
+      expect(parse("if X then skip else skip skip end")).toEqual(
         conditionalStatement(
           lexicalVariable("X"),
           skipStatement(),
-          skipStatement(),
+          sequenceStatement(skipStatement(), skipStatement()),
         ),
       );
     });
