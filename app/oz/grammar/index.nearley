@@ -64,7 +64,7 @@ value_creation_statement -> lexical_variable _ "=" _ lexical_value {%
   }
 %}
 
-conditional_statement -> "if" _ lexical_variable _ "then" __ sequence_statement __ "else" __ sequence_statement __ "end" {%
+conditional_statement -> "if" __ lexical_variable __ "then" __ sequence_statement __ "else" __ sequence_statement __ "end" {%
   function(d, position, reject) {
     return {
       node: "statement",
