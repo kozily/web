@@ -21,7 +21,7 @@ import {
 } from "../../app/oz/machine/build";
 import reduce from "../../app/oz/reducers/conditional";
 
-describe("Reducing X=VALUE statements", () => {
+describe("Reducing if statements", () => {
   beforeEach(() => {
     jasmine.addCustomEqualityTester(Immutable.is);
   });

@@ -14,7 +14,7 @@ describe("Parsing conditional statements", () => {
   });
 
   describe("when condition is a variable", () => {
-    it("when is composed by two statement in true statement", () => {
+    it("when is composed by two statement in the true statement", () => {
       expect(parse("if X then skip skip else skip end")).toEqual(
         conditionalStatement(
           lexicalVariable("X"),
@@ -24,17 +24,7 @@ describe("Parsing conditional statements", () => {
       );
     });
 
-    it("when is composed by true statement and a false statement", () => {
-      expect(parse("if X then skip else skip end")).toEqual(
-        conditionalStatement(
-          lexicalVariable("X"),
-          skipStatement(),
-          skipStatement(),
-        ),
-      );
-    });
-
-    it("when is composed by true statement and a false statement", () => {
+    it("when is composed by two statements in the false statement", () => {
       expect(parse("if X then skip else skip skip end")).toEqual(
         conditionalStatement(
           lexicalVariable("X"),
