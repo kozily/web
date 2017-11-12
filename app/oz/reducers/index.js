@@ -3,6 +3,7 @@ import sequence from "./sequence";
 import local from "./local";
 import binding from "./binding";
 import valueCreation from "./value_creation";
+import conditional from "./conditional";
 
 export default {
   skip,
@@ -10,4 +11,5 @@ export default {
   local,
   binding,
   valueCreation,
+  conditional,
 };

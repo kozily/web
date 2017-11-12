@@ -42,3 +42,17 @@ export const valueCreationStatement = (lhs, rhs) => {
     rhs,
   });
 };
+
+export const conditionalStatement = (
+  condition,
+  true_statement,
+  false_statement = undefined,
+) => {
+  return new Immutable.Map({
+    node: "statement",
+    type: "conditional",
+    condition,
+    true_statement,
+    false_statement,
+  });
+};

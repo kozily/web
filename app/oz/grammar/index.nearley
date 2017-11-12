@@ -20,6 +20,7 @@ statement ->
   | local_statement {% id %}
   | binding_statement {% id %}
   | value_creation_statement {% id %}
+  | conditional_statement {% id %}
 
 skip_statement -> "skip" {%
   function (d) {
@@ -60,5 +61,17 @@ value_creation_statement -> lexical_variable _ "=" _ lexical_value {%
       lhs: d[0],
       rhs: d[4],
     };
+  }
+%}
+
+conditional_statement -> "if" __ lexical_variable __ "then" __ sequence_statement __ "else" __ sequence_statement __ "end" {%
+  function(d, position, reject) {
+    return {
+      node: "statement",
+      type: "conditional",
+      condition: d[2],
+      true_statement: d[6],
+      false_statement: d[10],
+    }
   }
 %}
