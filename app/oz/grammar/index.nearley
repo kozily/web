@@ -21,6 +21,7 @@ statement ->
   | binding_statement {% id %}
   | value_creation_statement {% id %}
   | conditional_statement {% id %}
+  | pattern_matching_statement {% id %}
 
 skip_statement -> "skip" {%
   function (d) {
@@ -72,6 +73,22 @@ conditional_statement -> "if" __ lexical_variable __ "then" __ sequence_statemen
       condition: d[2],
       true_statement: d[6],
       false_statement: d[10],
+    }
+  }
+%}
+
+pattern_matching_statement -> "case" __ lexical_variable __ "of" __ lexical_record __ "then" __ sequence_statement __ "else" __ sequence_statement __ "end" {%
+  function(d, position, reject) {
+    console.log("START PATTERN MATCHING");
+    console.log(d);
+    console.log("END PATTERN MATCHING");
+    return {
+      node: "statement",
+      type: "patternMatching",
+      variable: d[2],
+      pattern: d[6],
+      true_statement: d[10],
+      false_statement: d[14],
     }
   }
 %}
