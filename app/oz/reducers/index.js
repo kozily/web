@@ -12,4 +12,5 @@ export default {
   binding,
   valueCreation,
   conditional,
+  patternMatching,
 };
