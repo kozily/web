@@ -1,5 +1,8 @@
-import { lookupVariableInStore } from "../machine/store";
-import { buildSemanticStatement } from "../machine/build";
+import { lookupVariableInStore, makeNewVariable } from "../machine/store";
+import {
+  buildSemanticStatement,
+  buildEquivalenceClass,
+} from "../machine/build";
 
 export default function(state, semanticStatement) {
   const store = state.get("store");
@@ -34,35 +37,73 @@ export default function(state, semanticStatement) {
 
   const label = value.getIn(["value", "label"]);
   const patternLabel = pattern.getIn(["value", "label"]);
+
+  /* checks if pattern matches */
   if (label === patternLabel) {
     const features = value.getIn(["value", "features"]);
     const patternFeatures = pattern.getIn(["value", "features"]);
-    if (features.size === patternFeatures.size) {
-      var keyMatches = features.reduce((r, v, k, i) => {
-        return (
-          r &&
-          patternFeatures.findKey((val, key, it) => {
-            return k === key;
-          }) !== undefined
-        );
-      }, true);
 
-      if (keyMatches) {
-        /* TODO create variable values for values of features and assign the same value of the variable then push to the state */
-        
-      } else {
-        throw new Error(
-          `Unexpected record features in case statement, keys do not match [variable keys: ${features.toJSON()}, pattern keys: ${patternFeatures.toJSON()}]`,
+    if (features.size === patternFeatures.size) {
+      var featurekeysMatches = features.reduce(
+        (accumulator, currentValue, currentIndex) => {
+          return (
+            accumulator &&
+            patternFeatures.findKey((val, key) => {
+              // comparing only keys of features
+              return currentIndex === key;
+            }) !== undefined
+          );
+        },
+        true,
+      );
+
+      if (featurekeysMatches) {
+        // declares the new variables specified in the pattern of the case
+        const newState = patternFeatures
+          .filter(x => x.get("node") === "variable")
+          .reduce(
+            (accumulator, currentValue) => {
+              const featureIdentifier = currentValue.get("identifier");
+              const newVariable = makeNewVariable({
+                in: store,
+                for: featureIdentifier,
+              });
+
+              const newEquivalenceClass = buildEquivalenceClass(
+                undefined,
+                newVariable,
+              );
+
+              return {
+                state: accumulator.state.update("store", store =>
+                  store.add(newEquivalenceClass),
+                ),
+                environment: accumulator.environment.set(
+                  featureIdentifier,
+                  newVariable,
+                ),
+              };
+            },
+            { state, environment: semanticStatement.get("environment") },
+          );
+
+        // unshift the true statement in the stack
+        const newSemanticStatement = buildSemanticStatement(
+          trueStatement,
+          newState.environment,
+        );
+
+        return newState.state.update("stack", stack =>
+          stack.push(newSemanticStatement),
         );
       }
-    } else {
-      throw new Error(
-        `Unexpected record features in case statement, size does not match [size: ${features.size}]`,
-      );
     }
-  } else {
-    throw new Error(
-      `Unexpected record label in case statement [label: ${label}]`,
-    );
   }
+
+  // Otherwise push (⟨s⟩2, E) on the stack.
+  const newSemanticStatement = buildSemanticStatement(
+    falseStatement,
+    environment,
+  );
+  return state.update("stack", stack => stack.push(newSemanticStatement));
 }

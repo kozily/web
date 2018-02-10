@@ -4,6 +4,7 @@ import local from "./local";
 import binding from "./binding";
 import valueCreation from "./value_creation";
 import conditional from "./conditional";
+import patternMatching from "./patternMatching";
 
 export default {
   skip,
