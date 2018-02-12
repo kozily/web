@@ -56,3 +56,16 @@ export const conditionalStatement = (
     false_statement,
   });
 };
+
+export const buildInOperatorStatement = (kind, operator, variables) => {
+  return Immutable.fromJS({
+    node: "statement",
+    type: "buildInOperation",
+    operator,
+    kind,
+    variables: variables.reduce((accumulator, value, index) => {
+      accumulator[++index] = value;
+      return accumulator;
+    }, {}),
+  });
+};

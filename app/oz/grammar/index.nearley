@@ -21,6 +21,11 @@ statement ->
   | binding_statement {% id %}
   | value_creation_statement {% id %}
   | conditional_statement {% id %}
+  | build_in_operators_statement {% id %}
+
+build_in_operators_statement ->
+    build_in_three_variable_operator_statement {% id %}
+  | build_in_two_variable_operator_statement {% id %}
 
 skip_statement -> "skip" {%
   function (d) {
@@ -75,3 +80,75 @@ conditional_statement -> "if" __ lexical_variable __ "then" __ sequence_statemen
     }
   }
 %}
+
+
+
+
+##############################################################################
+# Build_in operators statement
+##############################################################################
+
+@{%
+  function buildInOperatorStatement(kind, operator, variables) {
+    return {
+      node: 'statement',
+      type: 'buildInOperation',
+      operator: operator,
+      kind: kind,
+      variables: variables.reduce(
+        function(accumulator, value, index) {
+          accumulator[++index] = value;
+          return accumulator;
+        }, {}),
+    };
+  }
+%}
+
+grouper_three_variables -> lexical_variable __ lexical_variable __ lexical_variable {%
+  function(d) {
+    return [d[0],d[2],d[4]];
+  }
+%}
+
+value_conditional_operators -> "==" | "\\=" | "=<" | "<" | ">=" | ">"
+
+number_operators -> "+" | "-" | "*" | "div" | "mod"
+
+kind_operator_combination -> "Value" ".`" value_conditional_operators "`" {%
+  function(d) {
+    return {kind: d[0], operator: d[2][0]};
+  }
+%}
+  | "Number" ".`" number_operators "`" {%
+  function(d) {
+    return {kind: d[0], operator: d[2][0]};
+  }
+%}
+  | "Float" ".`" "/" "`" {%
+  function(d) {
+    return {kind: d[0], operator: d[2]};
+  }
+%}
+  | "Record" ".`" "." "`" {%
+  function(d) {
+    return {kind: d[0], operator: d[2]};
+  }
+%}
+
+build_in_three_variable_operator_statement -> "{" kind_operator_combination __ grouper_three_variables "}" {%
+  function(d) {
+    return buildInOperatorStatement(d[1].kind, d[1].operator, d[3]);
+  }
+%}
+
+build_in_two_variable_operator_statement -> "{" two_variable_operations __ lexical_variable __ lexical_variable "}" {%
+  function(d) {
+    if (d[1][0] === "IsProcedure") {
+      return buildInOperatorStatement("Procedure", d[1][0], [d[3], d[5]]);
+    } else {
+      return buildInOperatorStatement("Record", d[1][0], [d[3], d[5]]);
+    } 
+  }
+%}
+
+two_variable_operations -> "IsProcedure" | "Arity" | "Label"
