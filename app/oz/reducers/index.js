@@ -4,6 +4,7 @@ import local from "./local";
 import binding from "./binding";
 import valueCreation from "./value_creation";
 import conditional from "./conditional";
+import buildInOperation from "./build_in_operation";
 
 export default {
   skip,
@@ -12,4 +13,5 @@ export default {
   binding,
   valueCreation,
   conditional,
+  buildInOperation,
 };
