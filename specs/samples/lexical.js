@@ -19,11 +19,14 @@ export const lexicalBoolean = value => {
   return lexicalRecord(value.toString());
 };
 
-export const lexicalTuple = (label, first, second) => {
-  return lexicalRecord(label, {
-    1: first,
-    2: second,
-  });
+export const lexicalTuple = (label, tuples = []) => {
+  return lexicalRecord(
+    label,
+    tuples.reduce((accumulator, value, index) => {
+      accumulator[++index] = value;
+      return accumulator;
+    }, {}),
+  );
 };
 
 export const lexicalNil = () => {
@@ -31,11 +34,11 @@ export const lexicalNil = () => {
 };
 
 export const lexicalList = (head, tail) => {
-  return lexicalTuple("|", head, tail);
+  return lexicalTuple("|", [head, tail]);
 };
 
 export const lexicalComplexList = array => {
-  return array.reduceRight(
+  return array.reduce(
     (result, item) => lexicalList(lexicalVariable(item), result),
     lexicalNil(),
   );
