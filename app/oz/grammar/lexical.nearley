@@ -22,6 +22,7 @@ lexical_value ->
   | lexical_integer {% id %}
   | lexical_float {% id %}
   | lexical_list {% id %}
+  | lexical_tuple {% id %}
 
 ##############################################################################
 # Variable identifiers
@@ -315,11 +316,28 @@ empty_list -> "[" _ "]" {%
 
 list_items ->
     lexical_variable
-  | lexical_variable __ list_items {%
+  | list_items __ lexical_variable {%
       function(d) {
-        return d[2].concat(d[0]);
+        return d[0].concat(d[2]);
       }
     %}
+
+
+
+##############################################################################
+# Tuple
+##############################################################################
+
+lexical_tuple -> lexical_atom_syntax "(" _ list_items _ ")" {%
+  function(d, position, reject) {
+    var label = d[0];
+    var features = d[3].reduce(function(result, item, index) {
+      result[++index] = item;
+      return result;
+    }, {});
+    return lexicalRecord(label, features);
+  }
+%}
 
 ##############################################################################
 # Library of helpful terminals and functions
