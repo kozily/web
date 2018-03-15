@@ -16,36 +16,30 @@ describe("Parsing case statements", () => {
     jasmine.addCustomEqualityTester(Immutable.is);
   });
 
-  describe("when variable match pattern", () => {
-    it("handles record with label and a feature", () => {
-      expect(
-        parse("case X of person(age:Age) then skip skip else skip end"),
-      ).toEqual(
-        patternMatchingStatement(
-          lexicalVariable("X"),
-          lexicalRecord("person", { age: lexicalVariable("Age") }),
-          sequenceStatement(skipStatement(), skipStatement()),
-          skipStatement(),
-        ),
-      );
-    });
+  it("handles record with label and features", () => {
+    expect(
+      parse("case X of person(name:Name age:Age) then skip skip else skip end"),
+    ).toEqual(
+      patternMatchingStatement(
+        lexicalVariable("X"),
+        lexicalRecord("person", {
+          name: lexicalVariable("Name"),
+          age: lexicalVariable("Age"),
+        }),
+        sequenceStatement(skipStatement(), skipStatement()),
+        skipStatement(),
+      ),
+    );
+  });
 
-    it("handles record with label and features", () => {
-      expect(
-        parse(
-          "case X of person(name:Name age:Age) then skip skip else skip end",
-        ),
-      ).toEqual(
-        patternMatchingStatement(
-          lexicalVariable("X"),
-          lexicalRecord("person", {
-            name: lexicalVariable("Name"),
-            age: lexicalVariable("Age"),
-          }),
-          sequenceStatement(skipStatement(), skipStatement()),
-          skipStatement(),
-        ),
-      );
-    });
+  it("handles record with label and no features", () => {
+    expect(parse("case X of person then skip skip else skip end")).toEqual(
+      patternMatchingStatement(
+        lexicalVariable("X"),
+        lexicalRecord("person"),
+        sequenceStatement(skipStatement(), skipStatement()),
+        skipStatement(),
+      ),
+    );
   });
 });

@@ -77,7 +77,7 @@ conditional_statement -> "if" __ lexical_variable __ "then" __ sequence_statemen
   }
 %}
 
-pattern_matching_statement -> "case" __ lexical_variable __ "of" __ lexical_record __ "then" __ sequence_statement __ "else" __ sequence_statement __ "end" {%
+pattern_matching_statement -> "case" __ lexical_variable __ "of" __ lexical_record_like __ "then" __ sequence_statement __ "else" __ sequence_statement __ "end" {%
   function(d, position, reject) {
     return {
       node: "statement",
