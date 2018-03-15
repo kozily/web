@@ -79,9 +79,6 @@ conditional_statement -> "if" __ lexical_variable __ "then" __ sequence_statemen
 
 pattern_matching_statement -> "case" __ lexical_variable __ "of" __ lexical_record __ "then" __ sequence_statement __ "else" __ sequence_statement __ "end" {%
   function(d, position, reject) {
-    console.log("START PATTERN MATCHING");
-    console.log(d);
-    console.log("END PATTERN MATCHING");
     return {
       node: "statement",
       type: "patternMatching",
