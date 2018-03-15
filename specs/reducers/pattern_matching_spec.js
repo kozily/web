@@ -1,7 +1,7 @@
 import Immutable from "immutable";
 import {
   skipStatement,
-  bindingStatement,
+  sequenceStatement,
   patternMatchingStatement,
 } from "../samples/statements";
 import {
@@ -20,20 +20,24 @@ import {
 } from "../../app/oz/machine/build";
 import reduce from "../../app/oz/reducers/pattern_matching";
 
-describe("Reducing case X of person(name:Name age:Age) then Z = Age else skip end statements", () => {
+describe("Reducing case statements", () => {
   beforeEach(() => {
     jasmine.addCustomEqualityTester(Immutable.is);
   });
 
-  it("reduces correctly and execute the true statement", () => {
+  it("when pattern matches", () => {
     const state = buildState(
       buildStack(),
       buildStore(
-        buildEquivalenceClass(undefined, buildVariable("z", 0)),
         buildEquivalenceClass(
-          lexicalRecord("person", { name: undefined, age: undefined }),
+          lexicalRecord("person", {
+            name: buildVariable("n", 0),
+            age: buildVariable("a", 0),
+          }),
           buildVariable("x", 0),
         ),
+        buildEquivalenceClass(undefined, buildVariable("n", 0)),
+        buildEquivalenceClass(undefined, buildVariable("a", 0)),
       ),
     );
 
@@ -44,12 +48,11 @@ describe("Reducing case X of person(name:Name age:Age) then Z = Age else skip en
           name: lexicalVariable("Name"),
           age: lexicalVariable("Age"),
         }),
-        bindingStatement(lexicalVariable("Z"), lexicalVariable("Age")),
+        sequenceStatement(skipStatement(), skipStatement()),
         skipStatement(),
       ),
       buildEnvironment({
         X: buildVariable("x", 0),
-        Z: buildVariable("z", 0),
       }),
     );
 
@@ -57,53 +60,36 @@ describe("Reducing case X of person(name:Name age:Age) then Z = Age else skip en
       buildState(
         buildStack(
           buildSemanticStatement(
-            bindingStatement(lexicalVariable("Z"), lexicalVariable("Age")),
+            sequenceStatement(skipStatement(), skipStatement()),
             buildEnvironment({
               X: buildVariable("x", 0),
-              Z: buildVariable("z", 0),
-              Name: buildVariable("name", 0),
-              Age: buildVariable("age", 0),
+              Name: buildVariable("n", 0),
+              Age: buildVariable("a", 0),
             }),
           ),
         ),
-        buildStore(
-          buildEquivalenceClass(undefined, buildVariable("z", 0)),
-          buildEquivalenceClass(
-            lexicalRecord("person", { name: undefined, age: undefined }),
-            buildVariable("x", 0),
-          ),
-          buildEquivalenceClass(undefined, buildVariable("name", 0)),
-          buildEquivalenceClass(undefined, buildVariable("age", 0)),
-        ),
+        state.get("store"),
       ),
     );
   });
 
-  it("reduces correctly and execute the false statement when differs in a feature key", () => {
+  it("when pattern matches with no features", () => {
     const state = buildState(
       buildStack(),
       buildStore(
-        buildEquivalenceClass(undefined, buildVariable("z", 0)),
-        buildEquivalenceClass(
-          lexicalRecord("person", { name: undefined, ages: undefined }),
-          buildVariable("x", 0),
-        ),
+        buildEquivalenceClass(lexicalRecord("person"), buildVariable("x", 0)),
       ),
     );
 
     const statement = buildSemanticStatement(
       patternMatchingStatement(
         lexicalVariable("X"),
-        lexicalRecord("person", {
-          name: lexicalVariable("Name"),
-          age: lexicalVariable("Age"),
-        }),
-        bindingStatement(lexicalVariable("Z"), lexicalVariable("Age")),
+        lexicalRecord("person"),
+        sequenceStatement(skipStatement(), skipStatement()),
         skipStatement(),
       ),
       buildEnvironment({
         X: buildVariable("x", 0),
-        Z: buildVariable("z", 0),
       }),
     );
 
@@ -111,33 +97,30 @@ describe("Reducing case X of person(name:Name age:Age) then Z = Age else skip en
       buildState(
         buildStack(
           buildSemanticStatement(
-            skipStatement(),
+            sequenceStatement(skipStatement(), skipStatement()),
             buildEnvironment({
               X: buildVariable("x", 0),
-              Z: buildVariable("z", 0),
             }),
           ),
         ),
-        buildStore(
-          buildEquivalenceClass(undefined, buildVariable("z", 0)),
-          buildEquivalenceClass(
-            lexicalRecord("person", { name: undefined, ages: undefined }),
-            buildVariable("x", 0),
-          ),
-        ),
+        state.get("store"),
       ),
     );
   });
 
-  it("reduces correctly and execute the false statement when differs in a label", () => {
+  it("when pattern does not match due to wrong features", () => {
     const state = buildState(
       buildStack(),
       buildStore(
-        buildEquivalenceClass(undefined, buildVariable("z", 0)),
         buildEquivalenceClass(
-          lexicalRecord("persona", { name: undefined, age: undefined }),
+          lexicalRecord("person", {
+            name: buildVariable("n", 0),
+            age: buildVariable("a", 0),
+          }),
           buildVariable("x", 0),
         ),
+        buildEquivalenceClass(undefined, buildVariable("n", 0)),
+        buildEquivalenceClass(undefined, buildVariable("a", 0)),
       ),
     );
 
@@ -145,15 +128,14 @@ describe("Reducing case X of person(name:Name age:Age) then Z = Age else skip en
       patternMatchingStatement(
         lexicalVariable("X"),
         lexicalRecord("person", {
-          name: lexicalVariable("Name"),
+          names: lexicalVariable("Name"),
           age: lexicalVariable("Age"),
         }),
-        bindingStatement(lexicalVariable("Z"), lexicalVariable("Age")),
+        sequenceStatement(skipStatement(), skipStatement()),
         skipStatement(),
       ),
       buildEnvironment({
         X: buildVariable("x", 0),
-        Z: buildVariable("z", 0),
       }),
     );
 
@@ -164,27 +146,27 @@ describe("Reducing case X of person(name:Name age:Age) then Z = Age else skip en
             skipStatement(),
             buildEnvironment({
               X: buildVariable("x", 0),
-              Z: buildVariable("z", 0),
             }),
           ),
         ),
-        buildStore(
-          buildEquivalenceClass(undefined, buildVariable("z", 0)),
-          buildEquivalenceClass(
-            lexicalRecord("persona", { name: undefined, age: undefined }),
-            buildVariable("x", 0),
-          ),
-        ),
+        state.get("store"),
       ),
     );
   });
 
-  it("can not reduce when the variable in case is not a record", () => {
+  it("when pattern does not match due to wrong label", () => {
     const state = buildState(
       buildStack(),
       buildStore(
-        buildEquivalenceClass(undefined, buildVariable("z", 0)),
-        buildEquivalenceClass(lexicalNumber(11), buildVariable("x", 0)),
+        buildEquivalenceClass(
+          lexicalRecord("people", {
+            name: buildVariable("n", 0),
+            age: buildVariable("a", 0),
+          }),
+          buildVariable("x", 0),
+        ),
+        buildEquivalenceClass(undefined, buildVariable("n", 0)),
+        buildEquivalenceClass(undefined, buildVariable("a", 0)),
       ),
     );
 
@@ -195,17 +177,64 @@ describe("Reducing case X of person(name:Name age:Age) then Z = Age else skip en
           name: lexicalVariable("Name"),
           age: lexicalVariable("Age"),
         }),
-        bindingStatement(lexicalVariable("Z"), lexicalVariable("Age")),
+        sequenceStatement(skipStatement(), skipStatement()),
         skipStatement(),
       ),
       buildEnvironment({
         X: buildVariable("x", 0),
-        Z: buildVariable("z", 0),
       }),
     );
 
-    expect(() => reduce(state, statement)).toThrowError(
-      "Wrong type in case statement [type: number]",
+    expect(reduce(state, statement)).toEqual(
+      buildState(
+        buildStack(
+          buildSemanticStatement(
+            skipStatement(),
+            buildEnvironment({
+              X: buildVariable("x", 0),
+            }),
+          ),
+        ),
+        state.get("store"),
+      ),
+    );
+  });
+
+  it("when pattern does not match due to variable not being a record", () => {
+    const state = buildState(
+      buildStack(),
+      buildStore(
+        buildEquivalenceClass(lexicalNumber(2), buildVariable("x", 0)),
+      ),
+    );
+
+    const statement = buildSemanticStatement(
+      patternMatchingStatement(
+        lexicalVariable("X"),
+        lexicalRecord("person", {
+          name: lexicalVariable("Name"),
+          age: lexicalVariable("Age"),
+        }),
+        sequenceStatement(skipStatement(), skipStatement()),
+        skipStatement(),
+      ),
+      buildEnvironment({
+        X: buildVariable("x", 0),
+      }),
+    );
+
+    expect(reduce(state, statement)).toEqual(
+      buildState(
+        buildStack(
+          buildSemanticStatement(
+            skipStatement(),
+            buildEnvironment({
+              X: buildVariable("x", 0),
+            }),
+          ),
+        ),
+        state.get("store"),
+      ),
     );
   });
 });

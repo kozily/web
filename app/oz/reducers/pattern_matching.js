@@ -1,8 +1,6 @@
-import { lookupVariableInStore, makeNewVariable } from "../machine/store";
-import {
-  buildSemanticStatement,
-  buildEquivalenceClass,
-} from "../machine/build";
+import Immutable from "immutable";
+import { lookupVariableInStore } from "../machine/store";
+import { buildSemanticStatement } from "../machine/build";
 
 export default function(state, semanticStatement) {
   const store = state.get("store");
@@ -19,91 +17,38 @@ export default function(state, semanticStatement) {
 
   const value = equivalentClass.get("value");
 
-  /* case value of pattern then true_statement else false_statement end */
-
-  /* validations */
-  /* check if value is bound */
   if (value === undefined) throw new Error("Unbound value in case statement");
-  /* check if value is a record */
-  if (value.get("type") !== "record")
-    throw new Error(
-      `Wrong type in case statement [type: ${value.get("type")}]`,
-    );
 
-  //TODO is this necessary?
-  /* check if value has features */
-  if (value.getIn(["value", "features"]).isEmpty())
-    throw new Error("The case statement record must have features");
-
-  const label = value.getIn(["value", "label"]);
-  const patternLabel = pattern.getIn(["value", "label"]);
-
-  /* checks if pattern matches */
-  if (label === patternLabel) {
-    const features = value.getIn(["value", "features"]);
+  if (
+    value.get("type") === "record" &&
+    value.getIn(["value", "label"]) === pattern.getIn(["value", "label"])
+  ) {
+    const valueFeatures = value.getIn(["value", "features"]);
     const patternFeatures = pattern.getIn(["value", "features"]);
 
-    if (features.size === patternFeatures.size) {
-      var featurekeysMatches = features.reduce(
-        (accumulator, currentValue, currentIndex) => {
-          return (
-            accumulator &&
-            patternFeatures.findKey((val, key) => {
-              // comparing only keys of features
-              return currentIndex === key;
-            }) !== undefined
+    if (
+      Immutable.is(
+        valueFeatures.keySeq().toSet(),
+        patternFeatures.keySeq().toSet(),
+      )
+    ) {
+      const newEnvironment = patternFeatures.reduce(
+        (result, identifier, feature) => {
+          return result.set(
+            identifier.get("identifier"),
+            valueFeatures.get(feature),
           );
         },
-        true,
+        environment,
       );
 
-      if (featurekeysMatches) {
-        // declares the new variables specified in the pattern of the case
-        const newState = patternFeatures
-          .filter(x => x.get("node") === "variable")
-          .reduce(
-            (accumulator, currentValue) => {
-              const featureIdentifier = currentValue.get("identifier");
-              const newVariable = makeNewVariable({
-                in: store,
-                for: featureIdentifier,
-              });
-
-              const newEquivalenceClass = buildEquivalenceClass(
-                undefined,
-                newVariable,
-              );
-
-              return {
-                state: accumulator.state.update("store", store =>
-                  store.add(newEquivalenceClass),
-                ),
-                environment: accumulator.environment.set(
-                  featureIdentifier,
-                  newVariable,
-                ),
-              };
-            },
-            { state, environment: semanticStatement.get("environment") },
-          );
-
-        // unshift the true statement in the stack
-        const newSemanticStatement = buildSemanticStatement(
-          trueStatement,
-          newState.environment,
-        );
-
-        return newState.state.update("stack", stack =>
-          stack.push(newSemanticStatement),
-        );
-      }
+      return state.update("stack", stack =>
+        stack.push(buildSemanticStatement(trueStatement, newEnvironment)),
+      );
     }
   }
 
-  // Otherwise push (⟨s⟩2, E) on the stack.
-  const newSemanticStatement = buildSemanticStatement(
-    falseStatement,
-    environment,
+  return state.update("stack", stack =>
+    stack.push(buildSemanticStatement(falseStatement, environment)),
   );
-  return state.update("stack", stack => stack.push(newSemanticStatement));
 }
