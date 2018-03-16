@@ -56,3 +56,19 @@ export const conditionalStatement = (
     false_statement,
   });
 };
+
+export const patternMatchingStatement = (
+  variable,
+  pattern,
+  true_statement,
+  false_statement = undefined,
+) => {
+  return new Immutable.Map({
+    node: "statement",
+    type: "patternMatching",
+    variable,
+    pattern,
+    true_statement,
+    false_statement,
+  });
+};
