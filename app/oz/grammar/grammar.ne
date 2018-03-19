@@ -1,34 +1,103 @@
 @builtin "whitespace.ne"
+@builtin "postprocessors.ne"
 
 ##############################################################################
-# LEXICAL SYNTAX
+# STM - STATEMENTS
 ##############################################################################
-# This section defines lexical nodes. These nodes are just a representation of
-# a character sequence which has a given meaning, just as strings, variable
-# identifiers and numbers; they don't have a semantic meaning on their own (you
-# can't execute a variable identifier in any meaningful way, unless it's in the
-# context of a unification, a declaration, etc.).
+# This section defines parsing rules for executable statements
 ##############################################################################
-lexical_index ->
-    lexical_variable {% id %}
-  | lexical_value {% id %}
+stm_root -> _ stm_sequence _ {% nth(1) %}
 
-lexical_value ->
-    lexical_record {% id %}
-  | lexical_atom {% id %}
-  | lexical_boolean {% id %}
-  | lexical_string {% id %}
-  | lexical_char {% id %}
-  | lexical_integer {% id %}
-  | lexical_float {% id %}
-  | lexical_list {% id %}
-  | lexical_tuple {% id %}
+stm_sequence ->
+    stm_simple __ stm_sequence {%
+      function (d) {
+        return { node: 'statement', type: 'sequence', head: d[0], tail: d[2] };
+      }
+    %}
+  | stm_simple {% id %}
+
+stm_simple ->
+    stm_skip {% id %}
+  | stm_local {% id %}
+  | stm_binding {% id %}
+  | stm_value_creation {% id %}
+  | stm_conditional {% id %}
+  | stm_pattern_matching {% id %}
+
+stm_skip -> "skip" {%
+  function (d) {
+    return {
+      node: 'statement',
+      type: 'skip'
+    };
+  }
+%}
+
+stm_local -> "local" __ ids_identifier __ "in" __ stm_sequence __ "end" {%
+  function(d) {
+    return {
+      node: 'statement',
+      type: 'local',
+      variable: d[2],
+      statement: d[6],
+    };
+  }
+%}
+
+stm_binding -> ids_identifier _ "=" _ ids_identifier {%
+  function(d, position, reject) {
+    return {
+      node: 'statement',
+      type: 'binding',
+      lhs: d[0],
+      rhs: d[4],
+    };
+  }
+%}
+
+stm_value_creation -> ids_identifier _ "=" _ val_value {%
+  function(d, position, reject) {
+    return {
+      node: 'statement',
+      type: 'valueCreation',
+      lhs: d[0],
+      rhs: d[4],
+    };
+  }
+%}
+
+stm_conditional -> "if" __ ids_identifier __ "then" __ stm_sequence __ "else" __ stm_sequence __ "end" {%
+  function(d, position, reject) {
+    return {
+      node: "statement",
+      type: "conditional",
+      condition: d[2],
+      true_statement: d[6],
+      false_statement: d[10],
+    }
+  }
+%}
+
+stm_pattern_matching -> "case" __ ids_identifier __ "of" __ val_record_like __ "then" __ stm_sequence __ "else" __ stm_sequence __ "end" {%
+  function(d, position, reject) {
+    return {
+      node: "statement",
+      type: "patternMatching",
+      variable: d[2],
+      pattern: d[6],
+      true_statement: d[10],
+      false_statement: d[14],
+    }
+  }
+%}
 
 ##############################################################################
-# Variable identifiers
+# IDS - IDENTIFIERS
+##############################################################################
+# This section defines parsing rules for standalone identifiers
 ##############################################################################
 @{%
-  function lexicalVariable(d) {
+  function idsBuildIdentifier(d) {
     return {
       node: 'variable',
       identifier: d[0],
@@ -36,51 +105,69 @@ lexical_value ->
   }
 %}
 
-lexical_variable ->
-    lexical_variable_syntax {% lexicalVariable %}
+ids_identifier ->
+    ids_identifier_syntax {% idsBuildIdentifier %}
 
-lexical_variable_syntax ->
-    lexical_variable_unquoted {% id %}
-  | lexical_variable_quoted {% id %}
+ids_identifier_syntax ->
+    ids_identifier_unquoted {% id %}
+  | ids_identifier_quoted {% id %}
 
 
-lexical_variable_unquoted -> [A-Z] [A-Za-z0-9_]:* {%
+ids_identifier_unquoted -> [A-Z] [A-Za-z0-9_]:* {%
   function(d) {
     return "" + d[0] + d[1].join("");
   }
 %}
 
-lexical_variable_quoted -> "`" ([^`\\] | lexical_lib_pseudo_char):* "`" {%
+ids_identifier_quoted -> "`" ([^`\\] | lib_pseudo_char):* "`" {%
   function(d) {
     return d[1].join("");
   }
 %}
 
 ##############################################################################
+# VAL - VALUES
+##############################################################################
+# This section defines parsing rules for value literals, such as records, atoms
+# and booleans.
+##############################################################################
+
+val_value ->
+    val_record {% id %}
+  | val_atom {% id %}
+  | val_boolean {% id %}
+  | val_string {% id %}
+  | val_char {% id %}
+  | val_integer {% id %}
+  | val_float {% id %}
+  | val_list {% id %}
+  | val_tuple {% id %}
+
+##############################################################################
 # Records
 ##############################################################################
 @{%
-  function lexicalRecord(label, features) {
+  function valBuildRecord(label, features) {
     return { node: 'value', type: 'record', value: { label: label, features: features } };
   }
 %}
 
-lexical_record -> lexical_atom_syntax "(" _ lexical_record_feature_list _ ")" {%
+val_record -> val_atom_syntax "(" _ val_record_feature_list _ ")" {%
   function(d, position, reject) {
     var label = d[0];
     var features = d[3].reduce(function(result, item) {
       result[item.name] = item.value;
       return result;
     }, {});
-    return lexicalRecord(label, features);
+    return valBuildRecord(label, features);
   }
 %}
 
-lexical_record_feature_list ->
-    lexical_record_feature_list __ lexical_record_feature {% function(d) { return d[0].concat(d[2]); } %}
-  | lexical_record_feature
+val_record_feature_list ->
+    val_record_feature_list __ val_record_feature {% function(d) { return d[0].concat(d[2]); } %}
+  | val_record_feature
 
-lexical_record_feature -> lexical_atom_syntax ":" lexical_variable {%
+val_record_feature -> val_atom_syntax ":" ids_identifier {%
   function(d, position, reject) {
     return {name: d[0], value: d[2]};
   }
@@ -90,11 +177,11 @@ lexical_record_feature -> lexical_atom_syntax ":" lexical_variable {%
 # Atoms
 ##############################################################################
 @{%
-  function lexicalAtom(d) {
-    return lexicalRecord(d[0], {});
+  function valBuildAtom(d) {
+    return valBuildRecord(d[0], {});
   }
 
-  LEXICAL_KEYWORDS = [
+  VAL_KEYWORDS = [
     'andthen', 'at', 'attr', 'break', 'case', 'catch', 'choice', 'class',
     'collect', 'cond', 'continue', 'declare', 'default', 'define', 'dis', 'div',
     'do', 'else', 'elsecase', 'elseif', 'elseof', 'end', 'export', 'fail', 'false',
@@ -105,17 +192,17 @@ lexical_record_feature -> lexical_atom_syntax ":" lexical_variable {%
   ];
 %}
 
-lexical_atom ->
-    lexical_atom_syntax {% lexicalAtom %}
+val_atom ->
+    val_atom_syntax {% valBuildAtom %}
 
-lexical_atom_syntax ->
-    lexical_atom_unquoted {% id %}
-  | lexical_atom_quoted {% id %}
+val_atom_syntax ->
+    val_atom_unquoted {% id %}
+  | val_atom_quoted {% id %}
 
-lexical_atom_unquoted -> [a-z] [a-zA-Z0-9_]:* {%
+val_atom_unquoted -> [a-z] [a-zA-Z0-9_]:* {%
   function(d, location, reject) {
     var name = "" + d[0] + d[1].join("");
-    if (LEXICAL_KEYWORDS.indexOf(name) === -1) {
+    if (VAL_KEYWORDS.indexOf(name) === -1) {
       return name;
     } else {
       return reject;
@@ -123,7 +210,7 @@ lexical_atom_unquoted -> [a-z] [a-zA-Z0-9_]:* {%
   }
 %}
 
-lexical_atom_quoted -> "'" ([^'\\] | lexical_lib_pseudo_char):* "'" {%
+val_atom_quoted -> "'" ([^'\\] | lib_pseudo_char):* "'" {%
   function(d) {
     return d[1].join("");
   }
@@ -133,25 +220,25 @@ lexical_atom_quoted -> "'" ([^'\\] | lexical_lib_pseudo_char):* "'" {%
 # Booleans
 ##############################################################################
 @{%
-  function lexicalBoolean(d) {
-    return lexicalRecord(d.toString(), {});
+  function valBuildBoolean(d) {
+    return valBuildRecord(d.toString(), {});
   }
 %}
 
-lexical_boolean ->
-    lexical_boolean_syntax {% lexicalBoolean %}
+val_boolean ->
+    val_boolean_syntax {% valBuildBoolean %}
 
-lexical_boolean_syntax ->
-    lexical_true_literal {% id %}
-  | lexical_false_literal {% id %}
+val_boolean_syntax ->
+    val_true_literal {% id %}
+  | val_false_literal {% id %}
 
-lexical_true_literal -> "true" {%
+val_true_literal -> "true" {%
   function (d) {
     return true;
   }
 %}
 
-lexical_false_literal -> "false" {%
+val_false_literal -> "false" {%
   function (d) {
     return false;
   }
@@ -160,31 +247,31 @@ lexical_false_literal -> "false" {%
 ##############################################################################
 # Record-like items
 ##############################################################################
-lexical_record_like ->
-    lexical_record {% id %}
-  | lexical_atom {% id %}
-  | lexical_boolean {% id %}
+val_record_like ->
+    val_record {% id %}
+  | val_atom {% id %}
+  | val_boolean {% id %}
 
 ##############################################################################
 # Strings
 ##############################################################################
 @{%
-  function lexicalString(d) {
+  function valBuildString(d) {
     if (d[0] === "") {
-      return lexicalRecord("nil", {});
+      return valBuildRecord("nil", {});
     } else {
-      return lexicalRecord("|", {
+      return valBuildRecord("|", {
         1: d[0].charCodeAt(0),
-        2: lexicalString([d[0].substring(1)]),
+        2: valBuildString([d[0].substring(1)]),
       });
     }
   }
 %}
 
-lexical_string ->
-    lexical_string_syntax {% lexicalString %}
+val_string ->
+    val_string_syntax {% valBuildString %}
 
-lexical_string_syntax -> "\"" ([^"\\] | lexical_lib_pseudo_char):* "\"" {%
+val_string_syntax -> "\"" ([^"\\] | lib_pseudo_char):* "\"" {%
   function(d) {
     return d[1].join("");
   }
@@ -194,7 +281,7 @@ lexical_string_syntax -> "\"" ([^"\\] | lexical_lib_pseudo_char):* "\"" {%
 # Generic numbers
 ##############################################################################
 @{%
-  function lexicalNumber(value) {
+  function valBuildNumber(value) {
     return { node: 'value', type: 'number', value: value[0] };
   }
 %}
@@ -202,12 +289,12 @@ lexical_string_syntax -> "\"" ([^"\\] | lexical_lib_pseudo_char):* "\"" {%
 ##############################################################################
 # Character
 ##############################################################################
-lexical_char ->
-    lexical_numeric_char {% lexicalNumber %}
-  | lexical_quoted_char {% lexicalNumber %}
-  | lexical_escaped_char {% lexicalNumber %}
+val_char ->
+    val_numeric_char {% valBuildNumber %}
+  | val_quoted_char {% valBuildNumber %}
+  | val_escaped_char {% valBuildNumber %}
 
-lexical_numeric_char -> [1-9] [0-9]:* {%
+val_numeric_char -> [1-9] [0-9]:* {%
   function(d, location, reject) {
     var value = parseInt("" + d[0] + d[1].join(""), 10);
     if (value > 255) {
@@ -218,13 +305,13 @@ lexical_numeric_char -> [1-9] [0-9]:* {%
   }
 %}
 
-lexical_quoted_char -> "&" [^\\] {%
+val_quoted_char -> "&" [^\\] {%
   function (d) {
     return d[1].charCodeAt(0);
   }
 %}
 
-lexical_escaped_char -> "&" lexical_lib_pseudo_char {%
+val_escaped_char -> "&" lib_pseudo_char {%
   function(d) {
     return d[1].charCodeAt(0);
   }
@@ -233,13 +320,13 @@ lexical_escaped_char -> "&" lexical_lib_pseudo_char {%
 ##############################################################################
 # Integer
 ##############################################################################
-lexical_integer ->
-    lexical_decimal_int {% lexicalNumber %}
-  | lexical_octal_int {% lexicalNumber %}
-  | lexical_hexal_int {% lexicalNumber %}
-  | lexical_bin_int {% lexicalNumber %}
+val_integer ->
+    val_decimal_int {% valBuildNumber %}
+  | val_octal_int {% valBuildNumber %}
+  | val_hexal_int {% valBuildNumber %}
+  | val_bin_int {% valBuildNumber %}
 
-lexical_decimal_int -> "~":? [1-9] [0-9]:* {%
+val_decimal_int -> "~":? [1-9] [0-9]:* {%
   function (d, location, reject) {
     var value = parseInt(
       translateWeirdOzUnaryMinus(d[0]) +
@@ -255,7 +342,7 @@ lexical_decimal_int -> "~":? [1-9] [0-9]:* {%
   }
 %}
 
-lexical_octal_int -> "~":? "0" [0-7]:+ {%
+val_octal_int -> "~":? "0" [0-7]:+ {%
   function (d) {
     return parseInt(
       translateWeirdOzUnaryMinus(d[0]) +
@@ -264,7 +351,7 @@ lexical_octal_int -> "~":? "0" [0-7]:+ {%
   }
 %}
 
-lexical_hexal_int -> "~":? ("0x" | "0X") [a-fA-F0-7]:+ {%
+val_hexal_int -> "~":? ("0x" | "0X") [a-fA-F0-7]:+ {%
   function (d) {
     return parseInt(
       translateWeirdOzUnaryMinus(d[0]) +
@@ -273,7 +360,7 @@ lexical_hexal_int -> "~":? ("0x" | "0X") [a-fA-F0-7]:+ {%
   }
 %}
 
-lexical_bin_int -> "~":? ("0b" | "0B") [0-1]:+ {%
+val_bin_int -> "~":? ("0b" | "0B") [0-1]:+ {%
   function (d) {
     return parseInt(
       translateWeirdOzUnaryMinus(d[0]) +
@@ -285,9 +372,9 @@ lexical_bin_int -> "~":? ("0b" | "0B") [0-1]:+ {%
 ##############################################################################
 # Float
 ##############################################################################
-lexical_float -> "~":? [0-9]:+ "." [0-9]:* (("e" | "E") "~":? [0-9]:+):? {%
+val_float -> "~":? [0-9]:+ "." [0-9]:* (("e" | "E") "~":? [0-9]:+):? {%
   function(d) {
-    return lexicalNumber([parseFloat(
+    return valBuildNumber([parseFloat(
       translateWeirdOzUnaryMinus(d[0]) +
       d[1].join("") +
       "." +
@@ -301,30 +388,30 @@ lexical_float -> "~":? [0-9]:+ "." [0-9]:* (("e" | "E") "~":? [0-9]:+):? {%
 # List
 ##############################################################################
 
-lexical_list ->
-    empty_list {% id %}
-  | normal_list {% id %}
+val_list ->
+    val_empty_list {% id %}
+  | val_list_with_items {% id %}
 
-normal_list -> "[" _ list_items _ "]" {%
+val_list_with_items -> "[" _ val_list_items _ "]" {%
   function(d) {
     return d[2].reduce(
       function(a, b) {
-        return lexicalRecord('|', {1: b, 2:a});
+        return valBuildRecord('|', {1: b, 2:a});
       },
-      lexicalRecord("nil", {})
+      valBuildRecord("nil", {})
     );
   }
 %}
 
-empty_list -> "[" _ "]" {%
+val_empty_list -> "[" _ "]" {%
   function(d) {
-    return lexicalRecord("nil", {});
+    return valBuildRecord("nil", {});
   }
 %}
 
-list_items ->
-    lexical_variable
-  | list_items __ lexical_variable {%
+val_list_items ->
+    ids_identifier
+  | val_list_items __ ids_identifier {%
       function(d) {
         return d[0].concat(d[2]);
       }
@@ -336,30 +423,34 @@ list_items ->
 # Tuple
 ##############################################################################
 
-lexical_tuple -> lexical_atom_syntax "(" _ list_items _ ")" {%
+val_tuple -> val_atom_syntax "(" _ val_list_items _ ")" {%
   function(d, position, reject) {
     var label = d[0];
     var features = d[3].reduce(function(result, item, index) {
       result[++index] = item;
       return result;
     }, {});
-    return lexicalRecord(label, features);
+    return valBuildRecord(label, features);
   }
 %}
 
+
 ##############################################################################
-# Library of helpful terminals and functions
+# LIB - UTILITIES
 ##############################################################################
+# This section defines common rules, terminals and functions
+##############################################################################
+
 @{%
   function translateWeirdOzUnaryMinus(v) { return v === "~" ? "-" : "+"; }
 %}
 
-lexical_lib_pseudo_char ->
-    lexical_lib_octal_char {% id %}
-  | lexical_lib_hexal_char {% id %}
-  | lexical_lib_escaped_char {% id %}
+lib_pseudo_char ->
+    lib_octal_char {% id %}
+  | lib_hexal_char {% id %}
+  | lib_escaped_char {% id %}
 
-lexical_lib_octal_char -> "\\" ([0-7] [0-7] [0-7]) {%
+lib_octal_char -> "\\" ([0-7] [0-7] [0-7]) {%
   function (d, location, reject) {
     var value = parseInt(d[1].join(""), 8);
     if (value > 255) {
@@ -370,14 +461,14 @@ lexical_lib_octal_char -> "\\" ([0-7] [0-7] [0-7]) {%
   }
 %}
 
-lexical_lib_hexal_char -> "\\" ("x" | "X") ([0-9a-fA-F] [0-9a-fA-F]) {%
+lib_hexal_char -> "\\" ("x" | "X") ([0-9a-fA-F] [0-9a-fA-F]) {%
   function (d) {
     return String.fromCharCode(parseInt(d[2].join(""), 16));
   }
 %}
 
 @{%
-  var LEXICAL_ESCAPEDCHARS = {
+  var LIB_ESCAPED_CHARS = {
     "a": String.fromCharCode(7),
     "b": String.fromCharCode(8),
     "f": String.fromCharCode(12),
@@ -393,9 +484,9 @@ lexical_lib_hexal_char -> "\\" ("x" | "X") ([0-9a-fA-F] [0-9a-fA-F]) {%
   }
 %}
 
-lexical_lib_escaped_char -> "\\" ("a" | "b" | "f" | "n" | "r" | "t" | "v" | "\\" | "'" | "\"" | "`" | "&") {%
+lib_escaped_char -> "\\" ("a" | "b" | "f" | "n" | "r" | "t" | "v" | "\\" | "'" | "\"" | "`" | "&") {%
   function (d) {
-    return LEXICAL_ESCAPEDCHARS[d[1]];
+    return LIB_ESCAPED_CHARS[d[1]];
   }
 %}
 

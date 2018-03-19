@@ -1,5 +1,5 @@
 import Immutable from "immutable";
-import { lexicalVariable } from "../../samples/lexical";
+import { lexicalIdentifier } from "../../samples/lexical";
 import { bindingStatement } from "../../samples/statements";
 import parse from "../../../app/oz/parser";
 
@@ -10,15 +10,15 @@ describe("Parsing X=Y statements", () => {
 
   it("handles condensed syntax correctly", () => {
     expect(parse("X=Y")).toEqual(
-      bindingStatement(lexicalVariable("X"), lexicalVariable("Y")),
+      bindingStatement(lexicalIdentifier("X"), lexicalIdentifier("Y")),
     );
   });
 
   it("handles spaced syntax correctly", () => {
     expect(parse("Variable = OtherVariable")).toEqual(
       bindingStatement(
-        lexicalVariable("Variable"),
-        lexicalVariable("OtherVariable"),
+        lexicalIdentifier("Variable"),
+        lexicalIdentifier("OtherVariable"),
       ),
     );
   });
@@ -26,8 +26,8 @@ describe("Parsing X=Y statements", () => {
   it("handles quoted variable syntax correctly", () => {
     expect(parse("`One Variable` = OtherVariable")).toEqual(
       bindingStatement(
-        lexicalVariable("One Variable"),
-        lexicalVariable("OtherVariable"),
+        lexicalIdentifier("One Variable"),
+        lexicalIdentifier("OtherVariable"),
       ),
     );
   });

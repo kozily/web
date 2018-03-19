@@ -1,62 +1,63 @@
 import Immutable from "immutable";
-import { lexicalRecord, lexicalVariable } from "../../samples/lexical";
+import { lexicalIdentifier } from "../../samples/lexical";
+import { valueRecord } from "../../samples/values";
 import { parserFor } from "../../../app/oz/parser";
-import lexicalGrammar from "../../../app/oz/grammar/lexical.nearley";
+import valueGrammar from "../../../app/oz/grammar/values.ne";
 
-const parse = parserFor(lexicalGrammar);
+const parse = parserFor(valueGrammar);
 
-describe("Parsing lexical record elements", () => {
+describe("Parsing record values", () => {
   beforeEach(() => {
     jasmine.addCustomEqualityTester(Immutable.is);
   });
 
   it("handles the standard syntax", () => {
     expect(parse("label(a:X b:Y)")).toEqual(
-      lexicalRecord("label", {
-        a: lexicalVariable("X"),
-        b: lexicalVariable("Y"),
+      valueRecord("label", {
+        a: lexicalIdentifier("X"),
+        b: lexicalIdentifier("Y"),
       }),
     );
   });
 
   it("handles the standard syntax with a single feature", () => {
     expect(parse("label(a:X)")).toEqual(
-      lexicalRecord("label", {
-        a: lexicalVariable("X"),
+      valueRecord("label", {
+        a: lexicalIdentifier("X"),
       }),
     );
   });
 
   it("handles the standard syntax with a single multicharacter feature", () => {
     expect(parse("label(feature:X)")).toEqual(
-      lexicalRecord("label", {
-        feature: lexicalVariable("X"),
+      valueRecord("label", {
+        feature: lexicalIdentifier("X"),
       }),
     );
   });
 
   it("handles the standard syntax with whitespaces", () => {
     expect(parse("label(\n  a:X\n  b:Y\n)")).toEqual(
-      lexicalRecord("label", {
-        a: lexicalVariable("X"),
-        b: lexicalVariable("Y"),
+      valueRecord("label", {
+        a: lexicalIdentifier("X"),
+        b: lexicalIdentifier("Y"),
       }),
     );
   });
 
   it("handles the standard syntax with a single feature and whitespaces", () => {
     expect(parse("label(  a:X\n  \n)")).toEqual(
-      lexicalRecord("label", {
-        a: lexicalVariable("X"),
+      valueRecord("label", {
+        a: lexicalIdentifier("X"),
       }),
     );
   });
 
   it("handles a quoted label syntax", () => {
     expect(parse("'andthen'(a:X b:Y)")).toEqual(
-      lexicalRecord("andthen", {
-        a: lexicalVariable("X"),
-        b: lexicalVariable("Y"),
+      valueRecord("andthen", {
+        a: lexicalIdentifier("X"),
+        b: lexicalIdentifier("Y"),
       }),
     );
   });

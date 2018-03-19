@@ -1,6 +1,7 @@
 import Immutable from "immutable";
 import { skipStatement, localStatement } from "../samples/statements";
-import { lexicalVariable, lexicalNumber } from "../samples/lexical";
+import { lexicalIdentifier } from "../samples/lexical";
+import { valueNumber } from "../samples/values";
 import {
   buildState,
   buildStack,
@@ -23,7 +24,7 @@ describe("Reducing local X in ... end statements", () => {
     );
 
     const statement = buildSemanticStatement(
-      localStatement(lexicalVariable("X"), skipStatement()),
+      localStatement(lexicalIdentifier("X"), skipStatement()),
     );
 
     expect(reduce(state, statement)).toEqual(
@@ -46,13 +47,13 @@ describe("Reducing local X in ... end statements", () => {
     const state = buildState(
       buildStack(buildSemanticStatement(skipStatement())),
       buildStore(
-        buildEquivalenceClass(lexicalNumber(10), buildVariable("y", 0)),
-        buildEquivalenceClass(lexicalNumber(20), buildVariable("x", 0)),
-        buildEquivalenceClass(lexicalNumber(30), buildVariable("x", 1)),
+        buildEquivalenceClass(valueNumber(10), buildVariable("y", 0)),
+        buildEquivalenceClass(valueNumber(20), buildVariable("x", 0)),
+        buildEquivalenceClass(valueNumber(30), buildVariable("x", 1)),
       ),
     );
     const statement = buildSemanticStatement(
-      localStatement(lexicalVariable("X"), skipStatement()),
+      localStatement(lexicalIdentifier("X"), skipStatement()),
       buildEnvironment({
         Y: buildVariable("y", 0),
       }),
@@ -72,9 +73,9 @@ describe("Reducing local X in ... end statements", () => {
         ),
 
         buildStore(
-          buildEquivalenceClass(lexicalNumber(10), buildVariable("y", 0)),
-          buildEquivalenceClass(lexicalNumber(20), buildVariable("x", 0)),
-          buildEquivalenceClass(lexicalNumber(30), buildVariable("x", 1)),
+          buildEquivalenceClass(valueNumber(10), buildVariable("y", 0)),
+          buildEquivalenceClass(valueNumber(20), buildVariable("x", 0)),
+          buildEquivalenceClass(valueNumber(30), buildVariable("x", 1)),
           buildEquivalenceClass(undefined, buildVariable("x", 2)),
         ),
       ),

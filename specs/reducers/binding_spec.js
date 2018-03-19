@@ -1,6 +1,6 @@
 import Immutable from "immutable";
 import { skipStatement, bindingStatement } from "../samples/statements";
-import { lexicalVariable } from "../samples/lexical";
+import { lexicalIdentifier } from "../samples/lexical";
 import {
   buildState,
   buildStack,
@@ -40,7 +40,7 @@ describe("Reducing X=Y statements", () => {
     );
 
     const statement = buildSemanticStatement(
-      bindingStatement(lexicalVariable("X"), lexicalVariable("Y")),
+      bindingStatement(lexicalIdentifier("X"), lexicalIdentifier("Y")),
       buildEnvironment({
         X: buildVariable("x", 0),
         Y: buildVariable("y", 0),
@@ -88,7 +88,7 @@ describe("Reducing X=Y statements", () => {
     );
 
     const statement = buildSemanticStatement(
-      bindingStatement(lexicalVariable("X"), lexicalVariable("Y")),
+      bindingStatement(lexicalIdentifier("X"), lexicalIdentifier("Y")),
       buildEnvironment({
         X: buildVariable("x", 0),
         Y: buildVariable("y", 0),
@@ -130,7 +130,7 @@ describe("Reducing X=Y statements", () => {
     );
 
     const statement = buildSemanticStatement(
-      bindingStatement(lexicalVariable("Z"), lexicalVariable("X")),
+      bindingStatement(lexicalIdentifier("Z"), lexicalIdentifier("X")),
       buildEnvironment({
         Z: buildVariable("z", 0),
         X: buildVariable("y", 0),
