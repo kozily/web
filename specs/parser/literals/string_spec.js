@@ -1,7 +1,7 @@
 import Immutable from "immutable";
-import { valueString } from "../../samples/values";
+import { literalString } from "../../samples/literals";
 import { parserFor } from "../../../app/oz/parser";
-import valueGrammar from "../../../app/oz/grammar/values.ne";
+import valueGrammar from "../../../app/oz/grammar/literals.ne";
 
 const parse = parserFor(valueGrammar);
 
@@ -11,6 +11,6 @@ describe("Parsing string values", () => {
   });
 
   it("handles parsing correctly", () => {
-    expect(parse('"a \\\\\\nSTRING"')).toEqual(valueString("a \\\nSTRING"));
+    expect(parse('"a \\\\\\nSTRING"')).toEqual(literalString("a \\\nSTRING"));
   });
 });

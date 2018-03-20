@@ -5,7 +5,7 @@ import {
   patternMatchingStatement,
 } from "../samples/statements";
 import { lexicalIdentifier } from "../samples/lexical";
-import { valueNumber, valueRecord } from "../samples/values";
+import { literalNumber, literalRecord } from "../samples/literals";
 import {
   buildState,
   buildStack,
@@ -27,7 +27,7 @@ describe("Reducing case statements", () => {
       buildStack(),
       buildStore(
         buildEquivalenceClass(
-          valueRecord("person", {
+          literalRecord("person", {
             name: buildVariable("n", 0),
             age: buildVariable("a", 0),
           }),
@@ -41,7 +41,7 @@ describe("Reducing case statements", () => {
     const statement = buildSemanticStatement(
       patternMatchingStatement(
         lexicalIdentifier("X"),
-        valueRecord("person", {
+        literalRecord("person", {
           name: lexicalIdentifier("Name"),
           age: lexicalIdentifier("Age"),
         }),
@@ -74,14 +74,14 @@ describe("Reducing case statements", () => {
     const state = buildState(
       buildStack(),
       buildStore(
-        buildEquivalenceClass(valueRecord("person"), buildVariable("x", 0)),
+        buildEquivalenceClass(literalRecord("person"), buildVariable("x", 0)),
       ),
     );
 
     const statement = buildSemanticStatement(
       patternMatchingStatement(
         lexicalIdentifier("X"),
-        valueRecord("person"),
+        literalRecord("person"),
         sequenceStatement(skipStatement(), skipStatement()),
         skipStatement(),
       ),
@@ -110,7 +110,7 @@ describe("Reducing case statements", () => {
       buildStack(),
       buildStore(
         buildEquivalenceClass(
-          valueRecord("person", {
+          literalRecord("person", {
             name: buildVariable("n", 0),
             age: buildVariable("a", 0),
           }),
@@ -124,7 +124,7 @@ describe("Reducing case statements", () => {
     const statement = buildSemanticStatement(
       patternMatchingStatement(
         lexicalIdentifier("X"),
-        valueRecord("person", {
+        literalRecord("person", {
           names: lexicalIdentifier("Name"),
           age: lexicalIdentifier("Age"),
         }),
@@ -156,7 +156,7 @@ describe("Reducing case statements", () => {
       buildStack(),
       buildStore(
         buildEquivalenceClass(
-          valueRecord("people", {
+          literalRecord("people", {
             name: buildVariable("n", 0),
             age: buildVariable("a", 0),
           }),
@@ -170,7 +170,7 @@ describe("Reducing case statements", () => {
     const statement = buildSemanticStatement(
       patternMatchingStatement(
         lexicalIdentifier("X"),
-        valueRecord("person", {
+        literalRecord("person", {
           name: lexicalIdentifier("Name"),
           age: lexicalIdentifier("Age"),
         }),
@@ -200,13 +200,15 @@ describe("Reducing case statements", () => {
   it("when pattern does not match due to variable not being a record", () => {
     const state = buildState(
       buildStack(),
-      buildStore(buildEquivalenceClass(valueNumber(2), buildVariable("x", 0))),
+      buildStore(
+        buildEquivalenceClass(literalNumber(2), buildVariable("x", 0)),
+      ),
     );
 
     const statement = buildSemanticStatement(
       patternMatchingStatement(
         lexicalIdentifier("X"),
-        valueRecord("person", {
+        literalRecord("person", {
           name: lexicalIdentifier("Name"),
           age: lexicalIdentifier("Age"),
         }),

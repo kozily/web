@@ -1,4 +1,4 @@
 @include "./grammar.ne"
 
 index ->
-    val_value {% id %}
+    lit_value {% id %}

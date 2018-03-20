@@ -7,7 +7,7 @@ import { makeNewVariable } from "../machine/store";
 export default function(state, semanticStatement) {
   const identifier = semanticStatement.getIn([
     "statement",
-    "variable",
+    "identifier",
     "identifier",
   ]);
   const childStatement = semanticStatement.getIn(["statement", "statement"]);

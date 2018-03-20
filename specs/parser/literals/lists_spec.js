@@ -1,13 +1,13 @@
 import Immutable from "immutable";
 import { parserFor } from "../../../app/oz/parser";
-import valueGrammar from "../../../app/oz/grammar/values.ne";
+import valueGrammar from "../../../app/oz/grammar/literals.ne";
 import { lexicalIdentifier } from "../../samples/lexical";
-import { valueList } from "../../samples/values";
+import { literalList } from "../../samples/literals";
 
 const parse = parserFor(valueGrammar);
 
 const identifiersList = (identifiers = []) =>
-  valueList(identifiers.map(id => lexicalIdentifier(id)));
+  literalList(identifiers.map(id => lexicalIdentifier(id)));
 
 describe("Parsing list values", () => {
   beforeEach(() => {

@@ -1,7 +1,7 @@
 import Immutable from "immutable";
 import { skipStatement, localStatement } from "../samples/statements";
 import { lexicalIdentifier } from "../samples/lexical";
-import { valueNumber } from "../samples/values";
+import { literalNumber } from "../samples/literals";
 import {
   buildState,
   buildStack,
@@ -47,9 +47,9 @@ describe("Reducing local X in ... end statements", () => {
     const state = buildState(
       buildStack(buildSemanticStatement(skipStatement())),
       buildStore(
-        buildEquivalenceClass(valueNumber(10), buildVariable("y", 0)),
-        buildEquivalenceClass(valueNumber(20), buildVariable("x", 0)),
-        buildEquivalenceClass(valueNumber(30), buildVariable("x", 1)),
+        buildEquivalenceClass(literalNumber(10), buildVariable("y", 0)),
+        buildEquivalenceClass(literalNumber(20), buildVariable("x", 0)),
+        buildEquivalenceClass(literalNumber(30), buildVariable("x", 1)),
       ),
     );
     const statement = buildSemanticStatement(
@@ -73,9 +73,9 @@ describe("Reducing local X in ... end statements", () => {
         ),
 
         buildStore(
-          buildEquivalenceClass(valueNumber(10), buildVariable("y", 0)),
-          buildEquivalenceClass(valueNumber(20), buildVariable("x", 0)),
-          buildEquivalenceClass(valueNumber(30), buildVariable("x", 1)),
+          buildEquivalenceClass(literalNumber(10), buildVariable("y", 0)),
+          buildEquivalenceClass(literalNumber(20), buildVariable("x", 0)),
+          buildEquivalenceClass(literalNumber(30), buildVariable("x", 1)),
           buildEquivalenceClass(undefined, buildVariable("x", 2)),
         ),
       ),

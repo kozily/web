@@ -15,19 +15,16 @@ export default function(state, semanticStatement) {
 
   const value = equivalentClass.get("value");
 
-  /* validations */
-  /* check if value is bound */
   if (value === undefined) throw new Error("Unbound value in if condition");
-  /* check if value is a record */
+
   if (value.get("type") !== "record")
     throw new Error(`Wrong type in if condition [type: ${value.get("type")}]`);
-  /* check if value has no features*/
+
   if (!value.getIn(["value", "features"]).isEmpty())
     throw new Error("The condition record must not have features");
 
   const label = value.getIn(["value", "label"]);
   if (label === "true") {
-    /*creates a new semantic statement to be pushed*/
     const newSemanticStatement = buildSemanticStatement(
       trueStatement,
       environment,

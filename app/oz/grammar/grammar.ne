@@ -38,7 +38,7 @@ stm_local -> "local" __ ids_identifier __ "in" __ stm_sequence __ "end" {%
     return {
       node: 'statement',
       type: 'local',
-      variable: d[2],
+      identifier: d[2],
       statement: d[6],
     };
   }
@@ -55,7 +55,7 @@ stm_binding -> ids_identifier _ "=" _ ids_identifier {%
   }
 %}
 
-stm_value_creation -> ids_identifier _ "=" _ val_value {%
+stm_value_creation -> ids_identifier _ "=" _ lit_value {%
   function(d, position, reject) {
     return {
       node: 'statement',
@@ -78,12 +78,12 @@ stm_conditional -> "if" __ ids_identifier __ "then" __ stm_sequence __ "else" __
   }
 %}
 
-stm_pattern_matching -> "case" __ ids_identifier __ "of" __ val_record_like __ "then" __ stm_sequence __ "else" __ stm_sequence __ "end" {%
+stm_pattern_matching -> "case" __ ids_identifier __ "of" __ lit_record_like __ "then" __ stm_sequence __ "else" __ stm_sequence __ "end" {%
   function(d, position, reject) {
     return {
       node: "statement",
       type: "patternMatching",
-      variable: d[2],
+      identifier: d[2],
       pattern: d[6],
       true_statement: d[10],
       false_statement: d[14],
@@ -99,7 +99,7 @@ stm_pattern_matching -> "case" __ ids_identifier __ "of" __ val_record_like __ "
 @{%
   function idsBuildIdentifier(d) {
     return {
-      node: 'variable',
+      node: 'identifier',
       identifier: d[0],
     };
   }
@@ -126,48 +126,48 @@ ids_identifier_quoted -> "`" ([^`\\] | lib_pseudo_char):* "`" {%
 %}
 
 ##############################################################################
-# VAL - VALUES
+# LIT - LITERALS
 ##############################################################################
 # This section defines parsing rules for value literals, such as records, atoms
 # and booleans.
 ##############################################################################
 
-val_value ->
-    val_record {% id %}
-  | val_atom {% id %}
-  | val_boolean {% id %}
-  | val_string {% id %}
-  | val_char {% id %}
-  | val_integer {% id %}
-  | val_float {% id %}
-  | val_list {% id %}
-  | val_tuple {% id %}
+lit_value ->
+    lit_record {% id %}
+  | lit_atom {% id %}
+  | lit_boolean {% id %}
+  | lit_string {% id %}
+  | lit_char {% id %}
+  | lit_integer {% id %}
+  | lit_float {% id %}
+  | lit_list {% id %}
+  | lit_tuple {% id %}
 
 ##############################################################################
 # Records
 ##############################################################################
 @{%
-  function valBuildRecord(label, features) {
-    return { node: 'value', type: 'record', value: { label: label, features: features } };
+  function litBuildRecord(label, features) {
+    return { node: 'literal', type: 'record', value: { label: label, features: features } };
   }
 %}
 
-val_record -> val_atom_syntax "(" _ val_record_feature_list _ ")" {%
+lit_record -> lit_atom_syntax "(" _ lit_record_feature_list _ ")" {%
   function(d, position, reject) {
     var label = d[0];
     var features = d[3].reduce(function(result, item) {
       result[item.name] = item.value;
       return result;
     }, {});
-    return valBuildRecord(label, features);
+    return litBuildRecord(label, features);
   }
 %}
 
-val_record_feature_list ->
-    val_record_feature_list __ val_record_feature {% function(d) { return d[0].concat(d[2]); } %}
-  | val_record_feature
+lit_record_feature_list ->
+    lit_record_feature_list __ lit_record_feature {% function(d) { return d[0].concat(d[2]); } %}
+  | lit_record_feature
 
-val_record_feature -> val_atom_syntax ":" ids_identifier {%
+lit_record_feature -> lit_atom_syntax ":" ids_identifier {%
   function(d, position, reject) {
     return {name: d[0], value: d[2]};
   }
@@ -177,11 +177,11 @@ val_record_feature -> val_atom_syntax ":" ids_identifier {%
 # Atoms
 ##############################################################################
 @{%
-  function valBuildAtom(d) {
-    return valBuildRecord(d[0], {});
+  function litBuildAtom(d) {
+    return litBuildRecord(d[0], {});
   }
 
-  VAL_KEYWORDS = [
+  LIT_KEYWORDS = [
     'andthen', 'at', 'attr', 'break', 'case', 'catch', 'choice', 'class',
     'collect', 'cond', 'continue', 'declare', 'default', 'define', 'dis', 'div',
     'do', 'else', 'elsecase', 'elseif', 'elseof', 'end', 'export', 'fail', 'false',
@@ -192,17 +192,17 @@ val_record_feature -> val_atom_syntax ":" ids_identifier {%
   ];
 %}
 
-val_atom ->
-    val_atom_syntax {% valBuildAtom %}
+lit_atom ->
+    lit_atom_syntax {% litBuildAtom %}
 
-val_atom_syntax ->
-    val_atom_unquoted {% id %}
-  | val_atom_quoted {% id %}
+lit_atom_syntax ->
+    lit_atom_unquoted {% id %}
+  | lit_atom_quoted {% id %}
 
-val_atom_unquoted -> [a-z] [a-zA-Z0-9_]:* {%
+lit_atom_unquoted -> [a-z] [a-zA-Z0-9_]:* {%
   function(d, location, reject) {
     var name = "" + d[0] + d[1].join("");
-    if (VAL_KEYWORDS.indexOf(name) === -1) {
+    if (LIT_KEYWORDS.indexOf(name) === -1) {
       return name;
     } else {
       return reject;
@@ -210,7 +210,7 @@ val_atom_unquoted -> [a-z] [a-zA-Z0-9_]:* {%
   }
 %}
 
-val_atom_quoted -> "'" ([^'\\] | lib_pseudo_char):* "'" {%
+lit_atom_quoted -> "'" ([^'\\] | lib_pseudo_char):* "'" {%
   function(d) {
     return d[1].join("");
   }
@@ -220,25 +220,25 @@ val_atom_quoted -> "'" ([^'\\] | lib_pseudo_char):* "'" {%
 # Booleans
 ##############################################################################
 @{%
-  function valBuildBoolean(d) {
-    return valBuildRecord(d.toString(), {});
+  function litBuildBoolean(d) {
+    return litBuildRecord(d.toString(), {});
   }
 %}
 
-val_boolean ->
-    val_boolean_syntax {% valBuildBoolean %}
+lit_boolean ->
+    lit_boolean_syntax {% litBuildBoolean %}
 
-val_boolean_syntax ->
-    val_true_literal {% id %}
-  | val_false_literal {% id %}
+lit_boolean_syntax ->
+    lit_true_literal {% id %}
+  | lit_false_literal {% id %}
 
-val_true_literal -> "true" {%
+lit_true_literal -> "true" {%
   function (d) {
     return true;
   }
 %}
 
-val_false_literal -> "false" {%
+lit_false_literal -> "false" {%
   function (d) {
     return false;
   }
@@ -247,31 +247,31 @@ val_false_literal -> "false" {%
 ##############################################################################
 # Record-like items
 ##############################################################################
-val_record_like ->
-    val_record {% id %}
-  | val_atom {% id %}
-  | val_boolean {% id %}
+lit_record_like ->
+    lit_record {% id %}
+  | lit_atom {% id %}
+  | lit_boolean {% id %}
 
 ##############################################################################
 # Strings
 ##############################################################################
 @{%
-  function valBuildString(d) {
+  function litBuildString(d) {
     if (d[0] === "") {
-      return valBuildRecord("nil", {});
+      return litBuildRecord("nil", {});
     } else {
-      return valBuildRecord("|", {
+      return litBuildRecord("|", {
         1: d[0].charCodeAt(0),
-        2: valBuildString([d[0].substring(1)]),
+        2: litBuildString([d[0].substring(1)]),
       });
     }
   }
 %}
 
-val_string ->
-    val_string_syntax {% valBuildString %}
+lit_string ->
+    lit_string_syntax {% litBuildString %}
 
-val_string_syntax -> "\"" ([^"\\] | lib_pseudo_char):* "\"" {%
+lit_string_syntax -> "\"" ([^"\\] | lib_pseudo_char):* "\"" {%
   function(d) {
     return d[1].join("");
   }
@@ -281,20 +281,20 @@ val_string_syntax -> "\"" ([^"\\] | lib_pseudo_char):* "\"" {%
 # Generic numbers
 ##############################################################################
 @{%
-  function valBuildNumber(value) {
-    return { node: 'value', type: 'number', value: value[0] };
+  function litBuildNumber(value) {
+    return { node: 'literal', type: 'number', value: value[0] };
   }
 %}
 
 ##############################################################################
 # Character
 ##############################################################################
-val_char ->
-    val_numeric_char {% valBuildNumber %}
-  | val_quoted_char {% valBuildNumber %}
-  | val_escaped_char {% valBuildNumber %}
+lit_char ->
+    lit_numeric_char {% litBuildNumber %}
+  | lit_quoted_char {% litBuildNumber %}
+  | lit_escaped_char {% litBuildNumber %}
 
-val_numeric_char -> [1-9] [0-9]:* {%
+lit_numeric_char -> [1-9] [0-9]:* {%
   function(d, location, reject) {
     var value = parseInt("" + d[0] + d[1].join(""), 10);
     if (value > 255) {
@@ -305,13 +305,13 @@ val_numeric_char -> [1-9] [0-9]:* {%
   }
 %}
 
-val_quoted_char -> "&" [^\\] {%
+lit_quoted_char -> "&" [^\\] {%
   function (d) {
     return d[1].charCodeAt(0);
   }
 %}
 
-val_escaped_char -> "&" lib_pseudo_char {%
+lit_escaped_char -> "&" lib_pseudo_char {%
   function(d) {
     return d[1].charCodeAt(0);
   }
@@ -320,13 +320,13 @@ val_escaped_char -> "&" lib_pseudo_char {%
 ##############################################################################
 # Integer
 ##############################################################################
-val_integer ->
-    val_decimal_int {% valBuildNumber %}
-  | val_octal_int {% valBuildNumber %}
-  | val_hexal_int {% valBuildNumber %}
-  | val_bin_int {% valBuildNumber %}
+lit_integer ->
+    lit_decimal_int {% litBuildNumber %}
+  | lit_octal_int {% litBuildNumber %}
+  | lit_hexal_int {% litBuildNumber %}
+  | lit_bin_int {% litBuildNumber %}
 
-val_decimal_int -> "~":? [1-9] [0-9]:* {%
+lit_decimal_int -> "~":? [1-9] [0-9]:* {%
   function (d, location, reject) {
     var value = parseInt(
       translateWeirdOzUnaryMinus(d[0]) +
@@ -342,7 +342,7 @@ val_decimal_int -> "~":? [1-9] [0-9]:* {%
   }
 %}
 
-val_octal_int -> "~":? "0" [0-7]:+ {%
+lit_octal_int -> "~":? "0" [0-7]:+ {%
   function (d) {
     return parseInt(
       translateWeirdOzUnaryMinus(d[0]) +
@@ -351,7 +351,7 @@ val_octal_int -> "~":? "0" [0-7]:+ {%
   }
 %}
 
-val_hexal_int -> "~":? ("0x" | "0X") [a-fA-F0-7]:+ {%
+lit_hexal_int -> "~":? ("0x" | "0X") [a-fA-F0-7]:+ {%
   function (d) {
     return parseInt(
       translateWeirdOzUnaryMinus(d[0]) +
@@ -360,7 +360,7 @@ val_hexal_int -> "~":? ("0x" | "0X") [a-fA-F0-7]:+ {%
   }
 %}
 
-val_bin_int -> "~":? ("0b" | "0B") [0-1]:+ {%
+lit_bin_int -> "~":? ("0b" | "0B") [0-1]:+ {%
   function (d) {
     return parseInt(
       translateWeirdOzUnaryMinus(d[0]) +
@@ -372,9 +372,9 @@ val_bin_int -> "~":? ("0b" | "0B") [0-1]:+ {%
 ##############################################################################
 # Float
 ##############################################################################
-val_float -> "~":? [0-9]:+ "." [0-9]:* (("e" | "E") "~":? [0-9]:+):? {%
+lit_float -> "~":? [0-9]:+ "." [0-9]:* (("e" | "E") "~":? [0-9]:+):? {%
   function(d) {
-    return valBuildNumber([parseFloat(
+    return litBuildNumber([parseFloat(
       translateWeirdOzUnaryMinus(d[0]) +
       d[1].join("") +
       "." +
@@ -388,30 +388,30 @@ val_float -> "~":? [0-9]:+ "." [0-9]:* (("e" | "E") "~":? [0-9]:+):? {%
 # List
 ##############################################################################
 
-val_list ->
-    val_empty_list {% id %}
-  | val_list_with_items {% id %}
+lit_list ->
+    lit_empty_list {% id %}
+  | lit_list_with_items {% id %}
 
-val_list_with_items -> "[" _ val_list_items _ "]" {%
+lit_list_with_items -> "[" _ lit_list_items _ "]" {%
   function(d) {
     return d[2].reduce(
       function(a, b) {
-        return valBuildRecord('|', {1: b, 2:a});
+        return litBuildRecord('|', {1: b, 2:a});
       },
-      valBuildRecord("nil", {})
+      litBuildRecord("nil", {})
     );
   }
 %}
 
-val_empty_list -> "[" _ "]" {%
+lit_empty_list -> "[" _ "]" {%
   function(d) {
-    return valBuildRecord("nil", {});
+    return litBuildRecord("nil", {});
   }
 %}
 
-val_list_items ->
+lit_list_items ->
     ids_identifier
-  | val_list_items __ ids_identifier {%
+  | lit_list_items __ ids_identifier {%
       function(d) {
         return d[0].concat(d[2]);
       }
@@ -423,14 +423,14 @@ val_list_items ->
 # Tuple
 ##############################################################################
 
-val_tuple -> val_atom_syntax "(" _ val_list_items _ ")" {%
+lit_tuple -> lit_atom_syntax "(" _ lit_list_items _ ")" {%
   function(d, position, reject) {
     var label = d[0];
     var features = d[3].reduce(function(result, item, index) {
       result[++index] = item;
       return result;
     }, {});
-    return valBuildRecord(label, features);
+    return litBuildRecord(label, features);
   }
 %}
 

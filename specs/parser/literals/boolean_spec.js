@@ -1,7 +1,7 @@
 import Immutable from "immutable";
-import { valueBoolean } from "../../samples/values";
+import { literalBoolean } from "../../samples/literals";
 import { parserFor } from "../../../app/oz/parser";
-import valueGrammar from "../../../app/oz/grammar/values.ne";
+import valueGrammar from "../../../app/oz/grammar/literals.ne";
 
 const parse = parserFor(valueGrammar);
 
@@ -11,10 +11,10 @@ describe("Parsing boolean values", () => {
   });
 
   it("handles true correctly", () => {
-    expect(parse("true")).toEqual(valueBoolean(true));
+    expect(parse("true")).toEqual(literalBoolean(true));
   });
 
   it("handles false correctly", () => {
-    expect(parse("false")).toEqual(valueBoolean(false));
+    expect(parse("false")).toEqual(literalBoolean(false));
   });
 });

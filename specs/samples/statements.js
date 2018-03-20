@@ -16,11 +16,11 @@ export const skipStatement = () => {
   });
 };
 
-export const localStatement = (variable, statement) => {
+export const localStatement = (identifier, statement) => {
   return new Immutable.Map({
     node: "statement",
     type: "local",
-    variable,
+    identifier,
     statement,
   });
 };
@@ -58,7 +58,7 @@ export const conditionalStatement = (
 };
 
 export const patternMatchingStatement = (
-  variable,
+  identifier,
   pattern,
   true_statement,
   false_statement = undefined,
@@ -66,7 +66,7 @@ export const patternMatchingStatement = (
   return new Immutable.Map({
     node: "statement",
     type: "patternMatching",
-    variable,
+    identifier,
     pattern,
     true_statement,
     false_statement,

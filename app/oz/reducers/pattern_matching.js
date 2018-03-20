@@ -7,7 +7,7 @@ export default function(state, semanticStatement) {
   const statement = semanticStatement.get("statement");
   const environment = semanticStatement.get("environment");
 
-  const identifier = statement.getIn(["variable", "identifier"]);
+  const identifier = statement.getIn(["identifier", "identifier"]);
   const pattern = statement.getIn(["pattern"]);
   const trueStatement = statement.getIn(["true_statement"]);
   const falseStatement = statement.getIn(["false_statement"]);

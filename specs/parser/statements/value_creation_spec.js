@@ -1,6 +1,6 @@
 import Immutable from "immutable";
 import { lexicalIdentifier } from "../../samples/lexical";
-import { valueNumber, valueRecord } from "../../samples/values";
+import { literalNumber, literalRecord } from "../../samples/literals";
 import { valueCreationStatement } from "../../samples/statements";
 import parse from "../../../app/oz/parser";
 
@@ -12,7 +12,7 @@ describe("Parsing X=VALUE statements", () => {
   describe("when parsing numbers", () => {
     it("handles condensed syntax correctly", () => {
       expect(parse("X=5")).toEqual(
-        valueCreationStatement(lexicalIdentifier("X"), valueNumber(5)),
+        valueCreationStatement(lexicalIdentifier("X"), literalNumber(5)),
       );
     });
 
@@ -20,7 +20,7 @@ describe("Parsing X=VALUE statements", () => {
       expect(parse("Variable = 12.0")).toEqual(
         valueCreationStatement(
           lexicalIdentifier("Variable"),
-          valueNumber(12.0),
+          literalNumber(12.0),
         ),
       );
     });
@@ -29,7 +29,7 @@ describe("Parsing X=VALUE statements", () => {
       expect(parse("`One Variable` = 152")).toEqual(
         valueCreationStatement(
           lexicalIdentifier("One Variable"),
-          valueNumber(152),
+          literalNumber(152),
         ),
       );
     });
@@ -40,7 +40,7 @@ describe("Parsing X=VALUE statements", () => {
       expect(parse("X=person(name:N)")).toEqual(
         valueCreationStatement(
           lexicalIdentifier("X"),
-          valueRecord("person", { name: lexicalIdentifier("N") }),
+          literalRecord("person", { name: lexicalIdentifier("N") }),
         ),
       );
     });
@@ -49,7 +49,7 @@ describe("Parsing X=VALUE statements", () => {
       expect(parse("X = person(name:N)")).toEqual(
         valueCreationStatement(
           lexicalIdentifier("X"),
-          valueRecord("person", { name: lexicalIdentifier("N") }),
+          literalRecord("person", { name: lexicalIdentifier("N") }),
         ),
       );
     });
@@ -58,7 +58,7 @@ describe("Parsing X=VALUE statements", () => {
       expect(parse("`One Variable` = person(name:N)")).toEqual(
         valueCreationStatement(
           lexicalIdentifier("One Variable"),
-          valueRecord("person", { name: lexicalIdentifier("N") }),
+          literalRecord("person", { name: lexicalIdentifier("N") }),
         ),
       );
     });
