@@ -1,6 +1,5 @@
 import React from "react";
 import { default as Icon, IconStack } from "./icons";
-import "./navbar.sass";
 
 export const NavBar = () => {
   return (

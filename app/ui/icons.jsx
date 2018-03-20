@@ -1,4 +1,3 @@
-import "font-awesome/scss/font-awesome.scss";
 import React from "react";
 import cx from "classnames";
 
