@@ -1,9 +1,6 @@
 import Immutable from "immutable";
-import {
-  lexicalVariable,
-  lexicalNumber,
-  lexicalRecord,
-} from "../../samples/lexical";
+import { lexicalIdentifier } from "../../samples/lexical";
+import { literalNumber, literalRecord } from "../../samples/literals";
 import { valueCreationStatement } from "../../samples/statements";
 import parse from "../../../app/oz/parser";
 
@@ -15,15 +12,15 @@ describe("Parsing X=VALUE statements", () => {
   describe("when parsing numbers", () => {
     it("handles condensed syntax correctly", () => {
       expect(parse("X=5")).toEqual(
-        valueCreationStatement(lexicalVariable("X"), lexicalNumber(5)),
+        valueCreationStatement(lexicalIdentifier("X"), literalNumber(5)),
       );
     });
 
     it("handles spaced syntax correctly", () => {
       expect(parse("Variable = 12.0")).toEqual(
         valueCreationStatement(
-          lexicalVariable("Variable"),
-          lexicalNumber(12.0),
+          lexicalIdentifier("Variable"),
+          literalNumber(12.0),
         ),
       );
     });
@@ -31,8 +28,8 @@ describe("Parsing X=VALUE statements", () => {
     it("handles quoted variable syntax correctly", () => {
       expect(parse("`One Variable` = 152")).toEqual(
         valueCreationStatement(
-          lexicalVariable("One Variable"),
-          lexicalNumber(152),
+          lexicalIdentifier("One Variable"),
+          literalNumber(152),
         ),
       );
     });
@@ -42,8 +39,8 @@ describe("Parsing X=VALUE statements", () => {
     it("handles condensed syntax correctly", () => {
       expect(parse("X=person(name:N)")).toEqual(
         valueCreationStatement(
-          lexicalVariable("X"),
-          lexicalRecord("person", { name: lexicalVariable("N") }),
+          lexicalIdentifier("X"),
+          literalRecord("person", { name: lexicalIdentifier("N") }),
         ),
       );
     });
@@ -51,8 +48,8 @@ describe("Parsing X=VALUE statements", () => {
     it("handles spaced syntax correctly", () => {
       expect(parse("X = person(name:N)")).toEqual(
         valueCreationStatement(
-          lexicalVariable("X"),
-          lexicalRecord("person", { name: lexicalVariable("N") }),
+          lexicalIdentifier("X"),
+          literalRecord("person", { name: lexicalIdentifier("N") }),
         ),
       );
     });
@@ -60,8 +57,8 @@ describe("Parsing X=VALUE statements", () => {
     it("handles quoted variable syntax correctly", () => {
       expect(parse("`One Variable` = person(name:N)")).toEqual(
         valueCreationStatement(
-          lexicalVariable("One Variable"),
-          lexicalRecord("person", { name: lexicalVariable("N") }),
+          lexicalIdentifier("One Variable"),
+          literalRecord("person", { name: lexicalIdentifier("N") }),
         ),
       );
     });

@@ -49,7 +49,7 @@ module.exports = {
         ],
       },
       {
-        test: /\.nearley$/,
+        test: /\.ne$/,
         use: [
           'nearley-loader',
         ],

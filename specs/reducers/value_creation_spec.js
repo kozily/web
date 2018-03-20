@@ -1,10 +1,7 @@
 import Immutable from "immutable";
 import { skipStatement, valueCreationStatement } from "../samples/statements";
-import {
-  lexicalVariable,
-  lexicalNumber,
-  lexicalRecord,
-} from "../samples/lexical";
+import { lexicalIdentifier } from "../samples/lexical";
+import { literalNumber, literalRecord } from "../samples/literals";
 import {
   buildState,
   buildStack,
@@ -40,7 +37,7 @@ describe("Reducing X=VALUE statements", () => {
       );
 
       const statement = buildSemanticStatement(
-        valueCreationStatement(lexicalVariable("X"), lexicalNumber(155)),
+        valueCreationStatement(lexicalIdentifier("X"), literalNumber(155)),
         buildEnvironment({
           X: buildVariable("x", 0),
         }),
@@ -51,7 +48,7 @@ describe("Reducing X=VALUE statements", () => {
           buildStack(buildSemanticStatement(skipStatement())),
           buildStore(
             buildEquivalenceClass(
-              lexicalNumber(155),
+              literalNumber(155),
               buildVariable("x", 0),
               buildVariable("x", 1),
             ),
@@ -70,7 +67,7 @@ describe("Reducing X=VALUE statements", () => {
         buildStack(buildSemanticStatement(skipStatement())),
         buildStore(
           buildEquivalenceClass(
-            lexicalNumber(155),
+            literalNumber(155),
             buildVariable("x", 0),
             buildVariable("x", 1),
           ),
@@ -83,7 +80,7 @@ describe("Reducing X=VALUE statements", () => {
       );
 
       const statement = buildSemanticStatement(
-        valueCreationStatement(lexicalVariable("X"), lexicalNumber(155)),
+        valueCreationStatement(lexicalIdentifier("X"), literalNumber(155)),
         buildEnvironment({
           X: buildVariable("x", 0),
         }),
@@ -94,7 +91,7 @@ describe("Reducing X=VALUE statements", () => {
           buildStack(buildSemanticStatement(skipStatement())),
           buildStore(
             buildEquivalenceClass(
-              lexicalNumber(155),
+              literalNumber(155),
               buildVariable("x", 0),
               buildVariable("x", 1),
             ),
@@ -113,7 +110,7 @@ describe("Reducing X=VALUE statements", () => {
         buildStack(buildSemanticStatement(skipStatement())),
         buildStore(
           buildEquivalenceClass(
-            lexicalNumber(24),
+            literalNumber(24),
             buildVariable("x", 0),
             buildVariable("x", 1),
           ),
@@ -126,7 +123,7 @@ describe("Reducing X=VALUE statements", () => {
       );
 
       const statement = buildSemanticStatement(
-        valueCreationStatement(lexicalVariable("X"), lexicalNumber(155)),
+        valueCreationStatement(lexicalIdentifier("X"), literalNumber(155)),
         buildEnvironment({
           X: buildVariable("x", 0),
         }),
@@ -145,7 +142,7 @@ describe("Reducing X=VALUE statements", () => {
           buildStack(buildSemanticStatement(skipStatement())),
           buildStore(
             buildEquivalenceClass(
-              lexicalRecord("person", { name: buildVariable("y", 0) }),
+              literalRecord("person", { name: buildVariable("y", 0) }),
               buildVariable("x", 0),
               buildVariable("x", 1),
             ),
@@ -159,8 +156,8 @@ describe("Reducing X=VALUE statements", () => {
 
         const statement = buildSemanticStatement(
           valueCreationStatement(
-            lexicalVariable("X"),
-            lexicalRecord("person", { name: lexicalVariable("Y") }),
+            lexicalIdentifier("X"),
+            literalRecord("person", { name: lexicalIdentifier("Y") }),
           ),
           buildEnvironment({
             X: buildVariable("x", 0),
@@ -173,7 +170,7 @@ describe("Reducing X=VALUE statements", () => {
             buildStack(buildSemanticStatement(skipStatement())),
             buildStore(
               buildEquivalenceClass(
-                lexicalRecord("person", { name: buildVariable("y", 0) }),
+                literalRecord("person", { name: buildVariable("y", 0) }),
                 buildVariable("x", 0),
                 buildVariable("x", 1),
               ),
@@ -192,7 +189,7 @@ describe("Reducing X=VALUE statements", () => {
           buildStack(buildSemanticStatement(skipStatement())),
           buildStore(
             buildEquivalenceClass(
-              lexicalRecord("person", { name: buildVariable("y", 0) }),
+              literalRecord("person", { name: buildVariable("y", 0) }),
               buildVariable("x", 0),
               buildVariable("x", 1),
             ),
@@ -207,8 +204,8 @@ describe("Reducing X=VALUE statements", () => {
 
         const statement = buildSemanticStatement(
           valueCreationStatement(
-            lexicalVariable("X"),
-            lexicalRecord("person", { name: lexicalVariable("W") }),
+            lexicalIdentifier("X"),
+            literalRecord("person", { name: lexicalIdentifier("W") }),
           ),
           buildEnvironment({
             X: buildVariable("x", 0),
@@ -221,7 +218,7 @@ describe("Reducing X=VALUE statements", () => {
             buildStack(buildSemanticStatement(skipStatement())),
             buildStore(
               buildEquivalenceClass(
-                lexicalRecord("person", { name: buildVariable("y", 0) }), //TODO remains y or w?
+                literalRecord("person", { name: buildVariable("y", 0) }), //TODO remains y or w?
                 buildVariable("x", 0),
                 buildVariable("x", 1),
               ),
@@ -241,16 +238,16 @@ describe("Reducing X=VALUE statements", () => {
           buildStack(buildSemanticStatement(skipStatement())),
           buildStore(
             buildEquivalenceClass(
-              lexicalRecord("person", { address: buildVariable("y", 0) }),
+              literalRecord("person", { address: buildVariable("y", 0) }),
               buildVariable("x", 0),
               buildVariable("x", 1),
             ),
             buildEquivalenceClass(
-              lexicalRecord("address", { street: buildVariable("a", 0) }),
+              literalRecord("address", { street: buildVariable("a", 0) }),
               buildVariable("y", 0),
             ),
             buildEquivalenceClass(
-              lexicalRecord("address", { street: buildVariable("b", 0) }),
+              literalRecord("address", { street: buildVariable("b", 0) }),
               buildVariable("p", 0),
             ),
             buildEquivalenceClass(
@@ -263,8 +260,8 @@ describe("Reducing X=VALUE statements", () => {
 
         const statement = buildSemanticStatement(
           valueCreationStatement(
-            lexicalVariable("X"),
-            lexicalRecord("person", { address: lexicalVariable("P") }),
+            lexicalIdentifier("X"),
+            literalRecord("person", { address: lexicalIdentifier("P") }),
           ),
           buildEnvironment({
             X: buildVariable("x", 0),
@@ -277,12 +274,12 @@ describe("Reducing X=VALUE statements", () => {
             buildStack(buildSemanticStatement(skipStatement())),
             buildStore(
               buildEquivalenceClass(
-                lexicalRecord("person", { address: buildVariable("y", 0) }),
+                literalRecord("person", { address: buildVariable("y", 0) }),
                 buildVariable("x", 0),
                 buildVariable("x", 1),
               ),
               buildEquivalenceClass(
-                lexicalRecord("address", { street: buildVariable("a", 0) }),
+                literalRecord("address", { street: buildVariable("a", 0) }),
                 buildVariable("y", 0),
                 buildVariable("p", 0),
               ),
@@ -303,7 +300,7 @@ describe("Reducing X=VALUE statements", () => {
           buildStack(buildSemanticStatement(skipStatement())),
           buildStore(
             buildEquivalenceClass(
-              lexicalRecord("person", { name: buildVariable("y", 0) }),
+              literalRecord("person", { name: buildVariable("y", 0) }),
               buildVariable("x", 0),
               buildVariable("x", 1),
             ),
@@ -316,7 +313,7 @@ describe("Reducing X=VALUE statements", () => {
         );
 
         const statement = buildSemanticStatement(
-          valueCreationStatement(lexicalVariable("X"), lexicalNumber(155)),
+          valueCreationStatement(lexicalIdentifier("X"), literalNumber(155)),
           buildEnvironment({
             X: buildVariable("x", 0),
           }),
@@ -332,23 +329,23 @@ describe("Reducing X=VALUE statements", () => {
           buildStack(buildSemanticStatement(skipStatement())),
           buildStore(
             buildEquivalenceClass(
-              lexicalRecord("person", { name: buildVariable("y", 0) }),
+              literalRecord("person", { name: buildVariable("y", 0) }),
               buildVariable("x", 0),
               buildVariable("x", 1),
             ),
             buildEquivalenceClass(
-              lexicalNumber(10),
+              literalNumber(10),
               buildVariable("y", 0),
               buildVariable("y", 1),
             ),
-            buildEquivalenceClass(lexicalNumber(24), buildVariable("z", 0)),
+            buildEquivalenceClass(literalNumber(24), buildVariable("z", 0)),
           ),
         );
 
         const statement = buildSemanticStatement(
           valueCreationStatement(
-            lexicalVariable("X"),
-            lexicalRecord("person", { name: lexicalVariable("Z") }),
+            lexicalIdentifier("X"),
+            literalRecord("person", { name: lexicalIdentifier("Z") }),
           ),
           buildEnvironment({
             X: buildVariable("x", 0),
@@ -366,7 +363,7 @@ describe("Reducing X=VALUE statements", () => {
           buildStack(buildSemanticStatement(skipStatement())),
           buildStore(
             buildEquivalenceClass(
-              lexicalRecord("person", { name: buildVariable("y", 0) }),
+              literalRecord("person", { name: buildVariable("y", 0) }),
               buildVariable("x", 0),
               buildVariable("x", 1),
             ),
@@ -380,8 +377,8 @@ describe("Reducing X=VALUE statements", () => {
 
         const statement = buildSemanticStatement(
           valueCreationStatement(
-            lexicalVariable("X"),
-            lexicalRecord("person", { lastname: lexicalVariable("Z") }),
+            lexicalIdentifier("X"),
+            literalRecord("person", { lastname: lexicalIdentifier("Z") }),
           ),
           buildEnvironment({
             X: buildVariable("x", 0),
@@ -399,7 +396,7 @@ describe("Reducing X=VALUE statements", () => {
           buildStack(buildSemanticStatement(skipStatement())),
           buildStore(
             buildEquivalenceClass(
-              lexicalRecord("person", { name: buildVariable("y", 0) }),
+              literalRecord("person", { name: buildVariable("y", 0) }),
               buildVariable("x", 0),
               buildVariable("x", 1),
             ),
@@ -413,10 +410,10 @@ describe("Reducing X=VALUE statements", () => {
 
         const statement = buildSemanticStatement(
           valueCreationStatement(
-            lexicalVariable("X"),
-            lexicalRecord("person", {
-              name: lexicalVariable("Y"),
-              lastname: lexicalVariable("Z"),
+            lexicalIdentifier("X"),
+            literalRecord("person", {
+              name: lexicalIdentifier("Y"),
+              lastname: lexicalIdentifier("Z"),
             }),
           ),
           buildEnvironment({
@@ -436,7 +433,7 @@ describe("Reducing X=VALUE statements", () => {
           buildStack(buildSemanticStatement(skipStatement())),
           buildStore(
             buildEquivalenceClass(
-              lexicalRecord("person", { name: buildVariable("y", 0) }),
+              literalRecord("person", { name: buildVariable("y", 0) }),
               buildVariable("x", 0),
               buildVariable("x", 1),
             ),
@@ -445,14 +442,14 @@ describe("Reducing X=VALUE statements", () => {
               buildVariable("y", 0),
               buildVariable("y", 1),
             ),
-            buildEquivalenceClass(lexicalNumber(24), buildVariable("z", 0)),
+            buildEquivalenceClass(literalNumber(24), buildVariable("z", 0)),
           ),
         );
 
         const statement = buildSemanticStatement(
           valueCreationStatement(
-            lexicalVariable("X"),
-            lexicalRecord("address", { street: lexicalVariable("Z") }),
+            lexicalIdentifier("X"),
+            literalRecord("address", { street: lexicalIdentifier("Z") }),
           ),
           buildEnvironment({
             X: buildVariable("x", 0),

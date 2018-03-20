@@ -1,9 +1,6 @@
 import Immutable from "immutable";
-import {
-  lexicalVariable,
-  //lexicalNumber,
-  lexicalRecord,
-} from "../../samples/lexical";
+import { lexicalIdentifier } from "../../samples/lexical";
+import { literalRecord } from "../../samples/literals";
 import {
   patternMatchingStatement,
   sequenceStatement,
@@ -21,10 +18,10 @@ describe("Parsing case statements", () => {
       parse("case X of person(name:Name age:Age) then skip skip else skip end"),
     ).toEqual(
       patternMatchingStatement(
-        lexicalVariable("X"),
-        lexicalRecord("person", {
-          name: lexicalVariable("Name"),
-          age: lexicalVariable("Age"),
+        lexicalIdentifier("X"),
+        literalRecord("person", {
+          name: lexicalIdentifier("Name"),
+          age: lexicalIdentifier("Age"),
         }),
         sequenceStatement(skipStatement(), skipStatement()),
         skipStatement(),
@@ -35,8 +32,8 @@ describe("Parsing case statements", () => {
   it("handles record with label and no features", () => {
     expect(parse("case X of person then skip skip else skip end")).toEqual(
       patternMatchingStatement(
-        lexicalVariable("X"),
-        lexicalRecord("person"),
+        lexicalIdentifier("X"),
+        literalRecord("person"),
         sequenceStatement(skipStatement(), skipStatement()),
         skipStatement(),
       ),

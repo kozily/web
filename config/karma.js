@@ -37,7 +37,7 @@ module.exports = (config) => {
             ],
           },
           {
-            test: /\.nearley$/,
+            test: /\.ne$/,
             use: [
               'nearley-loader',
             ],

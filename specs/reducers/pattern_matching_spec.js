@@ -4,11 +4,8 @@ import {
   sequenceStatement,
   patternMatchingStatement,
 } from "../samples/statements";
-import {
-  lexicalVariable,
-  lexicalRecord,
-  lexicalNumber,
-} from "../samples/lexical";
+import { lexicalIdentifier } from "../samples/lexical";
+import { literalNumber, literalRecord } from "../samples/literals";
 import {
   buildState,
   buildStack,
@@ -30,7 +27,7 @@ describe("Reducing case statements", () => {
       buildStack(),
       buildStore(
         buildEquivalenceClass(
-          lexicalRecord("person", {
+          literalRecord("person", {
             name: buildVariable("n", 0),
             age: buildVariable("a", 0),
           }),
@@ -43,10 +40,10 @@ describe("Reducing case statements", () => {
 
     const statement = buildSemanticStatement(
       patternMatchingStatement(
-        lexicalVariable("X"),
-        lexicalRecord("person", {
-          name: lexicalVariable("Name"),
-          age: lexicalVariable("Age"),
+        lexicalIdentifier("X"),
+        literalRecord("person", {
+          name: lexicalIdentifier("Name"),
+          age: lexicalIdentifier("Age"),
         }),
         sequenceStatement(skipStatement(), skipStatement()),
         skipStatement(),
@@ -77,14 +74,14 @@ describe("Reducing case statements", () => {
     const state = buildState(
       buildStack(),
       buildStore(
-        buildEquivalenceClass(lexicalRecord("person"), buildVariable("x", 0)),
+        buildEquivalenceClass(literalRecord("person"), buildVariable("x", 0)),
       ),
     );
 
     const statement = buildSemanticStatement(
       patternMatchingStatement(
-        lexicalVariable("X"),
-        lexicalRecord("person"),
+        lexicalIdentifier("X"),
+        literalRecord("person"),
         sequenceStatement(skipStatement(), skipStatement()),
         skipStatement(),
       ),
@@ -113,7 +110,7 @@ describe("Reducing case statements", () => {
       buildStack(),
       buildStore(
         buildEquivalenceClass(
-          lexicalRecord("person", {
+          literalRecord("person", {
             name: buildVariable("n", 0),
             age: buildVariable("a", 0),
           }),
@@ -126,10 +123,10 @@ describe("Reducing case statements", () => {
 
     const statement = buildSemanticStatement(
       patternMatchingStatement(
-        lexicalVariable("X"),
-        lexicalRecord("person", {
-          names: lexicalVariable("Name"),
-          age: lexicalVariable("Age"),
+        lexicalIdentifier("X"),
+        literalRecord("person", {
+          names: lexicalIdentifier("Name"),
+          age: lexicalIdentifier("Age"),
         }),
         sequenceStatement(skipStatement(), skipStatement()),
         skipStatement(),
@@ -159,7 +156,7 @@ describe("Reducing case statements", () => {
       buildStack(),
       buildStore(
         buildEquivalenceClass(
-          lexicalRecord("people", {
+          literalRecord("people", {
             name: buildVariable("n", 0),
             age: buildVariable("a", 0),
           }),
@@ -172,10 +169,10 @@ describe("Reducing case statements", () => {
 
     const statement = buildSemanticStatement(
       patternMatchingStatement(
-        lexicalVariable("X"),
-        lexicalRecord("person", {
-          name: lexicalVariable("Name"),
-          age: lexicalVariable("Age"),
+        lexicalIdentifier("X"),
+        literalRecord("person", {
+          name: lexicalIdentifier("Name"),
+          age: lexicalIdentifier("Age"),
         }),
         sequenceStatement(skipStatement(), skipStatement()),
         skipStatement(),
@@ -204,16 +201,16 @@ describe("Reducing case statements", () => {
     const state = buildState(
       buildStack(),
       buildStore(
-        buildEquivalenceClass(lexicalNumber(2), buildVariable("x", 0)),
+        buildEquivalenceClass(literalNumber(2), buildVariable("x", 0)),
       ),
     );
 
     const statement = buildSemanticStatement(
       patternMatchingStatement(
-        lexicalVariable("X"),
-        lexicalRecord("person", {
-          name: lexicalVariable("Name"),
-          age: lexicalVariable("Age"),
+        lexicalIdentifier("X"),
+        literalRecord("person", {
+          name: lexicalIdentifier("Name"),
+          age: lexicalIdentifier("Age"),
         }),
         sequenceStatement(skipStatement(), skipStatement()),
         skipStatement(),

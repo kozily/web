@@ -1,6 +1,6 @@
 import { Parser } from "nearley";
 import Immutable from "immutable";
-import ozGrammar from "./grammar/index.nearley";
+import ozGrammar from "./grammar/program.ne";
 
 export const parserFor = grammar => {
   return input => {

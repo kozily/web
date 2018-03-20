@@ -5,11 +5,8 @@ import {
   bindingStatement,
   conditionalStatement,
 } from "../samples/statements";
-import {
-  lexicalVariable,
-  lexicalNumber,
-  lexicalRecord,
-} from "../samples/lexical";
+import { lexicalIdentifier } from "../samples/lexical";
+import { literalNumber, literalRecord } from "../samples/literals";
 import {
   buildState,
   buildStack,
@@ -46,7 +43,7 @@ describe("Reducing if statements", () => {
 
       const statement = buildSemanticStatement(
         conditionalStatement(
-          lexicalVariable("X"),
+          lexicalIdentifier("X"),
           skipStatement(),
           sequenceStatement(skipStatement(), skipStatement()),
         ),
@@ -65,7 +62,7 @@ describe("Reducing if statements", () => {
         buildStack(buildSemanticStatement(skipStatement())),
         buildStore(
           buildEquivalenceClass(
-            lexicalNumber(24),
+            literalNumber(24),
             buildVariable("x", 0),
             buildVariable("x", 1),
           ),
@@ -79,7 +76,7 @@ describe("Reducing if statements", () => {
 
       const statement = buildSemanticStatement(
         conditionalStatement(
-          lexicalVariable("X"),
+          lexicalIdentifier("X"),
           skipStatement(),
           sequenceStatement(skipStatement(), skipStatement()),
         ),
@@ -98,7 +95,7 @@ describe("Reducing if statements", () => {
         buildStack(buildSemanticStatement(skipStatement())),
         buildStore(
           buildEquivalenceClass(
-            lexicalRecord("person", { name: buildVariable("y", 0) }),
+            literalRecord("person", { name: buildVariable("y", 0) }),
             buildVariable("x", 0),
             buildVariable("x", 1),
           ),
@@ -112,7 +109,7 @@ describe("Reducing if statements", () => {
 
       const statement = buildSemanticStatement(
         conditionalStatement(
-          lexicalVariable("X"),
+          lexicalIdentifier("X"),
           skipStatement(),
           sequenceStatement(skipStatement(), skipStatement()),
         ),
@@ -131,7 +128,7 @@ describe("Reducing if statements", () => {
         buildStack(buildSemanticStatement(skipStatement())),
         buildStore(
           buildEquivalenceClass(
-            lexicalRecord("person"),
+            literalRecord("person"),
             buildVariable("x", 0),
             buildVariable("x", 1),
           ),
@@ -145,7 +142,7 @@ describe("Reducing if statements", () => {
 
       const statement = buildSemanticStatement(
         conditionalStatement(
-          lexicalVariable("X"),
+          lexicalIdentifier("X"),
           skipStatement(),
           sequenceStatement(skipStatement(), skipStatement()),
         ),
@@ -166,7 +163,7 @@ describe("Reducing if statements", () => {
         buildStack(buildSemanticStatement(skipStatement())),
         buildStore(
           buildEquivalenceClass(
-            lexicalRecord("true"),
+            literalRecord("true"),
             buildVariable("x", 0),
             buildVariable("x", 1),
           ),
@@ -183,9 +180,9 @@ describe("Reducing if statements", () => {
       */
       const statement = buildSemanticStatement(
         conditionalStatement(
-          lexicalVariable("X"),
-          bindingStatement(lexicalVariable("Y"), lexicalNumber(84)),
-          bindingStatement(lexicalVariable("Y"), lexicalNumber(345)),
+          lexicalIdentifier("X"),
+          bindingStatement(lexicalIdentifier("Y"), literalNumber(84)),
+          bindingStatement(lexicalIdentifier("Y"), literalNumber(345)),
         ),
         buildEnvironment({
           X: buildVariable("x", 0),
@@ -197,7 +194,7 @@ describe("Reducing if statements", () => {
         buildState(
           buildStack(
             buildSemanticStatement(
-              bindingStatement(lexicalVariable("Y"), lexicalNumber(84)),
+              bindingStatement(lexicalIdentifier("Y"), literalNumber(84)),
               buildEnvironment({
                 X: buildVariable("x", 0),
                 Y: buildVariable("y", 0),
@@ -207,7 +204,7 @@ describe("Reducing if statements", () => {
           ),
           buildStore(
             buildEquivalenceClass(
-              lexicalRecord("true"),
+              literalRecord("true"),
               buildVariable("x", 0),
               buildVariable("x", 1),
             ),
@@ -226,7 +223,7 @@ describe("Reducing if statements", () => {
         buildStack(buildSemanticStatement(skipStatement())),
         buildStore(
           buildEquivalenceClass(
-            lexicalRecord("false"),
+            literalRecord("false"),
             buildVariable("x", 0),
             buildVariable("x", 1),
           ),
@@ -243,9 +240,9 @@ describe("Reducing if statements", () => {
       */
       const statement = buildSemanticStatement(
         conditionalStatement(
-          lexicalVariable("X"),
-          bindingStatement(lexicalVariable("Y"), lexicalNumber(84)),
-          bindingStatement(lexicalVariable("Y"), lexicalNumber(345)),
+          lexicalIdentifier("X"),
+          bindingStatement(lexicalIdentifier("Y"), literalNumber(84)),
+          bindingStatement(lexicalIdentifier("Y"), literalNumber(345)),
         ),
         buildEnvironment({
           X: buildVariable("x", 0),
@@ -257,7 +254,7 @@ describe("Reducing if statements", () => {
         buildState(
           buildStack(
             buildSemanticStatement(
-              bindingStatement(lexicalVariable("Y"), lexicalNumber(345)),
+              bindingStatement(lexicalIdentifier("Y"), literalNumber(345)),
               buildEnvironment({
                 X: buildVariable("x", 0),
                 Y: buildVariable("y", 0),
@@ -267,7 +264,7 @@ describe("Reducing if statements", () => {
           ),
           buildStore(
             buildEquivalenceClass(
-              lexicalRecord("false"),
+              literalRecord("false"),
               buildVariable("x", 0),
               buildVariable("x", 1),
             ),
