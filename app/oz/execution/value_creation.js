@@ -1,25 +1,5 @@
-import { makeNewVariable, unify } from "../machine/store";
+import { makeNewVariable, unify, createValue } from "../machine/store";
 import { buildEquivalenceClass } from "../machine/build";
-
-const valueCreators = {
-  number: (environment, value) => {
-    return value;
-  },
-
-  record: (environment, value) => {
-    return value.updateIn(["value", "features"], features => {
-      return features.map(feature => {
-        const identifier = feature.get("identifier");
-        return environment.get(identifier);
-      });
-    });
-  },
-};
-
-const createStoreValue = (environment, lexicalValue) => {
-  const creator = valueCreators[lexicalValue.get("type")];
-  return creator(environment, lexicalValue);
-};
 
 export default function(state, semanticStatement) {
   const store = state.get("store");
@@ -29,8 +9,8 @@ export default function(state, semanticStatement) {
   const identifier = statement.getIn(["lhs", "identifier"]);
   const variable = environment.get(identifier);
 
-  const lexicalValue = statement.get("rhs");
-  const storeValue = createStoreValue(environment, lexicalValue);
+  const literal = statement.get("rhs");
+  const storeValue = createValue(environment, literal);
 
   const newVariable = makeNewVariable({
     in: state.get("store"),

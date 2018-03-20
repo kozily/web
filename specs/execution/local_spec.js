@@ -11,7 +11,7 @@ import {
   buildVariable,
   buildEnvironment,
 } from "../../app/oz/machine/build";
-import reduce from "../../app/oz/reducers/local";
+import reduce from "../../app/oz/execution/local";
 
 describe("Reducing local X in ... end statements", () => {
   beforeEach(() => {

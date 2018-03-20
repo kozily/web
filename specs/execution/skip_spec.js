@@ -5,7 +5,7 @@ import {
   buildStack,
   buildSemanticStatement,
 } from "../../app/oz/machine/build";
-import reduce from "../../app/oz/reducers/skip";
+import reduce from "../../app/oz/execution/skip";
 
 describe("Reducing skip statements", () => {
   beforeEach(() => {

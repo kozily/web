@@ -16,7 +16,7 @@ import {
   buildVariable,
   buildEnvironment,
 } from "../../app/oz/machine/build";
-import reduce from "../../app/oz/reducers/conditional";
+import reduce from "../../app/oz/execution/conditional";
 
 describe("Reducing if statements", () => {
   beforeEach(() => {

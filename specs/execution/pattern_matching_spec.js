@@ -15,7 +15,7 @@ import {
   buildVariable,
   buildEnvironment,
 } from "../../app/oz/machine/build";
-import reduce from "../../app/oz/reducers/pattern_matching";
+import reduce from "../../app/oz/execution/pattern_matching";
 
 describe("Reducing case statements", () => {
   beforeEach(() => {
