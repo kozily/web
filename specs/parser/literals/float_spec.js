@@ -1,11 +1,11 @@
 import Immutable from "immutable";
 import { literalNumber } from "../../samples/literals";
 import { parserFor } from "../../../app/oz/parser";
-import valueGrammar from "../../../app/oz/grammar/literals.ne";
+import literalGrammar from "../../../app/oz/grammar/literals.ne";
 
-const parse = parserFor(valueGrammar);
+const parse = parserFor(literalGrammar);
 
-describe("Parsing float values", () => {
+describe("Parsing float literals", () => {
   beforeEach(() => {
     jasmine.addCustomEqualityTester(Immutable.is);
   });

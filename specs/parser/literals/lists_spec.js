@@ -1,15 +1,15 @@
 import Immutable from "immutable";
 import { parserFor } from "../../../app/oz/parser";
-import valueGrammar from "../../../app/oz/grammar/literals.ne";
+import literalGrammar from "../../../app/oz/grammar/literals.ne";
 import { lexicalIdentifier } from "../../samples/lexical";
 import { literalList } from "../../samples/literals";
 
-const parse = parserFor(valueGrammar);
+const parse = parserFor(literalGrammar);
 
 const identifiersList = (identifiers = []) =>
   literalList(identifiers.map(id => lexicalIdentifier(id)));
 
-describe("Parsing list values", () => {
+describe("Parsing list literals", () => {
   beforeEach(() => {
     jasmine.addCustomEqualityTester(Immutable.is);
   });

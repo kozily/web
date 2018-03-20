@@ -2,11 +2,11 @@ import Immutable from "immutable";
 import { lexicalIdentifier } from "../../samples/lexical";
 import { literalRecord } from "../../samples/literals";
 import { parserFor } from "../../../app/oz/parser";
-import valueGrammar from "../../../app/oz/grammar/literals.ne";
+import literalGrammar from "../../../app/oz/grammar/literals.ne";
 
-const parse = parserFor(valueGrammar);
+const parse = parserFor(literalGrammar);
 
-describe("Parsing record values", () => {
+describe("Parsing record literals", () => {
   beforeEach(() => {
     jasmine.addCustomEqualityTester(Immutable.is);
   });
