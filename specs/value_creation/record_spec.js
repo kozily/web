@@ -1,16 +1,16 @@
 import Immutable from "immutable";
-import { createValue } from "../../app/oz/machine/store";
+import { createValue } from "../../app/oz/machine/sigma";
 import { buildEnvironment, buildVariable } from "../../app/oz/machine/build";
 import { literalRecord } from "../samples/literals";
 import { valueRecord } from "../samples/values";
 import { lexicalIdentifier } from "../samples/lexical";
 
-describe("Creating record values in the store", () => {
+describe("Creating record values in the sigma", () => {
   beforeEach(() => {
     jasmine.addCustomEqualityTester(Immutable.is);
   });
 
-  it("creates a store record value", () => {
+  it("creates a sigma record value", () => {
     const environment = buildEnvironment({
       X: buildVariable("x", 0),
       Y: buildVariable("y", 0),

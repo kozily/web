@@ -7,10 +7,10 @@ import {
 import { lexicalIdentifier } from "../samples/lexical";
 import { literalNumber, literalRecord } from "../samples/literals";
 import {
-  buildState,
-  buildStack,
+  buildSingleThreadedState,
   buildSemanticStatement,
-  buildStore,
+  buildSigma,
+  buildThreadMetadata,
   buildEquivalenceClass,
   buildVariable,
   buildEnvironment,
@@ -23,9 +23,9 @@ describe("Reducing case statements", () => {
   });
 
   it("when pattern matches", () => {
-    const state = buildState(
-      buildStack(),
-      buildStore(
+    const state = buildSingleThreadedState({
+      semanticStatements: [buildSemanticStatement(skipStatement())],
+      sigma: buildSigma(
         buildEquivalenceClass(
           literalRecord("person", {
             name: buildVariable("n", 0),
@@ -36,7 +36,7 @@ describe("Reducing case statements", () => {
         buildEquivalenceClass(undefined, buildVariable("n", 0)),
         buildEquivalenceClass(undefined, buildVariable("a", 0)),
       ),
-    );
+    });
 
     const statement = buildSemanticStatement(
       patternMatchingStatement(
@@ -53,9 +53,9 @@ describe("Reducing case statements", () => {
       }),
     );
 
-    expect(reduce(state, statement)).toEqual(
-      buildState(
-        buildStack(
+    expect(reduce(state, statement, 0)).toEqual(
+      buildSingleThreadedState({
+        semanticStatements: [
           buildSemanticStatement(
             sequenceStatement(skipStatement(), skipStatement()),
             buildEnvironment({
@@ -64,19 +64,20 @@ describe("Reducing case statements", () => {
               Age: buildVariable("a", 0),
             }),
           ),
-        ),
-        state.get("store"),
-      ),
+          buildSemanticStatement(skipStatement()),
+        ],
+        sigma: state.get("sigma"),
+      }),
     );
   });
 
   it("when pattern matches with no features", () => {
-    const state = buildState(
-      buildStack(),
-      buildStore(
+    const state = buildSingleThreadedState({
+      semanticStatements: [buildSemanticStatement(skipStatement())],
+      sigma: buildSigma(
         buildEquivalenceClass(literalRecord("person"), buildVariable("x", 0)),
       ),
-    );
+    });
 
     const statement = buildSemanticStatement(
       patternMatchingStatement(
@@ -90,25 +91,26 @@ describe("Reducing case statements", () => {
       }),
     );
 
-    expect(reduce(state, statement)).toEqual(
-      buildState(
-        buildStack(
+    expect(reduce(state, statement, 0)).toEqual(
+      buildSingleThreadedState({
+        semanticStatements: [
           buildSemanticStatement(
             sequenceStatement(skipStatement(), skipStatement()),
             buildEnvironment({
               X: buildVariable("x", 0),
             }),
           ),
-        ),
-        state.get("store"),
-      ),
+          buildSemanticStatement(skipStatement()),
+        ],
+        sigma: state.get("sigma"),
+      }),
     );
   });
 
   it("when pattern does not match due to wrong features", () => {
-    const state = buildState(
-      buildStack(),
-      buildStore(
+    const state = buildSingleThreadedState({
+      semanticStatements: [buildSemanticStatement(skipStatement())],
+      sigma: buildSigma(
         buildEquivalenceClass(
           literalRecord("person", {
             name: buildVariable("n", 0),
@@ -119,7 +121,7 @@ describe("Reducing case statements", () => {
         buildEquivalenceClass(undefined, buildVariable("n", 0)),
         buildEquivalenceClass(undefined, buildVariable("a", 0)),
       ),
-    );
+    });
 
     const statement = buildSemanticStatement(
       patternMatchingStatement(
@@ -136,25 +138,26 @@ describe("Reducing case statements", () => {
       }),
     );
 
-    expect(reduce(state, statement)).toEqual(
-      buildState(
-        buildStack(
+    expect(reduce(state, statement, 0)).toEqual(
+      buildSingleThreadedState({
+        semanticStatements: [
           buildSemanticStatement(
             skipStatement(),
             buildEnvironment({
               X: buildVariable("x", 0),
             }),
           ),
-        ),
-        state.get("store"),
-      ),
+          buildSemanticStatement(skipStatement()),
+        ],
+        sigma: state.get("sigma"),
+      }),
     );
   });
 
   it("when pattern does not match due to wrong label", () => {
-    const state = buildState(
-      buildStack(),
-      buildStore(
+    const state = buildSingleThreadedState({
+      semanticStatements: [buildSemanticStatement(skipStatement())],
+      sigma: buildSigma(
         buildEquivalenceClass(
           literalRecord("people", {
             name: buildVariable("n", 0),
@@ -165,7 +168,7 @@ describe("Reducing case statements", () => {
         buildEquivalenceClass(undefined, buildVariable("n", 0)),
         buildEquivalenceClass(undefined, buildVariable("a", 0)),
       ),
-    );
+    });
 
     const statement = buildSemanticStatement(
       patternMatchingStatement(
@@ -182,28 +185,29 @@ describe("Reducing case statements", () => {
       }),
     );
 
-    expect(reduce(state, statement)).toEqual(
-      buildState(
-        buildStack(
+    expect(reduce(state, statement, 0)).toEqual(
+      buildSingleThreadedState({
+        semanticStatements: [
           buildSemanticStatement(
             skipStatement(),
             buildEnvironment({
               X: buildVariable("x", 0),
             }),
           ),
-        ),
-        state.get("store"),
-      ),
+          buildSemanticStatement(skipStatement()),
+        ],
+        sigma: state.get("sigma"),
+      }),
     );
   });
 
   it("when pattern does not match due to variable not being a record", () => {
-    const state = buildState(
-      buildStack(),
-      buildStore(
+    const state = buildSingleThreadedState({
+      semanticStatements: [buildSemanticStatement(skipStatement())],
+      sigma: buildSigma(
         buildEquivalenceClass(literalNumber(2), buildVariable("x", 0)),
       ),
-    );
+    });
 
     const statement = buildSemanticStatement(
       patternMatchingStatement(
@@ -220,18 +224,51 @@ describe("Reducing case statements", () => {
       }),
     );
 
-    expect(reduce(state, statement)).toEqual(
-      buildState(
-        buildStack(
+    expect(reduce(state, statement, 0)).toEqual(
+      buildSingleThreadedState({
+        semanticStatements: [
           buildSemanticStatement(
             skipStatement(),
             buildEnvironment({
               X: buildVariable("x", 0),
             }),
           ),
-        ),
-        state.get("store"),
+          buildSemanticStatement(skipStatement()),
+        ],
+        sigma: state.get("sigma"),
+      }),
+    );
+  });
+
+  it("when the case identifier is unbound", () => {
+    const state = buildSingleThreadedState({
+      semanticStatements: [buildSemanticStatement(skipStatement())],
+      sigma: buildSigma(
+        buildEquivalenceClass(undefined, buildVariable("x", 0)),
       ),
+    });
+
+    const statement = buildSemanticStatement(
+      patternMatchingStatement(
+        lexicalIdentifier("X"),
+        literalRecord("person"),
+        sequenceStatement(skipStatement(), skipStatement()),
+        skipStatement(),
+      ),
+      buildEnvironment({
+        X: buildVariable("x", 0),
+      }),
+    );
+
+    expect(reduce(state, statement, 0)).toEqual(
+      buildSingleThreadedState({
+        threadMetadata: buildThreadMetadata({ status: "blocked" }),
+        semanticStatements: [
+          statement,
+          buildSemanticStatement(skipStatement()),
+        ],
+        sigma: state.get("sigma"),
+      }),
     );
   });
 });

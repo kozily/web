@@ -1,7 +1,7 @@
 import Immutable from "immutable";
-import { unify } from "../../app/oz/machine/store";
+import { unify } from "../../app/oz/machine/sigma";
 import {
-  buildStore,
+  buildSigma,
   buildEquivalenceClass,
   buildVariable,
 } from "../../app/oz/machine/build";
@@ -13,7 +13,7 @@ describe("Unifying records", () => {
   });
 
   it("unifies correctly if the records have same labels, same features and same values in features", () => {
-    const store = buildStore(
+    const sigma = buildSigma(
       buildEquivalenceClass(
         valueRecord("person", { name: buildVariable("y", 0) }),
         buildVariable("x", 0),
@@ -31,7 +31,7 @@ describe("Unifying records", () => {
       ),
     );
 
-    const unifiedStore = buildStore(
+    const unifiedSigma = buildSigma(
       buildEquivalenceClass(
         valueRecord("person", { name: buildVariable("y", 0) }),
         buildVariable("x", 0),
@@ -46,13 +46,13 @@ describe("Unifying records", () => {
       ),
     );
 
-    expect(unify(store, buildVariable("x", 0), buildVariable("z", 0))).toEqual(
-      unifiedStore,
+    expect(unify(sigma, buildVariable("x", 0), buildVariable("z", 0))).toEqual(
+      unifiedSigma,
     );
   });
 
   it("unifies correctly if the records have same labels, same features and different values in features", () => {
-    const store = buildStore(
+    const sigma = buildSigma(
       buildEquivalenceClass(
         valueRecord("person", { name: buildVariable("y", 0) }),
         buildVariable("x", 0),
@@ -71,7 +71,7 @@ describe("Unifying records", () => {
       buildEquivalenceClass(undefined, buildVariable("w", 0)),
     );
 
-    const unifiedStore = buildStore(
+    const unifiedSigma = buildSigma(
       buildEquivalenceClass(
         valueRecord("person", { name: buildVariable("y", 0) }),
         buildVariable("x", 0),
@@ -87,13 +87,13 @@ describe("Unifying records", () => {
       ),
     );
 
-    expect(unify(store, buildVariable("x", 0), buildVariable("z", 0))).toEqual(
-      unifiedStore,
+    expect(unify(sigma, buildVariable("x", 0), buildVariable("z", 0))).toEqual(
+      unifiedSigma,
     );
   });
 
   it("unifies correctly recursive unifications", () => {
-    const store = buildStore(
+    const sigma = buildSigma(
       buildEquivalenceClass(
         valueRecord("person", { address: buildVariable("y", 0) }),
         buildVariable("x", 0),
@@ -118,7 +118,7 @@ describe("Unifying records", () => {
       ),
     );
 
-    const unifiedStore = buildStore(
+    const unifiedSigma = buildSigma(
       buildEquivalenceClass(
         valueRecord("person", { address: buildVariable("y", 0) }),
         buildVariable("x", 0),
@@ -137,13 +137,13 @@ describe("Unifying records", () => {
       ),
     );
 
-    expect(unify(store, buildVariable("x", 0), buildVariable("z", 0))).toEqual(
-      unifiedStore,
+    expect(unify(sigma, buildVariable("x", 0), buildVariable("z", 0))).toEqual(
+      unifiedSigma,
     );
   });
 
   it("fails if the records have different labels", () => {
-    const store = buildStore(
+    const sigma = buildSigma(
       buildEquivalenceClass(
         valueRecord("person", { name: buildVariable("y", 0) }),
         buildVariable("x", 0),
@@ -162,12 +162,12 @@ describe("Unifying records", () => {
     );
 
     expect(() =>
-      unify(store, buildVariable("x", 0), buildVariable("z", 0)),
+      unify(sigma, buildVariable("x", 0), buildVariable("z", 0)),
     ).toThrowError("Incompatible labels person and address");
   });
 
   it("fails if the records have different amount of features", () => {
-    const store = buildStore(
+    const sigma = buildSigma(
       buildEquivalenceClass(
         valueRecord("person", { name: buildVariable("y", 0) }),
         buildVariable("x", 0),
@@ -189,12 +189,12 @@ describe("Unifying records", () => {
     );
 
     expect(() =>
-      unify(store, buildVariable("x", 0), buildVariable("z", 0)),
+      unify(sigma, buildVariable("x", 0), buildVariable("z", 0)),
     ).toThrowError("Incompatible features name and name,lastname");
   });
 
   it("fails if the records have different features", () => {
-    const store = buildStore(
+    const sigma = buildSigma(
       buildEquivalenceClass(
         valueRecord("person", { name: buildVariable("y", 0) }),
         buildVariable("x", 0),
@@ -215,12 +215,12 @@ describe("Unifying records", () => {
     );
 
     expect(() =>
-      unify(store, buildVariable("x", 0), buildVariable("z", 0)),
+      unify(sigma, buildVariable("x", 0), buildVariable("z", 0)),
     ).toThrowError("Incompatible features name and lastname");
   });
 
   it("fails if the records have different values in the features", () => {
-    const store = buildStore(
+    const sigma = buildSigma(
       buildEquivalenceClass(
         valueRecord("person", { name: buildVariable("y", 0) }),
         buildVariable("x", 0),
@@ -242,7 +242,7 @@ describe("Unifying records", () => {
     );
 
     expect(() =>
-      unify(store, buildVariable("x", 0), buildVariable("z", 0)),
+      unify(sigma, buildVariable("x", 0), buildVariable("z", 0)),
     ).toThrowError("Incompatible values 10 and 24");
   });
 });

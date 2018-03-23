@@ -8,10 +8,10 @@ const identifier2variable = identifier => {
   return identifier.charAt(0).toLowerCase() + identifier.substring(1);
 };
 
-export const makeNewVariable = ({ in: store, for: identifier }) => {
+export const makeNewVariable = ({ in: sigma, for: identifier }) => {
   const variableName = identifier2variable(identifier);
 
-  const currentMaximumVariable = store
+  const currentMaximumVariable = sigma
     .flatMap(equivalence => equivalence.get("variables"))
     .filter(variable => variable.get("name") === variableName)
     .maxBy(variable => variable.get("sequence"));
@@ -27,37 +27,37 @@ export const isEquivalenceClassBound = equivalenceClass => {
   return equivalenceClass.get("value") !== undefined;
 };
 
-export const lookupVariableInStore = (store, variable) => {
-  return store.find(ec =>
+export const lookupVariableInSigma = (sigma, variable) => {
+  return sigma.find(ec =>
     ec.get("variables").some(x => Immutable.is(x, variable)),
   );
 };
 
-export const mergeEquivalenceClasses = (store, target, source) => {
+export const mergeEquivalenceClasses = (sigma, target, source) => {
   const sourceVariables = source.get("variables");
 
   const mergedEquivalenceClass = target.update("variables", variables =>
     variables.union(sourceVariables),
   );
 
-  return store
+  return sigma
     .delete(source)
     .delete(target)
     .add(mergedEquivalenceClass);
 };
 
-export const unify = (store, x, y) => {
-  const equivalenceClassX = lookupVariableInStore(store, x);
+export const unify = (sigma, x, y) => {
+  const equivalenceClassX = lookupVariableInSigma(sigma, x);
   const isXBound = isEquivalenceClassBound(equivalenceClassX);
-  const equivalenceClassY = lookupVariableInStore(store, y);
+  const equivalenceClassY = lookupVariableInSigma(sigma, y);
   const isYBound = isEquivalenceClassBound(equivalenceClassY);
 
   if (!isXBound && !isYBound) {
-    return mergeEquivalenceClasses(store, equivalenceClassX, equivalenceClassY);
+    return mergeEquivalenceClasses(sigma, equivalenceClassX, equivalenceClassY);
   } else if (!isXBound && isYBound) {
-    return mergeEquivalenceClasses(store, equivalenceClassY, equivalenceClassX);
+    return mergeEquivalenceClasses(sigma, equivalenceClassY, equivalenceClassX);
   } else if (isXBound && !isYBound) {
-    return mergeEquivalenceClasses(store, equivalenceClassX, equivalenceClassY);
+    return mergeEquivalenceClasses(sigma, equivalenceClassX, equivalenceClassY);
   } else {
     const xType = equivalenceClassX.getIn(["value", "type"]);
     const yType = equivalenceClassY.getIn(["value", "type"]);
@@ -66,14 +66,14 @@ export const unify = (store, x, y) => {
       throw new Error(`Incompatible value types ${xType} and ${yType}`);
     }
 
-    const unifiedStore = unifyValue(
+    const unifiedSigma = unifyValue(
       unify,
-      store,
+      sigma,
       equivalenceClassX,
       equivalenceClassY,
     );
     return mergeEquivalenceClasses(
-      unifiedStore,
+      unifiedSigma,
       equivalenceClassX,
       equivalenceClassY,
     );

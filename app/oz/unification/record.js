@@ -1,6 +1,6 @@
 import Immutable from "immutable";
 
-export default (unify, store, equivalenceClassX, equivalenceClassY) => {
+export default (unify, sigma, equivalenceClassX, equivalenceClassY) => {
   const xValue = equivalenceClassX.getIn(["value", "value"]);
   const yValue = equivalenceClassY.getIn(["value", "value"]);
 
@@ -19,10 +19,10 @@ export default (unify, store, equivalenceClassX, equivalenceClassY) => {
     );
   }
 
-  return xFeatures.reduce((updatedStore, feature) => {
+  return xFeatures.reduce((updatedSigma, feature) => {
     const xVariable = xValue.getIn(["features", feature]);
     const yVariable = yValue.getIn(["features", feature]);
 
-    return unify(updatedStore, xVariable, yVariable);
-  }, store);
+    return unify(updatedSigma, xVariable, yVariable);
+  }, sigma);
 };

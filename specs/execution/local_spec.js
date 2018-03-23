@@ -4,9 +4,9 @@ import { lexicalIdentifier } from "../samples/lexical";
 import { literalNumber } from "../samples/literals";
 import {
   buildState,
-  buildStack,
+  buildThread,
   buildSemanticStatement,
-  buildStore,
+  buildSigma,
   buildEquivalenceClass,
   buildVariable,
   buildEnvironment,
@@ -18,40 +18,46 @@ describe("Reducing local X in ... end statements", () => {
     jasmine.addCustomEqualityTester(Immutable.is);
   });
 
-  it("reduces correctly when the store is empty", () => {
-    const state = buildState(
-      buildStack(buildSemanticStatement(skipStatement())),
-    );
+  it("reduces correctly when the sigma is empty", () => {
+    const state = buildState({
+      threads: [buildThread()],
+    });
 
     const statement = buildSemanticStatement(
       localStatement(lexicalIdentifier("X"), skipStatement()),
     );
 
-    expect(reduce(state, statement)).toEqual(
-      buildState(
-        buildStack(
-          buildSemanticStatement(
-            skipStatement(),
-            buildEnvironment({
-              X: buildVariable("x", 0),
-            }),
-          ),
-          buildSemanticStatement(skipStatement()),
+    expect(reduce(state, statement, 0)).toEqual(
+      buildState({
+        threads: [
+          buildThread({
+            semanticStatements: [
+              buildSemanticStatement(
+                skipStatement(),
+                buildEnvironment({
+                  X: buildVariable("x", 0),
+                }),
+              ),
+            ],
+          }),
+        ],
+        sigma: buildSigma(
+          buildEquivalenceClass(undefined, buildVariable("x", 0)),
         ),
-        buildStore(buildEquivalenceClass(undefined, buildVariable("x", 0))),
-      ),
+      }),
     );
   });
 
-  it("reduces correctly when there are previous variables in the store", () => {
-    const state = buildState(
-      buildStack(buildSemanticStatement(skipStatement())),
-      buildStore(
+  it("reduces correctly when there are previous variables in the sigma", () => {
+    const state = buildState({
+      threads: [buildThread()],
+      sigma: buildSigma(
         buildEquivalenceClass(literalNumber(10), buildVariable("y", 0)),
         buildEquivalenceClass(literalNumber(20), buildVariable("x", 0)),
         buildEquivalenceClass(literalNumber(30), buildVariable("x", 1)),
       ),
-    );
+    });
+
     const statement = buildSemanticStatement(
       localStatement(lexicalIdentifier("X"), skipStatement()),
       buildEnvironment({
@@ -59,26 +65,29 @@ describe("Reducing local X in ... end statements", () => {
       }),
     );
 
-    expect(reduce(state, statement)).toEqual(
-      buildState(
-        buildStack(
-          buildSemanticStatement(
-            skipStatement(),
-            buildEnvironment({
-              Y: buildVariable("y", 0),
-              X: buildVariable("x", 2),
-            }),
-          ),
-          buildSemanticStatement(skipStatement()),
-        ),
+    expect(reduce(state, statement, 0)).toEqual(
+      buildState({
+        threads: [
+          buildThread({
+            semanticStatements: [
+              buildSemanticStatement(
+                skipStatement(),
+                buildEnvironment({
+                  Y: buildVariable("y", 0),
+                  X: buildVariable("x", 2),
+                }),
+              ),
+            ],
+          }),
+        ],
 
-        buildStore(
+        sigma: buildSigma(
           buildEquivalenceClass(literalNumber(10), buildVariable("y", 0)),
           buildEquivalenceClass(literalNumber(20), buildVariable("x", 0)),
           buildEquivalenceClass(literalNumber(30), buildVariable("x", 1)),
           buildEquivalenceClass(undefined, buildVariable("x", 2)),
         ),
-      ),
+      }),
     );
   });
 });

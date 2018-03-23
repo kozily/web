@@ -1,9 +1,10 @@
 import Immutable from "immutable";
 import { sequenceStatement, skipStatement } from "../samples/statements";
 import {
-  buildState,
-  buildStack,
+  buildSingleThreadedState,
+  buildEnvironment,
   buildSemanticStatement,
+  buildVariable,
 } from "../../app/oz/machine/build";
 import reduce from "../../app/oz/execution/sequence";
 
@@ -13,21 +14,24 @@ describe("Reducing sequence statements", () => {
   });
 
   it("reduces correctly", () => {
-    const state = buildState(
-      buildStack(buildSemanticStatement(skipStatement())),
-    );
+    const state = buildSingleThreadedState({});
+
+    const sharedEnvironment = buildEnvironment({
+      X: buildVariable("x", 0),
+    });
+
     const statement = buildSemanticStatement(
       sequenceStatement(skipStatement(), skipStatement()),
+      sharedEnvironment,
     );
 
-    expect(reduce(state, statement)).toEqual(
-      buildState(
-        buildStack(
-          buildSemanticStatement(skipStatement()),
-          buildSemanticStatement(skipStatement()),
-          buildSemanticStatement(skipStatement()),
-        ),
-      ),
+    expect(reduce(state, statement, 0)).toEqual(
+      buildSingleThreadedState({
+        semanticStatements: [
+          buildSemanticStatement(skipStatement(), sharedEnvironment),
+          buildSemanticStatement(skipStatement(), sharedEnvironment),
+        ],
+      }),
     );
   });
 });

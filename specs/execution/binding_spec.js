@@ -2,10 +2,9 @@ import Immutable from "immutable";
 import { skipStatement, bindingStatement } from "../samples/statements";
 import { lexicalIdentifier } from "../samples/lexical";
 import {
-  buildState,
-  buildStack,
+  buildSingleThreadedState,
   buildSemanticStatement,
-  buildStore,
+  buildSigma,
   buildEquivalenceClass,
   buildVariable,
   buildEnvironment,
@@ -18,9 +17,9 @@ describe("Reducing X=Y statements", () => {
   });
 
   it("reduces correctly when variables unbound and in different equivalence sets", () => {
-    const state = buildState(
-      buildStack(buildSemanticStatement(skipStatement())),
-      buildStore(
+    const state = buildSingleThreadedState({
+      semanticStatements: [buildSemanticStatement(skipStatement())],
+      sigma: buildSigma(
         buildEquivalenceClass(
           undefined,
           buildVariable("x", 0),
@@ -37,7 +36,7 @@ describe("Reducing X=Y statements", () => {
           buildVariable("z", 1),
         ),
       ),
-    );
+    });
 
     const statement = buildSemanticStatement(
       bindingStatement(lexicalIdentifier("X"), lexicalIdentifier("Y")),
@@ -48,9 +47,9 @@ describe("Reducing X=Y statements", () => {
     );
 
     expect(reduce(state, statement)).toEqual(
-      buildState(
-        buildStack(buildSemanticStatement(skipStatement())),
-        buildStore(
+      buildSingleThreadedState({
+        semanticStatements: [buildSemanticStatement(skipStatement())],
+        sigma: buildSigma(
           buildEquivalenceClass(
             undefined,
             buildVariable("x", 0),
@@ -64,14 +63,14 @@ describe("Reducing X=Y statements", () => {
             buildVariable("z", 1),
           ),
         ),
-      ),
+      }),
     );
   });
 
   it("reduces correctly when variables unbound and in the same equivalence sets", () => {
-    const state = buildState(
-      buildStack(buildSemanticStatement(skipStatement())),
-      buildStore(
+    const state = buildSingleThreadedState({
+      semanticStatements: [buildSemanticStatement(skipStatement())],
+      sigma: buildSigma(
         buildEquivalenceClass(
           undefined,
           buildVariable("x", 0),
@@ -85,7 +84,7 @@ describe("Reducing X=Y statements", () => {
           buildVariable("z", 1),
         ),
       ),
-    );
+    });
 
     const statement = buildSemanticStatement(
       bindingStatement(lexicalIdentifier("X"), lexicalIdentifier("Y")),
@@ -96,9 +95,9 @@ describe("Reducing X=Y statements", () => {
     );
 
     expect(reduce(state, statement)).toEqual(
-      buildState(
-        buildStack(buildSemanticStatement(skipStatement())),
-        buildStore(
+      buildSingleThreadedState({
+        semanticStatements: [buildSemanticStatement(skipStatement())],
+        sigma: buildSigma(
           buildEquivalenceClass(
             undefined,
             buildVariable("x", 0),
@@ -112,14 +111,14 @@ describe("Reducing X=Y statements", () => {
             buildVariable("z", 1),
           ),
         ),
-      ),
+      }),
     );
   });
 
   it("reduces correctly when variables unbound and in reverse order", () => {
-    const state = buildState(
-      buildStack(buildSemanticStatement(skipStatement())),
-      buildStore(
+    const state = buildSingleThreadedState({
+      semanticStatements: [buildSemanticStatement(skipStatement())],
+      sigma: buildSigma(
         buildEquivalenceClass(
           undefined,
           buildVariable("x", 0),
@@ -127,7 +126,7 @@ describe("Reducing X=Y statements", () => {
         ),
         buildEquivalenceClass(undefined, buildVariable("z", 0)),
       ),
-    );
+    });
 
     const statement = buildSemanticStatement(
       bindingStatement(lexicalIdentifier("Z"), lexicalIdentifier("X")),
@@ -138,9 +137,9 @@ describe("Reducing X=Y statements", () => {
     );
 
     expect(reduce(state, statement)).toEqual(
-      buildState(
-        buildStack(buildSemanticStatement(skipStatement())),
-        buildStore(
+      buildSingleThreadedState({
+        semanticStatements: [buildSemanticStatement(skipStatement())],
+        sigma: buildSigma(
           buildEquivalenceClass(
             undefined,
             buildVariable("z", 0),
@@ -148,7 +147,7 @@ describe("Reducing X=Y statements", () => {
             buildVariable("y", 0),
           ),
         ),
-      ),
+      }),
     );
   });
 });

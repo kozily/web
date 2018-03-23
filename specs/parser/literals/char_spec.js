@@ -10,7 +10,7 @@ describe("Parsing char literals", () => {
     jasmine.addCustomEqualityTester(Immutable.is);
   });
 
-  it("handles numeric characters correclty", () => {
+  it("handles numeric characters correctly", () => {
     expect(parse("40")).toEqual(literalNumber(40));
     expect(parse("255")).toEqual(literalNumber(255));
   });

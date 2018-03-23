@@ -2,15 +2,35 @@ import Immutable from "immutable";
 import { execute } from "./execution";
 
 export const isFinalState = state => {
-  return state.get("stack").isEmpty();
+  return (
+    state.get("threads").isEmpty() ||
+    state.get("threads").every(thread => thread.get("stack").isEmpty())
+  );
+};
+
+export const isBlockedState = state => {
+  return state
+    .get("threads")
+    .every(thread => thread.getIn(["metadata", "status"]) === "blocked");
 };
 
 export const executeSingleStep = state => {
   try {
-    const semanticStatement = state.get("stack").peek();
-    const reducibleState = state.update("stack", stack => stack.pop());
+    const activeThreadIndex = state
+      .get("threads")
+      .findIndex(thread => thread.getIn(["metadata", "status"]) === "current");
+    const activeThread = state.getIn(["threads", activeThreadIndex]);
 
-    return execute(reducibleState, semanticStatement);
+    const activeStack = activeThread.get("stack");
+
+    const semanticStatement = activeStack.peek();
+
+    const reducibleState = state.updateIn(
+      ["threads", activeThreadIndex, "stack"],
+      stack => stack.pop(),
+    );
+
+    return execute(reducibleState, semanticStatement, activeThreadIndex);
   } catch (error) {
     throw new Error(`${error.message}: ${state.toString()}`);
   }
@@ -19,7 +39,7 @@ export const executeSingleStep = state => {
 export const executeAllSteps = (state, result = new Immutable.List()) => {
   const updatedResult = result.push(state);
 
-  if (isFinalState(state)) {
+  if (isFinalState(state) || isBlockedState(state)) {
     return updatedResult;
   }
 

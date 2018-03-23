@@ -11,10 +11,10 @@ export const unificators = {
 
 export const unifyValue = (
   recurse,
-  store,
+  sigma,
   equivalenceClassX,
   equivalenceClassY,
 ) => {
   const unificator = unificators[equivalenceClassX.getIn(["value", "type"])];
-  return unificator(recurse, store, equivalenceClassX, equivalenceClassY);
+  return unificator(recurse, sigma, equivalenceClassX, equivalenceClassY);
 };

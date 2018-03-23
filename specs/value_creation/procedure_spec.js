@@ -1,17 +1,17 @@
 import Immutable from "immutable";
-import { createValue } from "../../app/oz/machine/store";
+import { createValue } from "../../app/oz/machine/sigma";
 import { buildEnvironment, buildVariable } from "../../app/oz/machine/build";
 import { literalNumber, literalProcedure } from "../samples/literals";
 import { valueProcedure } from "../samples/values";
 import { lexicalIdentifier } from "../samples/lexical";
 import { skipStatement, valueCreationStatement } from "../samples/statements";
 
-describe("Creating procedure values in the store", () => {
+describe("Creating procedure values in the sigma", () => {
   beforeEach(() => {
     jasmine.addCustomEqualityTester(Immutable.is);
   });
 
-  it("creates a store procedure value without arguments or free identifiers", () => {
+  it("creates a sigma procedure value without arguments or free identifiers", () => {
     const environment = buildEnvironment({
       X: buildVariable("x", 0),
       Y: buildVariable("y", 0),
@@ -24,7 +24,7 @@ describe("Creating procedure values in the store", () => {
     );
   });
 
-  it("creates a store procedure value with arguments", () => {
+  it("creates a sigma procedure value with arguments", () => {
     const environment = buildEnvironment({
       X: buildVariable("x", 0),
       Y: buildVariable("y", 0),
@@ -44,7 +44,7 @@ describe("Creating procedure values in the store", () => {
     );
   });
 
-  it("creates a store procedure value with free identifiers", () => {
+  it("creates a sigma procedure value with free identifiers", () => {
     const environment = buildEnvironment({
       X: buildVariable("x", 0),
       Y: buildVariable("y", 0),
