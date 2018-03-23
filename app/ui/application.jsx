@@ -1,12 +1,13 @@
 import React from "react";
 import NavBar from "./navbar";
-import Ide from "./ide";
+import Overview from "./overview";
+import "semantic-ui-css/semantic.min.css";
 
 export const Application = () => {
   return (
     <div>
       <NavBar />
-      <Ide />
+      <Overview />
     </div>
   );
 };

@@ -1,7 +1,14 @@
 import React from "react";
-import JSONTree from "react-json-tree";
-import Icon from "./icons";
+import {
+  Icon,
+  Menu,
+  Container,
+  Button,
+  Divider,
+  Segment,
+} from "semantic-ui-react";
 import Editor from "./editor";
+import Errors from "./errors";
 
 export default class IDE extends React.Component {
   constructor(props) {
@@ -37,51 +44,25 @@ export default class IDE extends React.Component {
     this.setState(steps);
   }
 
-  renderEditor() {
-    return (
-      <div className="panel panel-primary">
-        <div className="panel-heading">
-          <Icon icon="list-ol" /> Code
-        </div>
-        <div className="panel-body">
-          <Editor onSteps={this.handleSteps} />
-        </div>
-      </div>
-    );
-  }
-
-  renderTreeView(icon, name, what) {
-    return (
-      <div className="panel panel-primary">
-        <div className="panel-heading">
-          <Icon icon={icon} /> {name}
-        </div>
-        <div className="panel-body">
-          <JSONTree
-            theme={this.theme}
-            hideRoot
-            data={what}
-            shouldExpandNode={() => true}
-          />
-        </div>
-      </div>
-    );
-  }
-
   render() {
     return (
-      <div className="container-fluid">
-        <div className="row">
-          <div className="col-md-6">
-            {this.renderEditor()}
-            {this.renderTreeView("cube", "Kernel", this.state.kernel)}
-          </div>
-
-          <div className="col-md-6">
-            {this.renderTreeView("cogs", "Execution", this.state.execution)}
-          </div>
-        </div>
-      </div>
+      <Container fluid>
+        <Menu borderless size="small" color="grey" fluid>
+          <Menu.Item>
+            <Icon name="list ol" />Code
+          </Menu.Item>
+          <Menu.Item position="right">
+            <Button icon labelPosition="left">
+              <Icon name="bug" /> Debug
+            </Button>
+          </Menu.Item>
+        </Menu>
+        <Segment>
+          <Editor onSteps={this.handleSteps} />
+        </Segment>
+        <Divider horizontal />
+        <Errors />
+      </Container>
     );
   }
 }
