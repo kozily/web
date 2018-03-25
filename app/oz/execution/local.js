@@ -2,9 +2,9 @@ import {
   buildEquivalenceClass,
   buildSemanticStatement,
 } from "../machine/build";
-import { makeNewVariable } from "../machine/store";
+import { makeNewVariable } from "../machine/sigma";
 
-export default function(state, semanticStatement) {
+export default function(state, semanticStatement, activeThreadIndex) {
   const identifier = semanticStatement.getIn([
     "statement",
     "identifier",
@@ -13,7 +13,7 @@ export default function(state, semanticStatement) {
   const childStatement = semanticStatement.getIn(["statement", "statement"]);
 
   const newVariable = makeNewVariable({
-    in: state.get("store"),
+    in: state.get("sigma"),
     for: identifier,
   });
   const newEquivalenceClass = buildEquivalenceClass(undefined, newVariable);
@@ -26,6 +26,8 @@ export default function(state, semanticStatement) {
   );
 
   return state
-    .update("store", store => store.add(newEquivalenceClass))
-    .update("stack", stack => stack.push(newSemanticStatement));
+    .update("sigma", sigma => sigma.add(newEquivalenceClass))
+    .updateIn(["threads", activeThreadIndex, "stack"], stack =>
+      stack.push(newSemanticStatement),
+    );
 }

@@ -1,9 +1,9 @@
 import Immutable from "immutable";
-import { lookupVariableInStore } from "../machine/store";
+import { lookupVariableInSigma } from "../machine/sigma";
 import { buildSemanticStatement } from "../machine/build";
 
-export default function(state, semanticStatement) {
-  const store = state.get("store");
+export default function(state, semanticStatement, activeThreadIndex) {
+  const sigma = state.get("sigma");
   const statement = semanticStatement.get("statement");
   const environment = semanticStatement.get("environment");
 
@@ -13,11 +13,17 @@ export default function(state, semanticStatement) {
   const falseStatement = statement.getIn(["false_statement"]);
 
   const variable = environment.get(identifier);
-  const equivalentClass = lookupVariableInStore(store, variable);
+  const equivalentClass = lookupVariableInSigma(sigma, variable);
 
   const value = equivalentClass.get("value");
 
-  if (value === undefined) throw new Error("Unbound value in case statement");
+  if (value === undefined) {
+    return state
+      .setIn(["threads", activeThreadIndex, "metadata", "status"], "blocked")
+      .updateIn(["threads", activeThreadIndex, "stack"], stack =>
+        stack.push(semanticStatement),
+      );
+  }
 
   if (
     value.get("type") === "record" &&
@@ -42,13 +48,13 @@ export default function(state, semanticStatement) {
         environment,
       );
 
-      return state.update("stack", stack =>
+      return state.updateIn(["threads", activeThreadIndex, "stack"], stack =>
         stack.push(buildSemanticStatement(trueStatement, newEnvironment)),
       );
     }
   }
 
-  return state.update("stack", stack =>
+  return state.updateIn(["threads", activeThreadIndex, "stack"], stack =>
     stack.push(buildSemanticStatement(falseStatement, environment)),
   );
 }

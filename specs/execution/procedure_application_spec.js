@@ -6,10 +6,10 @@ import {
 import { lexicalIdentifier } from "../samples/lexical";
 import { valueProcedure, valueNumber } from "../samples/values";
 import {
-  buildState,
-  buildStack,
+  buildSingleThreadedState,
   buildSemanticStatement,
-  buildStore,
+  buildSigma,
+  buildThreadMetadata,
   buildEquivalenceClass,
   buildVariable,
   buildEnvironment,
@@ -22,9 +22,9 @@ describe("Reducing {X ...} statements", () => {
   });
 
   it("Executes simple functional procedures correctly", () => {
-    const state = buildState(
-      buildStack(),
-      buildStore(
+    const state = buildSingleThreadedState({
+      semanticStatements: [buildSemanticStatement(skipStatement())],
+      sigma: buildSigma(
         buildEquivalenceClass(
           valueProcedure(
             [lexicalIdentifier("I"), lexicalIdentifier("O")],
@@ -35,7 +35,7 @@ describe("Reducing {X ...} statements", () => {
         buildEquivalenceClass(valueNumber(10), buildVariable("x", 0)),
         buildEquivalenceClass(undefined, buildVariable("y", 0)),
       ),
-    );
+    });
 
     const statement = buildSemanticStatement(
       procedureApplicationStatement(lexicalIdentifier("P"), [
@@ -49,9 +49,9 @@ describe("Reducing {X ...} statements", () => {
       }),
     );
 
-    expect(reduce(state, statement)).toEqual(
-      buildState(
-        buildStack(
+    expect(reduce(state, statement, 0)).toEqual(
+      buildSingleThreadedState({
+        semanticStatements: [
           buildSemanticStatement(
             skipStatement(),
             buildEnvironment({
@@ -59,16 +59,17 @@ describe("Reducing {X ...} statements", () => {
               O: buildVariable("y", 0),
             }),
           ),
-        ),
-        state.get("store"),
-      ),
+          buildSemanticStatement(skipStatement()),
+        ],
+        sigma: state.get("sigma"),
+      }),
     );
   });
 
   it("Executes procedure values with closure and arguments correctly", () => {
-    const state = buildState(
-      buildStack(),
-      buildStore(
+    const state = buildSingleThreadedState({
+      semanticStatements: [buildSemanticStatement(skipStatement())],
+      sigma: buildSigma(
         buildEquivalenceClass(
           valueProcedure(
             [lexicalIdentifier("Input"), lexicalIdentifier("Output")],
@@ -86,7 +87,7 @@ describe("Reducing {X ...} statements", () => {
 
         buildEquivalenceClass(undefined, buildVariable("c", 0)),
       ),
-    );
+    });
 
     const statement = buildSemanticStatement(
       procedureApplicationStatement(lexicalIdentifier("X"), [
@@ -100,9 +101,9 @@ describe("Reducing {X ...} statements", () => {
       }),
     );
 
-    expect(reduce(state, statement)).toEqual(
-      buildState(
-        buildStack(
+    expect(reduce(state, statement, 0)).toEqual(
+      buildSingleThreadedState({
+        semanticStatements: [
           buildSemanticStatement(
             skipStatement(),
             buildEnvironment({
@@ -111,19 +112,20 @@ describe("Reducing {X ...} statements", () => {
               ClosureValue: buildVariable("c", 0),
             }),
           ),
-        ),
-        state.get("store"),
-      ),
+          buildSemanticStatement(skipStatement()),
+        ],
+        sigma: state.get("sigma"),
+      }),
     );
   });
 
   it("fails if a non-procedure value is called", () => {
-    const state = buildState(
-      buildStack(),
-      buildStore(
+    const state = buildSingleThreadedState({
+      semanticStatements: [buildSemanticStatement(skipStatement())],
+      sigma: buildSigma(
         buildEquivalenceClass(valueNumber(155), buildVariable("p", 0)),
       ),
-    );
+    });
 
     const statement = buildSemanticStatement(
       procedureApplicationStatement(lexicalIdentifier("P")),
@@ -132,13 +134,13 @@ describe("Reducing {X ...} statements", () => {
       }),
     );
 
-    expect(() => reduce(state, statement)).toThrowError();
+    expect(() => reduce(state, statement, 0)).toThrowError();
   });
 
   it("fails if a procedure is called with the wrong number of arguments", () => {
-    const state = buildState(
-      buildStack(),
-      buildStore(
+    const state = buildSingleThreadedState({
+      semanticStatements: [buildSemanticStatement(skipStatement())],
+      sigma: buildSigma(
         buildEquivalenceClass(
           valueProcedure(
             [lexicalIdentifier("Input"), lexicalIdentifier("Output")],
@@ -149,7 +151,7 @@ describe("Reducing {X ...} statements", () => {
 
         buildEquivalenceClass(valueNumber(5), buildVariable("y", 0)),
       ),
-    );
+    });
 
     const statement = buildSemanticStatement(
       procedureApplicationStatement(lexicalIdentifier("X"), [
@@ -161,6 +163,40 @@ describe("Reducing {X ...} statements", () => {
       }),
     );
 
-    expect(() => reduce(state, statement)).toThrowError();
+    expect(() => reduce(state, statement, 0)).toThrowError();
+  });
+
+  it("blocks the thread if the procedure identifier is unbound", () => {
+    const state = buildSingleThreadedState({
+      semanticStatements: [buildSemanticStatement(skipStatement())],
+      sigma: buildSigma(
+        buildEquivalenceClass(undefined, buildVariable("p", 0)),
+        buildEquivalenceClass(valueNumber(10), buildVariable("x", 0)),
+        buildEquivalenceClass(undefined, buildVariable("y", 0)),
+      ),
+    });
+
+    const statement = buildSemanticStatement(
+      procedureApplicationStatement(lexicalIdentifier("P"), [
+        lexicalIdentifier("X"),
+        lexicalIdentifier("Y"),
+      ]),
+      buildEnvironment({
+        P: buildVariable("p", 0),
+        X: buildVariable("x", 0),
+        Y: buildVariable("y", 0),
+      }),
+    );
+
+    expect(reduce(state, statement, 0)).toEqual(
+      buildSingleThreadedState({
+        threadMetadata: buildThreadMetadata({ status: "blocked" }),
+        semanticStatements: [
+          statement,
+          buildSemanticStatement(skipStatement()),
+        ],
+        sigma: state.get("sigma"),
+      }),
+    );
   });
 });

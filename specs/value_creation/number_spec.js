@@ -1,15 +1,15 @@
 import Immutable from "immutable";
-import { createValue } from "../../app/oz/machine/store";
+import { createValue } from "../../app/oz/machine/sigma";
 import { buildEnvironment } from "../../app/oz/machine/build";
 import { literalNumber } from "../samples/literals";
 import { valueNumber } from "../samples/values";
 
-describe("Creating number values in the store", () => {
+describe("Creating number values in the sigma", () => {
   beforeEach(() => {
     jasmine.addCustomEqualityTester(Immutable.is);
   });
 
-  it("creates a store number value", () => {
+  it("creates a sigma number value", () => {
     const environment = buildEnvironment();
     const literal = literalNumber(155);
 

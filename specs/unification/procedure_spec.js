@@ -1,7 +1,7 @@
 import Immutable from "immutable";
-import { unify } from "../../app/oz/machine/store";
+import { unify } from "../../app/oz/machine/sigma";
 import {
-  buildStore,
+  buildSigma,
   buildEquivalenceClass,
   buildVariable,
 } from "../../app/oz/machine/build";
@@ -15,7 +15,7 @@ describe("Unifying procedures", () => {
   });
 
   it("unifies correctly if the procedures are compatible", () => {
-    const store = buildStore(
+    const sigma = buildSigma(
       buildEquivalenceClass(
         valueProcedure(
           [lexicalIdentifier("A"), lexicalIdentifier("B")],
@@ -34,7 +34,7 @@ describe("Unifying procedures", () => {
       ),
     );
 
-    const unifiedStore = buildStore(
+    const unifiedSigma = buildSigma(
       buildEquivalenceClass(
         valueProcedure(
           [lexicalIdentifier("A"), lexicalIdentifier("B")],
@@ -46,13 +46,13 @@ describe("Unifying procedures", () => {
       ),
     );
 
-    expect(unify(store, buildVariable("x", 0), buildVariable("y", 0))).toEqual(
-      unifiedStore,
+    expect(unify(sigma, buildVariable("x", 0), buildVariable("y", 0))).toEqual(
+      unifiedSigma,
     );
   });
 
   it("fails if the procedureds are not compatible", () => {
-    const store = buildStore(
+    const sigma = buildSigma(
       buildEquivalenceClass(
         valueProcedure(
           [lexicalIdentifier("A"), lexicalIdentifier("B")],
@@ -72,7 +72,7 @@ describe("Unifying procedures", () => {
     );
 
     expect(() =>
-      unify(store, buildVariable("x", 0), buildVariable("y", 0)),
+      unify(sigma, buildVariable("x", 0), buildVariable("y", 0)),
     ).toThrowError("Incompatible procedure values");
   });
 });

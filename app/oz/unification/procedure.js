@@ -1,6 +1,6 @@
 import Immutable from "immutable";
 
-export default (unify, store, equivalenceClassX, equivalenceClassY) => {
+export default (unify, sigma, equivalenceClassX, equivalenceClassY) => {
   const xValue = equivalenceClassX.getIn(["value", "value"]);
   const yValue = equivalenceClassY.getIn(["value", "value"]);
 
@@ -8,5 +8,5 @@ export default (unify, store, equivalenceClassX, equivalenceClassY) => {
     throw new Error(`Incompatible procedure values`);
   }
 
-  return store;
+  return sigma;
 };

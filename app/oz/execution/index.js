@@ -19,7 +19,7 @@ export const executors = {
   [statementTypes.procedureApplication]: procedureApplication,
 };
 
-export const execute = (state, semanticStatement) => {
+export const execute = (state, semanticStatement, activeThreadIndex) => {
   const executor = executors[semanticStatement.getIn(["statement", "type"])];
-  return executor(state, semanticStatement);
+  return executor(state, semanticStatement, activeThreadIndex);
 };

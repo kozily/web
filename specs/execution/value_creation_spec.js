@@ -1,13 +1,12 @@
 import Immutable from "immutable";
-import { skipStatement, valueCreationStatement } from "../samples/statements";
+import { valueCreationStatement } from "../samples/statements";
 import { lexicalIdentifier } from "../samples/lexical";
 import { literalNumber } from "../samples/literals";
 import { valueNumber } from "../samples/values";
 import {
-  buildState,
-  buildStack,
+  buildSingleThreadedState,
   buildSemanticStatement,
-  buildStore,
+  buildSigma,
   buildEquivalenceClass,
   buildVariable,
   buildEnvironment,
@@ -21,9 +20,8 @@ describe("Reducing X=VALUE statements", () => {
 
   describe("when value is a number", () => {
     it("when variable is unbound", () => {
-      const state = buildState(
-        buildStack(buildSemanticStatement(skipStatement())),
-        buildStore(
+      const state = buildSingleThreadedState({
+        sigma: buildSigma(
           buildEquivalenceClass(
             undefined,
             buildVariable("x", 0),
@@ -35,7 +33,7 @@ describe("Reducing X=VALUE statements", () => {
             buildVariable("y", 1),
           ),
         ),
-      );
+      });
 
       const statement = buildSemanticStatement(
         valueCreationStatement(lexicalIdentifier("X"), literalNumber(155)),
@@ -45,9 +43,8 @@ describe("Reducing X=VALUE statements", () => {
       );
 
       expect(reduce(state, statement)).toEqual(
-        buildState(
-          buildStack(buildSemanticStatement(skipStatement())),
-          buildStore(
+        buildSingleThreadedState({
+          sigma: buildSigma(
             buildEquivalenceClass(
               valueNumber(155),
               buildVariable("x", 0),
@@ -59,7 +56,7 @@ describe("Reducing X=VALUE statements", () => {
               buildVariable("y", 1),
             ),
           ),
-        ),
+        }),
       );
     });
   });

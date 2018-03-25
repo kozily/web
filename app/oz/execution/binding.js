@@ -1,4 +1,4 @@
-import { unify } from "../machine/store";
+import { unify } from "../machine/sigma";
 
 export default function(state, semanticStatement) {
   const statement = semanticStatement.get("statement");
@@ -10,5 +10,5 @@ export default function(state, semanticStatement) {
   const rhsIdentifier = statement.getIn(["rhs", "identifier"]);
   const rhsVariable = environment.get(rhsIdentifier);
 
-  return state.update("store", store => unify(store, lhsVariable, rhsVariable));
+  return state.update("sigma", sigma => unify(sigma, lhsVariable, rhsVariable));
 }

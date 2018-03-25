@@ -1,8 +1,8 @@
-import { makeNewVariable, unify, createValue } from "../machine/store";
+import { makeNewVariable, unify, createValue } from "../machine/sigma";
 import { buildEquivalenceClass } from "../machine/build";
 
 export default function(state, semanticStatement) {
-  const store = state.get("store");
+  const sigma = state.get("sigma");
   const statement = semanticStatement.get("statement");
   const environment = semanticStatement.get("environment");
 
@@ -10,21 +10,21 @@ export default function(state, semanticStatement) {
   const variable = environment.get(identifier);
 
   const literal = statement.get("rhs");
-  const storeValue = createValue(environment, literal);
+  const sigmaValue = createValue(environment, literal);
 
   const newVariable = makeNewVariable({
-    in: state.get("store"),
+    in: state.get("sigma"),
     for: "__VALUE_CREATION__",
   });
-  const newEquivalenceClass = buildEquivalenceClass(storeValue, newVariable);
-  const newStore = store.add(newEquivalenceClass);
-  const unifiedStore = unify(newStore, variable, newVariable);
+  const newEquivalenceClass = buildEquivalenceClass(sigmaValue, newVariable);
+  const newSigma = sigma.add(newEquivalenceClass);
+  const unifiedSigma = unify(newSigma, variable, newVariable);
 
-  const resultingEquivalenceClass = unifiedStore.find(x =>
+  const resultingEquivalenceClass = unifiedSigma.find(x =>
     x.get("variables").contains(newVariable),
   );
 
-  const cleanUnifiedStore = unifiedStore
+  const cleanUnifiedSigma = unifiedSigma
     .delete(resultingEquivalenceClass)
     .add(
       resultingEquivalenceClass.update("variables", variables =>
@@ -32,5 +32,5 @@ export default function(state, semanticStatement) {
       ),
     );
 
-  return state.set("store", cleanUnifiedStore);
+  return state.set("sigma", cleanUnifiedSigma);
 }

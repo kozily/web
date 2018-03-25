@@ -1,7 +1,7 @@
 import Immutable from "immutable";
-import { unify } from "../../app/oz/machine/store";
+import { unify } from "../../app/oz/machine/sigma";
 import {
-  buildStore,
+  buildSigma,
   buildEquivalenceClass,
   buildVariable,
 } from "../../app/oz/machine/build";
@@ -13,12 +13,12 @@ describe("Unifying numbers", () => {
   });
 
   it("unifies correctly if the numbers are the same", () => {
-    const store = buildStore(
+    const sigma = buildSigma(
       buildEquivalenceClass(valueNumber(100), buildVariable("x", 0)),
       buildEquivalenceClass(valueNumber(100), buildVariable("y", 0)),
     );
 
-    const unifiedStore = buildStore(
+    const unifiedSigma = buildSigma(
       buildEquivalenceClass(
         valueNumber(100),
         buildVariable("x", 0),
@@ -26,19 +26,19 @@ describe("Unifying numbers", () => {
       ),
     );
 
-    expect(unify(store, buildVariable("x", 0), buildVariable("y", 0))).toEqual(
-      unifiedStore,
+    expect(unify(sigma, buildVariable("x", 0), buildVariable("y", 0))).toEqual(
+      unifiedSigma,
     );
   });
 
   it("fails if the numbers are different", () => {
-    const store = buildStore(
+    const sigma = buildSigma(
       buildEquivalenceClass(valueNumber(100), buildVariable("x", 0)),
       buildEquivalenceClass(valueNumber(101), buildVariable("y", 0)),
     );
 
     expect(() =>
-      unify(store, buildVariable("x", 0), buildVariable("y", 0)),
+      unify(sigma, buildVariable("x", 0), buildVariable("y", 0)),
     ).toThrowError("Incompatible values 100 and 101");
   });
 });

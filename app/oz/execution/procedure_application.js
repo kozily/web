@@ -1,8 +1,8 @@
-import { lookupVariableInStore } from "../machine/store";
+import { lookupVariableInSigma } from "../machine/sigma";
 import { buildSemanticStatement } from "../machine/build";
 
-export default function(state, semanticStatement) {
-  const store = state.get("store");
+export default function(state, semanticStatement, activeThreadIndex) {
+  const sigma = state.get("sigma");
   const statement = semanticStatement.get("statement");
   const environment = semanticStatement.get("environment");
 
@@ -10,12 +10,17 @@ export default function(state, semanticStatement) {
   const callArguments = statement.get("args").map(x => x.get("identifier"));
 
   const variable = environment.get(callIdentifier);
-  const equivalenceClass = lookupVariableInStore(store, variable);
+  const equivalenceClass = lookupVariableInSigma(sigma, variable);
 
   const procedureValue = equivalenceClass.get("value");
 
-  if (procedureValue === undefined)
-    throw new Error("Unbound value in procedure application");
+  if (procedureValue === undefined) {
+    return state
+      .setIn(["threads", activeThreadIndex, "metadata", "status"], "blocked")
+      .updateIn(["threads", activeThreadIndex, "stack"], stack =>
+        stack.push(semanticStatement),
+      );
+  }
 
   if (procedureValue.get("type") !== "procedure")
     throw new Error(
@@ -46,5 +51,7 @@ export default function(state, semanticStatement) {
 
   const newStatement = buildSemanticStatement(procedureBody, newEnvironment);
 
-  return state.update("stack", stack => stack.push(newStatement));
+  return state.updateIn(["threads", activeThreadIndex, "stack"], stack =>
+    stack.push(newStatement),
+  );
 }

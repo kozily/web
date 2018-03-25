@@ -1,48 +1,78 @@
 import Immutable from "immutable";
 
 export const buildEnvironment = (contents = {}) => {
-  return new Immutable.Map(contents);
+  return Immutable.Map(contents);
 };
 
 export const buildSemanticStatement = (
   statement,
   environment = buildEnvironment(),
 ) => {
-  return new Immutable.Map({
+  return Immutable.Map({
     statement,
     environment,
   });
 };
 
-export const buildStack = (...semanticStatements) => {
-  return new Immutable.Stack(semanticStatements);
+export const buildThreadMetadata = ({ status = "current" } = {}) => {
+  return Immutable.Map({
+    status,
+  });
+};
+
+export const buildThread = ({
+  metadata = buildThreadMetadata(),
+  semanticStatements = [],
+} = {}) => {
+  return Immutable.Map({
+    stack: Immutable.Stack(semanticStatements),
+    metadata,
+  });
 };
 
 export const buildVariable = (name, sequence) => {
-  return new Immutable.Map({
+  return Immutable.Map({
     name,
     sequence,
   });
 };
 
 export const buildEquivalenceClass = (value, ...variables) => {
-  return new Immutable.Map({
+  return Immutable.Map({
     value,
-    variables: new Immutable.Set(variables),
+    variables: Immutable.Set(variables),
   });
 };
 
-export const buildStore = (...equivalenceClasses) => {
-  return new Immutable.Set(equivalenceClasses);
+export const buildSigma = (...equivalenceClasses) => {
+  return Immutable.Set(equivalenceClasses);
 };
 
-export const buildState = (stack = buildStack(), store = buildStore()) => {
-  return new Immutable.Map({
-    stack,
-    store,
+export const buildSingleThreadedState = ({
+  semanticStatements = [],
+  sigma = buildSigma(),
+  threadMetadata = buildThreadMetadata(),
+} = {}) => {
+  return buildState({
+    threads: [
+      buildThread({
+        semanticStatements,
+        metadata: threadMetadata,
+      }),
+    ],
+    sigma,
+  });
+};
+
+export const buildState = ({ threads = [], sigma = buildSigma() } = {}) => {
+  return Immutable.Map({
+    threads: Immutable.List(threads),
+    sigma,
   });
 };
 
 export const buildFromKernelAST = ast => {
-  return buildState(buildStack(buildSemanticStatement(ast)));
+  return buildSingleThreadedState({
+    semanticStatements: [buildSemanticStatement(ast)],
+  });
 };
