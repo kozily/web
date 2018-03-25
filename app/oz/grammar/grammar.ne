@@ -23,6 +23,7 @@ stm_simple ->
   | stm_value_creation {% id %}
   | stm_conditional {% id %}
   | stm_pattern_matching {% id %}
+  | stm_procedure_application {% id %}
 
 stm_skip -> "skip" {%
   function (d) {
@@ -91,6 +92,17 @@ stm_pattern_matching -> "case" __ ids_identifier __ "of" __ lit_record_like __ "
   }
 %}
 
+stm_procedure_application -> "{" _ ids_identifier lit_procedure_args:? _ "}" {%
+  function(d) {
+    return {
+      node: "statement",
+      type: "procedureApplication",
+      procedure: d[2],
+      args: d[3] || [],
+    };
+  }
+%}
+
 ##############################################################################
 # IDS - IDENTIFIERS
 ##############################################################################
@@ -142,6 +154,7 @@ lit_value ->
   | lit_float {% id %}
   | lit_list {% id %}
   | lit_tuple {% id %}
+  | lit_procedure {% id %}
 
 ##############################################################################
 # Records
@@ -434,6 +447,32 @@ lit_tuple -> lit_atom_syntax "(" _ lit_list_items _ ")" {%
   }
 %}
 
+##############################################################################
+# Procedures
+##############################################################################
+@{%
+  function litBuildProcedure(args, body) {
+    return {
+      node: 'literal',
+      type: 'procedure',
+      value: { args: (args || []), body: body },
+    };
+  }
+%}
+
+lit_procedure -> "proc" _ "{" _ "$" lit_procedure_args:? _ "}" _  stm_sequence __ "end" {%
+  function(d) {
+    return litBuildProcedure(d[5], d[9]);
+  }
+%}
+
+lit_procedure_args ->
+    __ ids_identifier {% function(d) { return [d[1]] } %}
+  | lit_procedure_args __ ids_identifier {%
+    function(d) {
+      return d[0].concat(d[2])
+    }
+  %}
 
 ##############################################################################
 # LIB - UTILITIES

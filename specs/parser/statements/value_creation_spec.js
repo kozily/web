@@ -1,7 +1,14 @@
 import Immutable from "immutable";
 import { lexicalIdentifier } from "../../samples/lexical";
-import { literalNumber, literalRecord } from "../../samples/literals";
-import { valueCreationStatement } from "../../samples/statements";
+import {
+  literalNumber,
+  literalRecord,
+  literalProcedure,
+} from "../../samples/literals";
+import {
+  valueCreationStatement,
+  skipStatement,
+} from "../../samples/statements";
 import parse from "../../../app/oz/parser";
 
 describe("Parsing X=VALUE statements", () => {
@@ -59,6 +66,44 @@ describe("Parsing X=VALUE statements", () => {
         valueCreationStatement(
           lexicalIdentifier("One Variable"),
           literalRecord("person", { name: lexicalIdentifier("N") }),
+        ),
+      );
+    });
+  });
+
+  describe("when parsing procedures", () => {
+    it("handles condensed syntax correctly", () => {
+      expect(parse("X=proc{$ X Y} skip end")).toEqual(
+        valueCreationStatement(
+          lexicalIdentifier("X"),
+          literalProcedure(
+            [lexicalIdentifier("X"), lexicalIdentifier("Y")],
+            skipStatement(),
+          ),
+        ),
+      );
+    });
+
+    it("handles spaced syntax correctly", () => {
+      expect(parse("X = proc{$ X Y} skip end")).toEqual(
+        valueCreationStatement(
+          lexicalIdentifier("X"),
+          literalProcedure(
+            [lexicalIdentifier("X"), lexicalIdentifier("Y")],
+            skipStatement(),
+          ),
+        ),
+      );
+    });
+
+    it("handles quoted variable syntax correctly", () => {
+      expect(parse("`One Variable` = proc{$ X Y} skip end")).toEqual(
+        valueCreationStatement(
+          lexicalIdentifier("One Variable"),
+          literalProcedure(
+            [lexicalIdentifier("X"), lexicalIdentifier("Y")],
+            skipStatement(),
+          ),
         ),
       );
     });

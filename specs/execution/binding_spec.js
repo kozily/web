@@ -10,7 +10,7 @@ import {
   buildVariable,
   buildEnvironment,
 } from "../../app/oz/machine/build";
-import reduce from "../../app/oz/reducers/binding";
+import reduce from "../../app/oz/execution/binding";
 
 describe("Reducing X=Y statements", () => {
   beforeEach(() => {

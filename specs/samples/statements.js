@@ -72,3 +72,12 @@ export const patternMatchingStatement = (
     false_statement,
   });
 };
+
+export const procedureApplicationStatement = (procedure, args = []) => {
+  return new Immutable.fromJS({
+    node: "statement",
+    type: "procedureApplication",
+    procedure,
+    args,
+  });
+};

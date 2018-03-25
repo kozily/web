@@ -5,7 +5,7 @@ import {
   buildStack,
   buildSemanticStatement,
 } from "../../app/oz/machine/build";
-import reduce from "../../app/oz/reducers/sequence";
+import reduce from "../../app/oz/execution/sequence";
 
 describe("Reducing sequence statements", () => {
   beforeEach(() => {

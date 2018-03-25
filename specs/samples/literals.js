@@ -58,3 +58,14 @@ export const literalNumber = value => {
     value,
   });
 };
+
+export const literalProcedure = (args = [], body) => {
+  return Immutable.fromJS({
+    node: "literal",
+    type: "procedure",
+    value: {
+      args,
+      body,
+    },
+  });
+};

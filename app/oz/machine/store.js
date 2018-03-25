@@ -1,5 +1,8 @@
 import Immutable from "immutable";
 import { buildVariable } from "./build";
+import { unifyValue } from "../unification";
+
+export { createValue } from "../value_creation";
 
 const identifier2variable = identifier => {
   return identifier.charAt(0).toLowerCase() + identifier.substring(1);
@@ -43,46 +46,6 @@ export const mergeEquivalenceClasses = (store, target, source) => {
     .add(mergedEquivalenceClass);
 };
 
-const unificators = {
-  number: (store, equivalenceClassX, equivalenceClassY) => {
-    const xValue = equivalenceClassX.getIn(["value", "value"]);
-    const yValue = equivalenceClassY.getIn(["value", "value"]);
-
-    if (xValue !== yValue) {
-      throw new Error(`Incompatible values ${xValue} and ${yValue}`);
-    }
-
-    return store;
-  },
-
-  record: (store, equivalenceClassX, equivalenceClassY) => {
-    const xValue = equivalenceClassX.getIn(["value", "value"]);
-    const yValue = equivalenceClassY.getIn(["value", "value"]);
-
-    const xLabel = xValue.get("label");
-    const yLabel = yValue.get("label");
-    if (xLabel !== yLabel) {
-      throw new Error(`Incompatible labels ${xLabel} and ${yLabel}`);
-    }
-
-    const xFeatures = new Immutable.Set(xValue.get("features").keySeq());
-    const yFeatures = new Immutable.Set(yValue.get("features").keySeq());
-
-    if (!Immutable.is(xFeatures, yFeatures)) {
-      throw new Error(
-        `Incompatible features ${xFeatures.toJSON()} and ${yFeatures.toJSON()}`,
-      );
-    }
-
-    return xFeatures.reduce((updatedStore, feature) => {
-      const xVariable = xValue.getIn(["features", feature]);
-      const yVariable = yValue.getIn(["features", feature]);
-
-      return unify(updatedStore, xVariable, yVariable);
-    }, store);
-  },
-};
-
 export const unify = (store, x, y) => {
   const equivalenceClassX = lookupVariableInStore(store, x);
   const isXBound = isEquivalenceClassBound(equivalenceClassX);
@@ -103,8 +66,8 @@ export const unify = (store, x, y) => {
       throw new Error(`Incompatible value types ${xType} and ${yType}`);
     }
 
-    const unifyValue = unificators[xType];
     const unifiedStore = unifyValue(
+      unify,
       store,
       equivalenceClassX,
       equivalenceClassY,
