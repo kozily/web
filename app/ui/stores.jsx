@@ -13,7 +13,7 @@ export const Stores = () => {
           <Store name="mu (u)" activeItem="full" />
         </Grid.Column>
         <Grid.Column width={5}>
-          <Store name="tao (t)" activeItem="full" />
+          <Store name="tau (t)" activeItem="full" />
         </Grid.Column>
       </Grid.Row>
     </Grid>
