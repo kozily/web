@@ -24,6 +24,8 @@ stm_simple ->
   | stm_conditional {% id %}
   | stm_pattern_matching {% id %}
   | stm_procedure_application {% id %}
+  | stm_try {% id %}
+  | stm_raise {% id %}
 
 stm_skip -> "skip" {%
   function (d) {
@@ -99,6 +101,28 @@ stm_procedure_application -> "{" _ ids_identifier lit_procedure_args:? _ "}" {%
       type: "procedureApplication",
       procedure: d[2],
       args: d[3] || [],
+    };
+  }
+%}
+
+stm_try -> "try" _ stm_sequence _ "catch" _ ids_identifier _ "then" _ stm_sequence _ "end" {%
+  function(d) {
+    return {
+      node: "statement",
+      type: "try",
+      statement: d[2],
+      exceptionIdentifier: d[6],
+      exceptionStatement: d[10],
+    };
+  }
+%}
+
+stm_raise -> "raise" _ ids_identifier _ "end" {%
+  function(d) {
+    return {
+      node: "statement",
+      type: "raise",
+      identifier: d[2],
     };
   }
 %}
