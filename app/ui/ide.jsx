@@ -17,7 +17,6 @@ export default class IDE extends React.Component {
     this.state = {
       execution: [],
       kernel: [],
-      visible: false,
     };
     this.theme = {
       scheme: "tomorrow",
@@ -46,10 +45,6 @@ export default class IDE extends React.Component {
   }
 
   render() {
-    const { visible } = this.state;
-    const toggleVisibility = () => {
-      this.setState({ visible: !this.state.visible });
-    };
     return (
       <Sidebar.Pushable>
         <Sidebar.Pusher>
@@ -58,7 +53,7 @@ export default class IDE extends React.Component {
               <Icon name="list ol" />Code
             </Menu.Item>
             <Menu.Item position="right">
-              <Button icon labelPosition="left" onClick={toggleVisibility}>
+              <Button icon labelPosition="left">
                 <Icon name="bug" />Debug
               </Button>
             </Menu.Item>
@@ -67,12 +62,7 @@ export default class IDE extends React.Component {
             <Editor onSteps={this.handleSteps} />
           </Segment>
         </Sidebar.Pusher>
-        <Sidebar
-          as={Menu}
-          animation="overlay"
-          direction="bottom"
-          visible={visible}
-        >
+        <Sidebar as={Menu} animation="overlay" direction="bottom" visible>
           <Divider horizontal />
           <Errors />
         </Sidebar>
