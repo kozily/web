@@ -1,6 +1,7 @@
 import { unify } from "../machine/sigma";
+import { failureException, raiseSystemException } from "../machine/exceptions";
 
-export default function(state, semanticStatement) {
+export default function(state, semanticStatement, activeThreadIndex) {
   const statement = semanticStatement.get("statement");
   const environment = semanticStatement.get("environment");
 
@@ -10,5 +11,10 @@ export default function(state, semanticStatement) {
   const rhsIdentifier = statement.getIn(["rhs", "identifier"]);
   const rhsVariable = environment.get(rhsIdentifier);
 
-  return state.update("sigma", sigma => unify(sigma, lhsVariable, rhsVariable));
+  try {
+    const newSigma = unify(state.get("sigma"), lhsVariable, rhsVariable);
+    return state.set("sigma", newSigma);
+  } catch (error) {
+    return raiseSystemException(state, activeThreadIndex, failureException());
+  }
 }

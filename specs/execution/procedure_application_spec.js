@@ -5,6 +5,8 @@ import {
 } from "../../app/oz/machine/statements";
 import { lexicalIdentifier } from "../../app/oz/machine/lexical";
 import { valueProcedure, valueNumber } from "../../app/oz/machine/values";
+import { errorException } from "../../app/oz/machine/exceptions";
+import { buildSystemExceptionState } from "./helpers";
 import {
   buildSingleThreadedState,
   buildSemanticStatement,
@@ -134,7 +136,9 @@ describe("Reducing {X ...} statements", () => {
       }),
     );
 
-    expect(() => reduce(state, statement, 0)).toThrowError();
+    expect(reduce(state, statement, 0)).toEqual(
+      buildSystemExceptionState(state, 0, errorException()),
+    );
   });
 
   it("fails if a procedure is called with the wrong number of arguments", () => {
@@ -163,7 +167,9 @@ describe("Reducing {X ...} statements", () => {
       }),
     );
 
-    expect(() => reduce(state, statement, 0)).toThrowError();
+    expect(reduce(state, statement, 0)).toEqual(
+      buildSystemExceptionState(state, 0, errorException()),
+    );
   });
 
   it("blocks the thread if the procedure identifier is unbound", () => {

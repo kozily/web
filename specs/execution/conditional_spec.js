@@ -7,6 +7,8 @@ import {
 } from "../../app/oz/machine/statements";
 import { lexicalIdentifier } from "../../app/oz/machine/lexical";
 import { literalNumber, literalRecord } from "../../app/oz/machine/literals";
+import { errorException } from "../../app/oz/machine/exceptions";
+import { buildSystemExceptionState } from "./helpers";
 import {
   buildSingleThreadedState,
   buildSemanticStatement,
@@ -52,8 +54,8 @@ describe("Reducing if statements", () => {
         }),
       );
 
-      expect(() => reduce(state, statement, 0)).toThrowError(
-        "Wrong type in if condition [type: number]",
+      expect(reduce(state, statement, 0)).toEqual(
+        buildSystemExceptionState(state, 0, errorException()),
       );
     });
 
@@ -85,8 +87,8 @@ describe("Reducing if statements", () => {
         }),
       );
 
-      expect(() => reduce(state, statement, 0)).toThrowError(
-        "The condition record must not have features",
+      expect(reduce(state, statement, 0)).toEqual(
+        buildSystemExceptionState(state, 0, errorException()),
       );
     });
 
@@ -118,8 +120,8 @@ describe("Reducing if statements", () => {
         }),
       );
 
-      expect(() => reduce(state, statement, 0)).toThrowError(
-        "Unexpected record label in if condition [label: person]",
+      expect(reduce(state, statement, 0)).toEqual(
+        buildSystemExceptionState(state, 0, errorException()),
       );
     });
   });

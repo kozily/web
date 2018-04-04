@@ -1,4 +1,6 @@
 import { buildSemanticStatement } from "../machine/build";
+import { UncaughtOzExceptionError } from "../machine/exceptions";
+import { lookupVariableInSigma } from "../machine/sigma";
 
 export default function(state, semanticStatement, activeThreadIndex) {
   const statement = semanticStatement.get("statement");
@@ -17,7 +19,13 @@ export default function(state, semanticStatement, activeThreadIndex) {
   );
 
   if (poppedState.getIn(["threads", activeThreadIndex, "stack"]).isEmpty()) {
-    throw new Error("Uncaught exception");
+    const sigma = state.get("sigma");
+    const exceptionEquivalenceClass = lookupVariableInSigma(
+      sigma,
+      exceptionVariable,
+    );
+    const innerOzException = exceptionEquivalenceClass.get("value");
+    throw new UncaughtOzExceptionError(innerOzException);
   }
 
   const catchSemanticStatement = poppedState

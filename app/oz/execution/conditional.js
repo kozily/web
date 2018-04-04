@@ -1,5 +1,6 @@
 import { lookupVariableInSigma } from "../machine/sigma";
 import { buildSemanticStatement } from "../machine/build";
+import { errorException, raiseSystemException } from "../machine/exceptions";
 
 export default function(state, semanticStatement, activeThreadIndex) {
   const sigma = state.get("sigma");
@@ -24,12 +25,16 @@ export default function(state, semanticStatement, activeThreadIndex) {
   }
 
   if (value.get("type") !== "record")
-    throw new Error(`Wrong type in if condition [type: ${value.get("type")}]`);
+    return raiseSystemException(state, activeThreadIndex, errorException());
 
   if (!value.getIn(["value", "features"]).isEmpty())
-    throw new Error("The condition record must not have features");
+    return raiseSystemException(state, activeThreadIndex, errorException());
 
   const label = value.getIn(["value", "label"]);
+
+  if (label !== "true" && label !== "false")
+    return raiseSystemException(state, activeThreadIndex, errorException());
+
   if (label === "true") {
     const newSemanticStatement = buildSemanticStatement(
       trueStatement,
@@ -38,17 +43,13 @@ export default function(state, semanticStatement, activeThreadIndex) {
     return state.updateIn(["threads", activeThreadIndex, "stack"], stack =>
       stack.push(newSemanticStatement),
     );
-  } else if (label === "false") {
+  } else {
     const newSemanticStatement = buildSemanticStatement(
       falseStatement,
       environment,
     );
     return state.updateIn(["threads", activeThreadIndex, "stack"], stack =>
       stack.push(newSemanticStatement),
-    );
-  } else {
-    throw new Error(
-      `Unexpected record label in if condition [label: ${label}]`,
     );
   }
 }
