@@ -4,13 +4,13 @@ import {
   valueCreationStatement,
   bindingStatement,
   sequenceStatement,
-} from "../samples/statements";
-import { lexicalIdentifier } from "../samples/lexical";
+} from "../../app/oz/machine/statements";
+import { lexicalIdentifier } from "../../app/oz/machine/lexical";
 import {
   literalNumber,
   literalRecord,
   literalProcedure,
-} from "../samples/literals";
+} from "../../app/oz/machine/literals";
 
 describe("Collecting free identifiers in a value creation statement", () => {
   beforeEach(() => {

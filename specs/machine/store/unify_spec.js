@@ -5,7 +5,7 @@ import {
   buildEquivalenceClass,
   buildVariable,
 } from "../../../app/oz/machine/build";
-import { valueNumber, valueRecord } from "../../samples/values";
+import { valueNumber, valueRecord } from "../../../app/oz/machine/values";
 
 describe("Unifying values in the sigma", () => {
   beforeEach(() => {

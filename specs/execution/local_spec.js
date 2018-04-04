@@ -1,7 +1,7 @@
 import Immutable from "immutable";
-import { skipStatement, localStatement } from "../samples/statements";
-import { lexicalIdentifier } from "../samples/lexical";
-import { literalNumber } from "../samples/literals";
+import { skipStatement, localStatement } from "../../app/oz/machine/statements";
+import { lexicalIdentifier } from "../../app/oz/machine/lexical";
+import { literalNumber } from "../../app/oz/machine/literals";
 import {
   buildState,
   buildThread,

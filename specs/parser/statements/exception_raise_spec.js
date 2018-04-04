@@ -1,6 +1,6 @@
 import Immutable from "immutable";
-import { lexicalIdentifier } from "../../samples/lexical";
-import { exceptionRaiseStatement } from "../../samples/statements";
+import { lexicalIdentifier } from "../../../app/oz/machine/lexical";
+import { exceptionRaiseStatement } from "../../../app/oz/machine/statements";
 import parse from "../../../app/oz/parser";
 
 describe("Parsing raise statements", () => {

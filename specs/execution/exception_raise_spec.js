@@ -4,8 +4,8 @@ import {
   sequenceStatement,
   exceptionRaiseStatement,
   exceptionCatchStatement,
-} from "../samples/statements";
-import { lexicalIdentifier } from "../samples/lexical";
+} from "../../app/oz/machine/statements";
+import { lexicalIdentifier } from "../../app/oz/machine/lexical";
 import {
   buildSingleThreadedState,
   buildSemanticStatement,

@@ -3,9 +3,9 @@ import {
   skipStatement,
   sequenceStatement,
   patternMatchingStatement,
-} from "../samples/statements";
-import { lexicalIdentifier } from "../samples/lexical";
-import { literalNumber, literalRecord } from "../samples/literals";
+} from "../../app/oz/machine/statements";
+import { lexicalIdentifier } from "../../app/oz/machine/lexical";
+import { literalNumber, literalRecord } from "../../app/oz/machine/literals";
 import {
   buildSingleThreadedState,
   buildSemanticStatement,

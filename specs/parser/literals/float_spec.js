@@ -1,5 +1,5 @@
 import Immutable from "immutable";
-import { literalNumber } from "../../samples/literals";
+import { literalNumber } from "../../../app/oz/machine/literals";
 import { parserFor } from "../../../app/oz/parser";
 import literalGrammar from "../../../app/oz/grammar/literals.ne";
 

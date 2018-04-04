@@ -1,7 +1,7 @@
 import Immutable from "immutable";
 import { collectFreeIdentifiers } from "../../app/oz/free_identifiers";
-import { exceptionRaiseStatement } from "../samples/statements";
-import { lexicalIdentifier } from "../samples/lexical";
+import { exceptionRaiseStatement } from "../../app/oz/machine/statements";
+import { lexicalIdentifier } from "../../app/oz/machine/lexical";
 
 describe("Collecting free identifiers in a raise statement", () => {
   beforeEach(() => {

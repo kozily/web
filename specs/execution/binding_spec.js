@@ -1,6 +1,9 @@
 import Immutable from "immutable";
-import { skipStatement, bindingStatement } from "../samples/statements";
-import { lexicalIdentifier } from "../samples/lexical";
+import {
+  skipStatement,
+  bindingStatement,
+} from "../../app/oz/machine/statements";
+import { lexicalIdentifier } from "../../app/oz/machine/lexical";
 import {
   buildSingleThreadedState,
   buildSemanticStatement,

@@ -1,8 +1,8 @@
 import Immutable from "immutable";
-import { valueCreationStatement } from "../samples/statements";
-import { lexicalIdentifier } from "../samples/lexical";
-import { literalNumber } from "../samples/literals";
-import { valueNumber } from "../samples/values";
+import { valueCreationStatement } from "../../app/oz/machine/statements";
+import { lexicalIdentifier } from "../../app/oz/machine/lexical";
+import { literalNumber } from "../../app/oz/machine/literals";
+import { valueNumber } from "../../app/oz/machine/values";
 import {
   buildSingleThreadedState,
   buildSemanticStatement,

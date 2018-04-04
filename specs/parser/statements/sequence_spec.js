@@ -1,5 +1,8 @@
 import Immutable from "immutable";
-import { skipStatement, sequenceStatement } from "../../samples/statements";
+import {
+  skipStatement,
+  sequenceStatement,
+} from "../../../app/oz/machine/statements";
 import parse from "../../../app/oz/parser";
 
 describe("Parsing sequence statements", () => {

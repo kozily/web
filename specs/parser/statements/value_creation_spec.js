@@ -1,14 +1,14 @@
 import Immutable from "immutable";
-import { lexicalIdentifier } from "../../samples/lexical";
+import { lexicalIdentifier } from "../../../app/oz/machine/lexical";
 import {
   literalNumber,
   literalRecord,
   literalProcedure,
-} from "../../samples/literals";
+} from "../../../app/oz/machine/literals";
 import {
   valueCreationStatement,
   skipStatement,
-} from "../../samples/statements";
+} from "../../../app/oz/machine/statements";
 import parse from "../../../app/oz/parser";
 
 describe("Parsing X=VALUE statements", () => {

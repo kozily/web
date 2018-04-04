@@ -1,5 +1,5 @@
 import Immutable from "immutable";
-import { skipStatement } from "../samples/statements";
+import { skipStatement } from "../../app/oz/machine/statements";
 import parse from "../../app/oz/parser";
 
 describe("Parsing whitespace around statements", () => {

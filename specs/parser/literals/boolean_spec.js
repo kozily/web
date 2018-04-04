@@ -1,5 +1,5 @@
 import Immutable from "immutable";
-import { literalBoolean } from "../../samples/literals";
+import { literalBoolean } from "../../../app/oz/machine/literals";
 import { parserFor } from "../../../app/oz/parser";
 import literalGrammar from "../../../app/oz/grammar/literals.ne";
 

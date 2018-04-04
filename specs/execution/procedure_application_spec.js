@@ -2,9 +2,9 @@ import Immutable from "immutable";
 import {
   skipStatement,
   procedureApplicationStatement,
-} from "../samples/statements";
-import { lexicalIdentifier } from "../samples/lexical";
-import { valueProcedure, valueNumber } from "../samples/values";
+} from "../../app/oz/machine/statements";
+import { lexicalIdentifier } from "../../app/oz/machine/lexical";
+import { valueProcedure, valueNumber } from "../../app/oz/machine/values";
 import {
   buildSingleThreadedState,
   buildSemanticStatement,
