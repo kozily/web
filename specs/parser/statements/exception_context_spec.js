@@ -1,7 +1,7 @@
 import Immutable from "immutable";
 import { lexicalIdentifier } from "../../samples/lexical";
 import {
-  tryStatement,
+  exceptionContextStatement,
   skipStatement,
   sequenceStatement,
 } from "../../samples/statements";
@@ -14,7 +14,7 @@ describe("Parsing try statements", () => {
 
   it("handles condensed syntax correctly", () => {
     expect(parse("try skip catch X then skip skip end")).toEqual(
-      tryStatement(
+      exceptionContextStatement(
         skipStatement(),
         lexicalIdentifier("X"),
         sequenceStatement(skipStatement(), skipStatement()),
@@ -24,7 +24,7 @@ describe("Parsing try statements", () => {
 
   it("handles spaced syntax correctly", () => {
     expect(parse("try\n\tskip\ncatch X then\n\tskip\n\tskip\nend")).toEqual(
-      tryStatement(
+      exceptionContextStatement(
         skipStatement(),
         lexicalIdentifier("X"),
         sequenceStatement(skipStatement(), skipStatement()),

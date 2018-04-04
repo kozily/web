@@ -11,6 +11,9 @@ import procedureApplication from "./procedure_application";
 import number from "./number";
 import record from "./record";
 import procedure from "./procedure";
+import exceptionContext from "./exception_context";
+import exceptionRaise from "./exception_raise";
+import exceptionCatch from "./exception_catch";
 
 export const collectors = {
   statement: {
@@ -22,6 +25,9 @@ export const collectors = {
     [statementTypes.valueCreation]: valueCreation,
     [statementTypes.patternMatching]: patternMatching,
     [statementTypes.procedureApplication]: procedureApplication,
+    [statementTypes.exceptionContext]: exceptionContext,
+    [statementTypes.exceptionRaise]: exceptionRaise,
+    [statementTypes.exceptionCatch]: exceptionCatch,
   },
   literal: {
     [valueTypes.number]: number,

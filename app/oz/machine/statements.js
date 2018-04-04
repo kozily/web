@@ -7,6 +7,9 @@ export const statementTypes = {
   conditional: "conditional",
   patternMatching: "patternMatching",
   procedureApplication: "procedureApplication",
+  exceptionContext: "exceptionContext",
+  exceptionRaise: "exceptionRaise",
+  exceptionCatch: "exceptionCatch",
 };
 
 export const allStatementTypes = Object.keys(statementTypes);

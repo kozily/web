@@ -109,8 +109,8 @@ stm_try -> "try" _ stm_sequence _ "catch" _ ids_identifier _ "then" _ stm_sequen
   function(d) {
     return {
       node: "statement",
-      type: "try",
-      statement: d[2],
+      type: "exceptionContext",
+      triedStatement: d[2],
       exceptionIdentifier: d[6],
       exceptionStatement: d[10],
     };
@@ -121,7 +121,7 @@ stm_raise -> "raise" _ ids_identifier _ "end" {%
   function(d) {
     return {
       node: "statement",
-      type: "raise",
+      type: "exceptionRaise",
       identifier: d[2],
     };
   }

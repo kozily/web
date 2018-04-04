@@ -6,14 +6,11 @@ export default (recurse, statement) => {
   ]);
 
   const patternIdentifiers = recurse(statement.get("pattern"));
-  const trueStatementRawIdentifiers = recurse(statement.get("true_statement"));
-  const trueStatementIdentifiers = trueStatementRawIdentifiers.subtract(
-    patternIdentifiers,
-  );
+  const trueStatementIdentifiers = recurse(statement.get("true_statement"));
 
   const falseStatementIdentifiers = recurse(statement.get("false_statement"));
 
   return caseIdentifier
     .union(falseStatementIdentifiers)
-    .union(trueStatementIdentifiers);
+    .union(trueStatementIdentifiers.subtract(patternIdentifiers));
 };
