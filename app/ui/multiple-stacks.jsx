@@ -2,51 +2,14 @@ import React from "react";
 import { Header, Container, Grid } from "semantic-ui-react";
 import Stack from "./stack";
 import "./multiple-stacks.css";
+import { connect } from "react-redux";
 
-export const MST = () => {
-  const mst = [
-    {
-      stack: ["X=10...", "Z=5...", "local Y in...", "Y=5"],
-      metadata: { name: "ST 3", status: "current" },
-    },
-    {
-      stack: ["local X, Y, Z in...", "X=10", "Z=5", "local Y in...", "Y=5"],
-      metadata: { name: "ST 2", status: "ready" },
-    },
-    {
-      stack: ["local X, Y, Z in...", "X=10", "Z=5", "local Y in...", "Y=5"],
-      metadata: { name: "ST 4", status: "ready" },
-    },
-    {
-      stack: ["case X of pers...", "Age=33", 'Name="mati"'],
-      metadata: { name: "ST 5", status: "blocked" },
-    },
-    {
-      stack: ["if X then...", "V=100"],
-      metadata: { name: "ST 4", status: "blocked" },
-    },
-    {
-      stack: ["if X then...", "V=100"],
-      metadata: { name: "ST 6", status: "blocked" },
-    },
-    {
-      stack: ["if X then...", "V=100"],
-      metadata: { name: "ST 7", status: "blocked" },
-    },
-    {
-      stack: ["if X then...", "V=100"],
-      metadata: { name: "ST 8", status: "blocked" },
-    },
-    {
-      stack: ["if X then...", "V=100"],
-      metadata: { name: "ST 9", status: "blocked" },
-    },
-  ];
-
+export const MST = props => {
   const colors = {
     ready: "green",
     blocked: "red",
   };
+  const currentStep = 0;
 
   const stackList = status => {
     return (
@@ -56,18 +19,26 @@ export const MST = () => {
         </Header>
         <Grid divided="vertically">
           <Grid.Row>
-            {mst
-              .filter(s => s.metadata.status == status)
-              .map((container, index) => (
-                <Grid.Column key={index} width={8}>
-                  <Stack container={container} color={colors[status]} />
-                </Grid.Column>
-              ))}
+            {step(currentStep, status).map((thread, index) => (
+              <Grid.Column key={index} width={8}>
+                <Stack
+                  container={thread}
+                  color={colors[status]}
+                  name={"ST" + index}
+                />
+              </Grid.Column>
+            ))}
           </Grid.Row>
         </Grid>
       </Grid.Column>
     );
   };
+
+  const step = (stepNumber, status) =>
+    props.debug.steps
+      .filter((state, step) => step == stepNumber)
+      .reduce((result, item) => result.concat(item.threads), [])
+      .filter(z => z.metadata.status === status);
 
   return (
     <Container>
@@ -78,7 +49,8 @@ export const MST = () => {
               Current
             </Header>
             <Stack
-              container={mst.filter(s => s.metadata.status == "current")[0]}
+              container={step(currentStep, "current").map(x => x.stack)}
+              name={step(currentStep, "current").map((x, i) => "ST" + i)[0]}
             />
           </Grid.Column>
           {stackList("ready")}
@@ -89,4 +61,6 @@ export const MST = () => {
   );
 };
 
-export default MST;
+const mapStateToProps = state => ({ debug: state.get("debug").toJS() });
+
+export default connect(mapStateToProps)(MST);
