@@ -7,6 +7,9 @@ import valueCreation from "./value_creation";
 import conditional from "./conditional";
 import patternMatching from "./pattern_matching";
 import procedureApplication from "./procedure_application";
+import exceptionContext from "./exception_context";
+import exceptionRaise from "./exception_raise";
+import exceptionCatch from "./exception_catch";
 
 export const executors = {
   [statementTypes.skip]: skip,
@@ -17,6 +20,9 @@ export const executors = {
   [statementTypes.conditional]: conditional,
   [statementTypes.patternMatching]: patternMatching,
   [statementTypes.procedureApplication]: procedureApplication,
+  [statementTypes.exceptionContext]: exceptionContext,
+  [statementTypes.exceptionRaise]: exceptionRaise,
+  [statementTypes.exceptionCatch]: exceptionCatch,
 };
 
 export const execute = (state, semanticStatement, activeThreadIndex) => {

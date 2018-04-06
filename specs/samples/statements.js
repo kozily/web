@@ -81,3 +81,37 @@ export const procedureApplicationStatement = (procedure, args = []) => {
     args,
   });
 };
+
+export const exceptionContextStatement = (
+  triedStatement,
+  exceptionIdentifier,
+  exceptionStatement,
+) => {
+  return new Immutable.fromJS({
+    node: "statement",
+    type: "exceptionContext",
+    triedStatement,
+    exceptionIdentifier,
+    exceptionStatement,
+  });
+};
+
+export const exceptionRaiseStatement = identifier => {
+  return new Immutable.fromJS({
+    node: "statement",
+    type: "exceptionRaise",
+    identifier,
+  });
+};
+
+export const exceptionCatchStatement = (
+  exceptionIdentifier,
+  exceptionStatement,
+) => {
+  return new Immutable.fromJS({
+    node: "statement",
+    type: "exceptionCatch",
+    exceptionIdentifier,
+    exceptionStatement,
+  });
+};
