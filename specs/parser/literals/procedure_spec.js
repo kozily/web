@@ -1,7 +1,10 @@
 import Immutable from "immutable";
-import { lexicalIdentifier } from "../../samples/lexical";
-import { literalProcedure } from "../../samples/literals";
-import { sequenceStatement, skipStatement } from "../../samples/statements.js";
+import { lexicalIdentifier } from "../../../app/oz/machine/lexical";
+import { literalProcedure } from "../../../app/oz/machine/literals";
+import {
+  sequenceStatement,
+  skipStatement,
+} from "../../../app/oz/machine/statements.js";
 import { parserFor } from "../../../app/oz/parser";
 import literalGrammar from "../../../app/oz/grammar/literals.ne";
 

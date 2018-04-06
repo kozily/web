@@ -1,6 +1,6 @@
 import Immutable from "immutable";
-import { lexicalIdentifier } from "../../samples/lexical";
-import { literalTuple } from "../../samples/literals";
+import { lexicalIdentifier } from "../../../app/oz/machine/lexical";
+import { literalTuple } from "../../../app/oz/machine/literals";
 import { parserFor } from "../../../app/oz/parser";
 import literalGrammar from "../../../app/oz/grammar/literals.ne";
 

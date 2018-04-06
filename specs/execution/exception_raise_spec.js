@@ -4,8 +4,8 @@ import {
   sequenceStatement,
   exceptionRaiseStatement,
   exceptionCatchStatement,
-} from "../samples/statements";
-import { lexicalIdentifier } from "../samples/lexical";
+} from "../../app/oz/machine/statements";
+import { lexicalIdentifier } from "../../app/oz/machine/lexical";
 import {
   buildSingleThreadedState,
   buildSemanticStatement,
@@ -15,6 +15,7 @@ import {
   buildEnvironment,
 } from "../../app/oz/machine/build";
 import reduce from "../../app/oz/execution/exception_raise";
+import { failureException } from "../../app/oz/machine/exceptions";
 
 describe("Reducing raise statements", () => {
   beforeEach(() => {
@@ -74,7 +75,10 @@ describe("Reducing raise statements", () => {
         buildSemanticStatement(skipStatement()),
       ],
       sigma: buildSigma(
-        buildEquivalenceClass(undefined, buildVariable("x", 0)),
+        buildEquivalenceClass(
+          failureException("Message"),
+          buildVariable("x", 0),
+        ),
       ),
     });
 
@@ -85,8 +89,11 @@ describe("Reducing raise statements", () => {
       }),
     );
 
-    expect(() => reduce(state, statement, 0)).toThrowError(
-      "Uncaught exception",
-    );
+    expect(() => reduce(state, statement, 0)).toThrowMatching(error => {
+      return (
+        error.message === "Uncaught exception" &&
+        Immutable.is(error.innerOzException, failureException("Message"))
+      );
+    });
   });
 });

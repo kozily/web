@@ -15,25 +15,21 @@ export const isBlockedState = state => {
 };
 
 export const executeSingleStep = state => {
-  try {
-    const activeThreadIndex = state
-      .get("threads")
-      .findIndex(thread => thread.getIn(["metadata", "status"]) === "current");
-    const activeThread = state.getIn(["threads", activeThreadIndex]);
+  const activeThreadIndex = state
+    .get("threads")
+    .findIndex(thread => thread.getIn(["metadata", "status"]) === "current");
+  const activeThread = state.getIn(["threads", activeThreadIndex]);
 
-    const activeStack = activeThread.get("stack");
+  const activeStack = activeThread.get("stack");
 
-    const semanticStatement = activeStack.peek();
+  const semanticStatement = activeStack.peek();
 
-    const reducibleState = state.updateIn(
-      ["threads", activeThreadIndex, "stack"],
-      stack => stack.pop(),
-    );
+  const reducibleState = state.updateIn(
+    ["threads", activeThreadIndex, "stack"],
+    stack => stack.pop(),
+  );
 
-    return execute(reducibleState, semanticStatement, activeThreadIndex);
-  } catch (error) {
-    throw new Error(`${error.message}: ${state.toString()}`);
-  }
+  return execute(reducibleState, semanticStatement, activeThreadIndex);
 };
 
 export const executeAllSteps = (state, result = new Immutable.List()) => {

@@ -1,10 +1,10 @@
 import Immutable from "immutable";
-import { lexicalIdentifier } from "../../samples/lexical";
+import { lexicalIdentifier } from "../../../app/oz/machine/lexical";
 import {
   exceptionContextStatement,
   skipStatement,
   sequenceStatement,
-} from "../../samples/statements";
+} from "../../../app/oz/machine/statements";
 import parse from "../../../app/oz/parser";
 
 describe("Parsing try statements", () => {

@@ -1,5 +1,5 @@
 import Immutable from "immutable";
-import { lexicalIdentifier } from "../../samples/lexical";
+import { lexicalIdentifier } from "../../../app/oz/machine/lexical";
 import { parserFor } from "../../../app/oz/parser";
 import lexicalGrammar from "../../../app/oz/grammar/lexical.ne";
 

@@ -1,10 +1,13 @@
 import Immutable from "immutable";
 import { createValue } from "../../app/oz/machine/sigma";
 import { buildEnvironment, buildVariable } from "../../app/oz/machine/build";
-import { literalNumber, literalProcedure } from "../samples/literals";
-import { valueProcedure } from "../samples/values";
-import { lexicalIdentifier } from "../samples/lexical";
-import { skipStatement, valueCreationStatement } from "../samples/statements";
+import { literalNumber, literalProcedure } from "../../app/oz/machine/literals";
+import { valueProcedure } from "../../app/oz/machine/values";
+import { lexicalIdentifier } from "../../app/oz/machine/lexical";
+import {
+  skipStatement,
+  valueCreationStatement,
+} from "../../app/oz/machine/statements";
 
 describe("Creating procedure values in the sigma", () => {
   beforeEach(() => {

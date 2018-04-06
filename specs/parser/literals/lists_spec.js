@@ -1,8 +1,8 @@
 import Immutable from "immutable";
 import { parserFor } from "../../../app/oz/parser";
 import literalGrammar from "../../../app/oz/grammar/literals.ne";
-import { lexicalIdentifier } from "../../samples/lexical";
-import { literalList } from "../../samples/literals";
+import { lexicalIdentifier } from "../../../app/oz/machine/lexical";
+import { literalList } from "../../../app/oz/machine/literals";
 
 const parse = parserFor(literalGrammar);
 

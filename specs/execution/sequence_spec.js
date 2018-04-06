@@ -1,5 +1,8 @@
 import Immutable from "immutable";
-import { sequenceStatement, skipStatement } from "../samples/statements";
+import {
+  sequenceStatement,
+  skipStatement,
+} from "../../app/oz/machine/statements";
 import {
   buildSingleThreadedState,
   buildEnvironment,

@@ -1,5 +1,6 @@
 import { lookupVariableInSigma } from "../machine/sigma";
 import { buildSemanticStatement } from "../machine/build";
+import { errorException, raiseSystemException } from "../machine/exceptions";
 
 export default function(state, semanticStatement, activeThreadIndex) {
   const sigma = state.get("sigma");
@@ -23,22 +24,14 @@ export default function(state, semanticStatement, activeThreadIndex) {
   }
 
   if (procedureValue.get("type") !== "procedure")
-    throw new Error(
-      `Wrong type in procedure application, trying to call a ${procedureValue.get(
-        "type",
-      )}`,
-    );
+    return raiseSystemException(state, activeThreadIndex, errorException());
 
   const declaredArguments = procedureValue
     .getIn(["value", "args"])
     .map(x => x.get("identifier"));
 
   if (declaredArguments.count() !== callArguments.count())
-    throw new Error(
-      `Wrong number of arguments in procedure application, declared arguments ${declaredArguments
-        .toJS()
-        .join(",")}, applying arguments ${callArguments.toJS().join(", ")}`,
-    );
+    return raiseSystemException(state, activeThreadIndex, errorException());
 
   const contextualEnvironment = procedureValue.getIn(["value", "context"]);
   const newEnvironment = callArguments

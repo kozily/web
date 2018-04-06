@@ -5,9 +5,9 @@ import {
   buildEquivalenceClass,
   buildVariable,
 } from "../../app/oz/machine/build";
-import { valueProcedure } from "../samples/values";
-import { lexicalIdentifier } from "../samples/lexical";
-import { skipStatement } from "../samples/statements";
+import { valueProcedure } from "../../app/oz/machine/values";
+import { lexicalIdentifier } from "../../app/oz/machine/lexical";
+import { skipStatement } from "../../app/oz/machine/statements";
 
 describe("Unifying procedures", () => {
   beforeEach(() => {

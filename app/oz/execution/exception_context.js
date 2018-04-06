@@ -1,17 +1,15 @@
-import Immutable from "immutable";
 import { buildSemanticStatement } from "../machine/build";
+import { exceptionCatchStatement } from "../machine/statements";
 
 export default function(state, semanticStatement, activeThreadIndex) {
   const statement = semanticStatement.get("statement");
   const environment = semanticStatement.get("environment");
 
   const triedStatement = statement.get("triedStatement");
-  const catchStatement = Immutable.fromJS({
-    node: "statement",
-    type: "exceptionCatch",
-    exceptionIdentifier: statement.get("exceptionIdentifier"),
-    exceptionStatement: statement.get("exceptionStatement"),
-  });
+  const catchStatement = exceptionCatchStatement(
+    statement.get("exceptionIdentifier"),
+    statement.get("exceptionStatement"),
+  );
 
   return state.updateIn(["threads", activeThreadIndex, "stack"], stack =>
     stack

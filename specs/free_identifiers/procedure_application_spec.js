@@ -1,7 +1,7 @@
 import Immutable from "immutable";
 import { collectFreeIdentifiers } from "../../app/oz/free_identifiers";
-import { procedureApplicationStatement } from "../samples/statements";
-import { lexicalIdentifier } from "../samples/lexical";
+import { procedureApplicationStatement } from "../../app/oz/machine/statements";
+import { lexicalIdentifier } from "../../app/oz/machine/lexical";
 
 describe("Collecting free identifiers in a procedure application statement", () => {
   beforeEach(() => {

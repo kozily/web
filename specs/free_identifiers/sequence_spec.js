@@ -1,7 +1,10 @@
 import Immutable from "immutable";
 import { collectFreeIdentifiers } from "../../app/oz/free_identifiers";
-import { sequenceStatement, bindingStatement } from "../samples/statements";
-import { lexicalIdentifier } from "../samples/lexical";
+import {
+  sequenceStatement,
+  bindingStatement,
+} from "../../app/oz/machine/statements";
+import { lexicalIdentifier } from "../../app/oz/machine/lexical";
 
 describe("Collecting free identifiers in a sequence statement", () => {
   beforeEach(() => {

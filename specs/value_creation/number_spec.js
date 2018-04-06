@@ -1,8 +1,8 @@
 import Immutable from "immutable";
 import { createValue } from "../../app/oz/machine/sigma";
 import { buildEnvironment } from "../../app/oz/machine/build";
-import { literalNumber } from "../samples/literals";
-import { valueNumber } from "../samples/values";
+import { literalNumber } from "../../app/oz/machine/literals";
+import { valueNumber } from "../../app/oz/machine/values";
 
 describe("Creating number values in the sigma", () => {
   beforeEach(() => {

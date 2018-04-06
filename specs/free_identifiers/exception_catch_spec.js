@@ -3,8 +3,8 @@ import { collectFreeIdentifiers } from "../../app/oz/free_identifiers";
 import {
   exceptionCatchStatement,
   bindingStatement,
-} from "../samples/statements";
-import { lexicalIdentifier } from "../samples/lexical";
+} from "../../app/oz/machine/statements";
+import { lexicalIdentifier } from "../../app/oz/machine/lexical";
 
 describe("Collecting free identifiers in a catch statement", () => {
   beforeEach(() => {

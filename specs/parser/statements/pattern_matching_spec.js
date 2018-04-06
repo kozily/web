@@ -1,11 +1,11 @@
 import Immutable from "immutable";
-import { lexicalIdentifier } from "../../samples/lexical";
-import { literalRecord } from "../../samples/literals";
+import { lexicalIdentifier } from "../../../app/oz/machine/lexical";
+import { literalRecord } from "../../../app/oz/machine/literals";
 import {
   patternMatchingStatement,
   sequenceStatement,
   skipStatement,
-} from "../../samples/statements";
+} from "../../../app/oz/machine/statements";
 import parse from "../../../app/oz/parser";
 
 describe("Parsing case statements", () => {

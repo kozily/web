@@ -1,11 +1,11 @@
 import Immutable from "immutable";
 
-import { lexicalIdentifier } from "../../samples/lexical";
+import { lexicalIdentifier } from "../../../app/oz/machine/lexical";
 import {
   sequenceStatement,
   skipStatement,
   conditionalStatement,
-} from "../../samples/statements";
+} from "../../../app/oz/machine/statements";
 import parse from "../../../app/oz/parser";
 
 describe("Parsing conditional statements", () => {

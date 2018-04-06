@@ -5,7 +5,7 @@ import {
   buildEquivalenceClass,
   buildVariable,
 } from "../../app/oz/machine/build";
-import { valueNumber } from "../samples/values";
+import { valueNumber } from "../../app/oz/machine/values";
 
 describe("Unifying numbers", () => {
   beforeEach(() => {
