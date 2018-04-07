@@ -94,7 +94,7 @@ stm_pattern_matching -> "case" __ ids_identifier __ "of" __ lit_record_like __ "
   }
 %}
 
-stm_procedure_application -> "{" _ ids_identifier lit_procedure_args:? _ "}" {%
+stm_procedure_application -> "{" _ procedure_identifier lit_procedure_args:? _ "}" {%
   function(d) {
     return {
       node: "statement",
@@ -138,8 +138,20 @@ stm_raise -> "raise" _ ids_identifier _ "end" {%
       node: 'identifier',
       identifier: d[0],
     };
-  }
+  };
+
+  function idsBuildRecordIdentifier(d) {
+    return {
+      node: 'recordSelection',
+      identifier: d[0].identifier,
+      feature: d[2],
+    };
+  };
 %}
+
+procedure_identifier ->
+    ids_identifier {% id %}
+  | ids_identifier "." lit_atom {% idsBuildRecordIdentifier %}
 
 ids_identifier ->
     ids_identifier_syntax {% idsBuildIdentifier %}

@@ -3,8 +3,16 @@ import {
   skipStatement,
   procedureApplicationStatement,
 } from "../../app/oz/machine/statements";
-import { lexicalIdentifier } from "../../app/oz/machine/lexical";
-import { valueProcedure, valueNumber } from "../../app/oz/machine/values";
+import {
+  lexicalIdentifier,
+  lexicalRecordSelection,
+} from "../../app/oz/machine/lexical";
+import { literalAtom } from "../../app/oz/machine/literals";
+import {
+  valueProcedure,
+  valueNumber,
+  valueRecord,
+} from "../../app/oz/machine/values";
 import { errorException } from "../../app/oz/machine/exceptions";
 import { buildSystemExceptionState } from "./helpers";
 import {
@@ -202,6 +210,101 @@ describe("Reducing {X ...} statements", () => {
           buildSemanticStatement(skipStatement()),
         ],
         sigma: state.get("sigma"),
+      }),
+    );
+  });
+
+  it("Executes builtIn sum procedure correctly", () => {
+    const state = buildSingleThreadedState({
+      semanticStatements: [buildSemanticStatement(skipStatement())],
+      sigma: buildSigma(
+        buildEquivalenceClass(
+          valueProcedure(
+            [lexicalIdentifier("I"), lexicalIdentifier("O")],
+            skipStatement(),
+          ),
+          buildVariable("p", 0),
+        ),
+        buildEquivalenceClass(valueNumber(10), buildVariable("x", 0)),
+        buildEquivalenceClass(undefined, buildVariable("y", 0)),
+      ),
+    });
+
+    const statement = buildSemanticStatement(
+      procedureApplicationStatement(lexicalIdentifier("P"), [
+        lexicalIdentifier("X"),
+        lexicalIdentifier("Y"),
+      ]),
+      buildEnvironment({
+        P: buildVariable("p", 0),
+        X: buildVariable("x", 0),
+        Y: buildVariable("y", 0),
+      }),
+    );
+
+    expect(reduce(state, statement, 0)).toEqual(
+      buildSingleThreadedState({
+        semanticStatements: [
+          buildSemanticStatement(
+            skipStatement(),
+            buildEnvironment({
+              I: buildVariable("x", 0),
+              O: buildVariable("y", 0),
+            }),
+          ),
+          buildSemanticStatement(skipStatement()),
+        ],
+        sigma: state.get("sigma"),
+      }),
+    );
+  });
+
+  it("Executes recordSelection procedure user defined correctly", () => {
+    const state = buildSingleThreadedState({
+      semanticStatements: [],
+      sigma: buildSigma(
+        buildEquivalenceClass(undefined, buildVariable("c", 0)),
+        buildEquivalenceClass(
+          valueRecord("person", { age: buildVariable("a", 0) }),
+          buildVariable("x", 0),
+        ),
+        buildEquivalenceClass(valueNumber(30), buildVariable("a", 0)),
+        buildEquivalenceClass(valueRecord("age"), buildVariable("f", 0)),
+      ),
+    });
+
+    const statement = buildSemanticStatement(
+      procedureApplicationStatement(
+        lexicalRecordSelection("Record", literalAtom(".")),
+        [
+          lexicalIdentifier("X"),
+          lexicalIdentifier("F"),
+          lexicalIdentifier("C"),
+        ],
+      ),
+      buildEnvironment({
+        X: buildVariable("x", 0),
+        A: buildVariable("a", 0),
+        C: buildVariable("c", 0),
+        F: buildVariable("f", 0),
+      }),
+    );
+
+    expect(reduce(state, statement, 0)).toEqual(
+      buildSingleThreadedState({
+        semanticStatements: [],
+        sigma: buildSigma(
+          buildEquivalenceClass(valueRecord("age"), buildVariable("f", 0)),
+          buildEquivalenceClass(
+            valueRecord("person", { age: buildVariable("a", 0) }),
+            buildVariable("x", 0),
+          ),
+          buildEquivalenceClass(
+            valueNumber(30),
+            buildVariable("a", 0),
+            buildVariable("c", 0),
+          ),
+        ),
       }),
     );
   });
