@@ -1,11 +1,11 @@
 import { createStore } from "redux";
 import { combineReducers } from "redux-immutable";
 import { reducer as parse } from "./parse";
-import { reducer as debug } from "./debug";
+import { reducer as runtime } from "./runtime";
 
 const globalReducer = combineReducers({
   parse,
-  debug,
+  runtime,
 });
 
 export default createStore(

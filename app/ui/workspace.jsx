@@ -1,18 +1,18 @@
 import React from "react";
-import Ide from "./ide";
-import Debuger from "./debuger";
+import Code from "./code";
+import Runtime from "./runtime";
 import { Grid, Container } from "semantic-ui-react";
 
-export const Overview = () => {
+export const Workspace = () => {
   return (
     <Container fluid>
-      <Grid celled>
+      <Grid padded>
         <Grid.Row>
           <Grid.Column width={4}>
-            <Ide />
+            <Code />
           </Grid.Column>
           <Grid.Column width={12}>
-            <Debuger />
+            <Runtime />
           </Grid.Column>
         </Grid.Row>
       </Grid>
@@ -20,4 +20,4 @@ export const Overview = () => {
   );
 };
 
-export default Overview;
+export default Workspace;

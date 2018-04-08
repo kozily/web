@@ -1,3 +1,3 @@
 export default (environment, literal) => {
-  return literal.delete("node");
+  return literal.set("node", "value");
 };

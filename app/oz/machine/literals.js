@@ -34,7 +34,7 @@ export const literalListItem = (head, tail) => {
 };
 
 export const literalList = (items = []) => {
-  return items.reduce(
+  return items.reduceRight(
     (result, item) => literalListItem(item, result),
     literalRecord("nil"),
   );

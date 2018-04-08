@@ -1,7 +1,7 @@
+import "semantic-ui-css/semantic.min.css";
 import React from "react";
 import NavBar from "./navbar";
-import Overview from "./overview";
-import "semantic-ui-css/semantic.min.css";
+import Workspace from "./workspace";
 import store from "../state/store";
 import { Provider } from "react-redux";
 
@@ -10,7 +10,7 @@ export const Application = () => {
     <Provider store={store}>
       <div>
         <NavBar />
-        <Overview />
+        <Workspace />
       </div>
     </Provider>
   );

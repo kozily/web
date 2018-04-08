@@ -10,6 +10,7 @@ export const allValueTypes = Object.keys(valueTypes);
 
 export const valueRecord = (label, features = {}) => {
   return Immutable.fromJS({
+    node: "value",
     type: "record",
     value: {
       label,
@@ -57,6 +58,7 @@ export const valueString = value => {
 
 export const valueNumber = value => {
   return Immutable.fromJS({
+    node: "value",
     type: "number",
     value,
   });
@@ -64,6 +66,7 @@ export const valueNumber = value => {
 
 export const valueProcedure = (args = [], body, context = {}) => {
   return Immutable.fromJS({
+    node: "value",
     type: "procedure",
     value: {
       args,

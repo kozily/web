@@ -14,7 +14,7 @@ export const buildSemanticStatement = (
   });
 };
 
-export const buildThreadMetadata = ({ status = "current" } = {}) => {
+export const buildThreadMetadata = ({ status = "ready" } = {}) => {
   return Immutable.Map({
     status,
   });
