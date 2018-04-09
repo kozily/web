@@ -8,5 +8,5 @@ export default (environment, literal) => {
     return accumulator.set(identifier, environment.get(identifier));
   }, buildEnvironment());
 
-  return literal.delete("node").setIn(["value", "context"], context);
+  return literal.set("node", "value").setIn(["value", "context"], context);
 };

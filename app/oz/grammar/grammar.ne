@@ -431,7 +431,7 @@ lit_list ->
 
 lit_list_with_items -> "[" _ lit_list_items _ "]" {%
   function(d) {
-    return d[2].reduce(
+    return d[2].reduceRight(
       function(a, b) {
         return litBuildRecord('|', {1: b, 2:a});
       },

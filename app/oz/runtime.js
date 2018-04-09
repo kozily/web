@@ -17,7 +17,7 @@ export const isBlockedState = state => {
 export const executeSingleStep = state => {
   const activeThreadIndex = state
     .get("threads")
-    .findIndex(thread => thread.getIn(["metadata", "status"]) === "current");
+    .findIndex(thread => thread.getIn(["metadata", "status"]) === "ready");
   const activeThread = state.getIn(["threads", activeThreadIndex]);
 
   const activeStack = activeThread.get("stack");

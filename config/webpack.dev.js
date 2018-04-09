@@ -55,24 +55,6 @@ module.exports = {
         ],
       },
       {
-        test: /\.(sass|scss)$/,
-        use: [
-          'style-loader',
-          {
-            loader: 'css-loader',
-            options: {
-              sourceMap: true,
-            },
-          },
-          {
-            loader: 'sass-loader',
-            options: {
-              sourceMap: true,
-            },
-          },
-        ],
-      },
-      {
         test: /\.css$/,
         use: [
           'style-loader',
@@ -85,7 +67,7 @@ module.exports = {
         ],
       },
       {
-        test: /\.(ttf|eot|svg|woff|woff2)/,
+        test: /\.(ttf|eot|svg|woff|woff2|png)/,
         use: [
           'file-loader',
         ],
