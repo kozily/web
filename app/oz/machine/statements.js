@@ -131,3 +131,14 @@ export const exceptionCatchStatement = (
     exceptionStatement,
   });
 };
+
+export const operatorStatement = (result, lhs, rhs) => {
+  return new Immutable.fromJS({
+    node: "statement",
+    type: "operator",
+    result,
+    operator: ".",
+    lhs,
+    rhs,
+  });
+};

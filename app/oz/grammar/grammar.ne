@@ -26,6 +26,7 @@ stm_simple ->
   | stm_procedure_application {% id %}
   | stm_try {% id %}
   | stm_raise {% id %}
+  | stm_operator {% id %}
 
 stm_skip -> "skip" {%
   function (d) {
@@ -123,6 +124,19 @@ stm_raise -> "raise" _ ids_identifier _ "end" {%
       node: "statement",
       type: "exceptionRaise",
       identifier: d[2],
+    };
+  }
+%}
+
+stm_operator -> ids_identifier _ "=" _ ids_identifier "." (lit_atom | ids_identifier ) {%
+  function(d, position, reject) {
+    return {
+      node: "statement",
+      type: "operator",
+      result: d[0],
+      operator: ".",
+      lhs: d[4],
+      rhs: d[6][0],
     };
   }
 %}

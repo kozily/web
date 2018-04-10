@@ -35,13 +35,11 @@ export default function(state, semanticStatement, activeThreadIndex) {
           `The builtIn recordSelection operator supports 3 arguments ${callArguments}`,
         );
       }
-      // {Record.'.' X F Z} == (Z = X.F)
       const userRecordDefinedVariables = callArguments.map(x =>
         environment.get(x),
       );
       const bindingVariable = userRecordDefinedVariables.last();
       if (userRecordDefinedVariables.get(0) != undefined) {
-        // is a user defined record
         const userRecordDefinedValues = userRecordDefinedVariables
           .pop()
           .map(x => lookupVariableInSigma(sigma, x).get("value"));
