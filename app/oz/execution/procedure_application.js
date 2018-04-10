@@ -23,29 +23,31 @@ export default function(state, semanticStatement, activeThreadIndex) {
   const callIdentifier = statement.getIn(["procedure", "identifier"]);
   const callArguments = statement.get("args").map(x => x.get("identifier"));
 
-  if (nodeCallIdentifier == "recordSelection") {
+  if (nodeCallIdentifier === "recordSelection") {
     if (
-      callIdentifier != "Record" ||
+      callIdentifier !== "Record" ||
       !isRecord(statement.getIn(["procedure", "feature"])) ||
       !isAtom(statement.getIn(["procedure", "feature"])) ||
-      statement.getIn(["procedure", "feature", "value", "label"]) != "."
+      statement.getIn(["procedure", "feature", "value", "label"]) !== "."
     ) {
       return raiseSystemException(state, activeThreadIndex, errorException());
     }
-    if (callArguments.size != 3) {
+    if (callArguments.size !== 3) {
       return raiseSystemException(state, activeThreadIndex, errorException());
     }
     const userRecordDefinedVariables = callArguments.map(x =>
       environment.get(x),
     );
     const bindingVariable = userRecordDefinedVariables.last();
-    if (userRecordDefinedVariables.get(0) === undefined) {
-      return raiseSystemException(state, activeThreadIndex, errorException());
-    }
     const userRecordDefinedValues = userRecordDefinedVariables
       .pop()
       .map(x => lookupVariableInSigma(sigma, x).get("value"));
-    if (userRecordDefinedValues.map(x => isRecord(x)).some(e => e == false)) {
+    if (
+      userRecordDefinedValues.map(x => x === undefined).some(e => e === true)
+    ) {
+      return raiseSystemException(state, activeThreadIndex, errorException());
+    }
+    if (userRecordDefinedValues.map(x => isRecord(x)).some(e => e === false)) {
       return raiseSystemException(state, activeThreadIndex, errorException());
     }
     const arg1 = userRecordDefinedValues.get(0);
@@ -53,14 +55,11 @@ export default function(state, semanticStatement, activeThreadIndex) {
     if (!isAtom(arg2)) {
       return raiseSystemException(state, activeThreadIndex, errorException());
     }
-    const variable2Proc = arg1
+    const variable2Point = arg1
       .getIn(["value", "features"])
       .get(arg2.getIn(["value", "label"]));
-    if (variable2Proc === undefined) {
-      return raiseSystemException(state, activeThreadIndex, errorException());
-    }
     return state.update("sigma", sigma =>
-      unify(sigma, bindingVariable, variable2Proc),
+      unify(sigma, bindingVariable, variable2Point),
     );
   }
 

@@ -259,53 +259,229 @@ describe("Reducing {X ...} statements", () => {
     );
   });
 
-  it("Executes recordSelection procedure user defined correctly", () => {
-    const state = buildSingleThreadedState({
-      semanticStatements: [],
-      sigma: buildSigma(
-        buildEquivalenceClass(undefined, buildVariable("c", 0)),
-        buildEquivalenceClass(
-          valueRecord("person", { age: buildVariable("a", 0) }),
-          buildVariable("x", 0),
-        ),
-        buildEquivalenceClass(valueNumber(30), buildVariable("a", 0)),
-        buildEquivalenceClass(valueRecord("age"), buildVariable("f", 0)),
-      ),
-    });
-
-    const statement = buildSemanticStatement(
-      procedureApplicationStatement(
-        lexicalRecordSelection("Record", literalAtom(".")),
-        [
-          lexicalIdentifier("X"),
-          lexicalIdentifier("F"),
-          lexicalIdentifier("C"),
-        ],
-      ),
-      buildEnvironment({
-        X: buildVariable("x", 0),
-        A: buildVariable("a", 0),
-        C: buildVariable("c", 0),
-        F: buildVariable("f", 0),
-      }),
-    );
-
-    expect(reduce(state, statement, 0)).toEqual(
-      buildSingleThreadedState({
+  describe("Reducing {X ...} recordSelection statements", () => {
+    it("handled correctly", () => {
+      const state = buildSingleThreadedState({
         semanticStatements: [],
         sigma: buildSigma(
-          buildEquivalenceClass(valueRecord("age"), buildVariable("f", 0)),
+          buildEquivalenceClass(undefined, buildVariable("c", 0)),
           buildEquivalenceClass(
             valueRecord("person", { age: buildVariable("a", 0) }),
             buildVariable("x", 0),
           ),
-          buildEquivalenceClass(
-            valueNumber(30),
-            buildVariable("a", 0),
-            buildVariable("c", 0),
-          ),
+          buildEquivalenceClass(valueNumber(30), buildVariable("a", 0)),
+          buildEquivalenceClass(valueRecord("age"), buildVariable("f", 0)),
         ),
-      }),
-    );
+      });
+
+      const statement = buildSemanticStatement(
+        procedureApplicationStatement(
+          lexicalRecordSelection("Record", literalAtom(".")),
+          [
+            lexicalIdentifier("X"),
+            lexicalIdentifier("F"),
+            lexicalIdentifier("C"),
+          ],
+        ),
+        buildEnvironment({
+          X: buildVariable("x", 0),
+          A: buildVariable("a", 0),
+          C: buildVariable("c", 0),
+          F: buildVariable("f", 0),
+        }),
+      );
+
+      expect(reduce(state, statement, 0)).toEqual(
+        buildSingleThreadedState({
+          semanticStatements: [],
+          sigma: buildSigma(
+            buildEquivalenceClass(valueRecord("age"), buildVariable("f", 0)),
+            buildEquivalenceClass(
+              valueRecord("person", { age: buildVariable("a", 0) }),
+              buildVariable("x", 0),
+            ),
+            buildEquivalenceClass(
+              valueNumber(30),
+              buildVariable("a", 0),
+              buildVariable("c", 0),
+            ),
+          ),
+        }),
+      );
+    });
+
+    it("Handled error in argument size ", () => {
+      const state = buildSingleThreadedState({
+        semanticStatements: [],
+        sigma: buildSigma(
+          buildEquivalenceClass(
+            valueRecord("person", { age: buildVariable("a", 0) }),
+            buildVariable("x", 0),
+          ),
+          buildEquivalenceClass(valueNumber(30), buildVariable("a", 0)),
+          buildEquivalenceClass(valueRecord("age"), buildVariable("f", 0)),
+        ),
+      });
+
+      const statement = buildSemanticStatement(
+        procedureApplicationStatement(
+          lexicalRecordSelection("Record", literalAtom(".")),
+          [lexicalIdentifier("X"), lexicalIdentifier("F")],
+        ),
+        buildEnvironment({
+          X: buildVariable("x", 0),
+          A: buildVariable("a", 0),
+          F: buildVariable("f", 0),
+        }),
+      );
+
+      expect(reduce(state, statement, 0)).toEqual(
+        buildSystemExceptionState(state, 0, errorException()),
+      );
+    });
+
+    it("Handled error first argument undefined", () => {
+      const state = buildSingleThreadedState({
+        semanticStatements: [],
+        sigma: buildSigma(
+          buildEquivalenceClass(undefined, buildVariable("c", 0)),
+          buildEquivalenceClass(valueRecord("age"), buildVariable("f", 0)),
+          buildEquivalenceClass(undefined, buildVariable("x", 0)),
+          buildEquivalenceClass(valueNumber(30), buildVariable("a", 0)),
+        ),
+      });
+
+      const statement = buildSemanticStatement(
+        procedureApplicationStatement(
+          lexicalRecordSelection("Record", literalAtom(".")),
+          [
+            lexicalIdentifier("X"),
+            lexicalIdentifier("F"),
+            lexicalIdentifier("C"),
+          ],
+        ),
+        buildEnvironment({
+          X: buildVariable("x", 0),
+          A: buildVariable("a", 0),
+          C: buildVariable("c", 0),
+          F: buildVariable("f", 0),
+        }),
+      );
+
+      expect(reduce(state, statement, 0)).toEqual(
+        buildSystemExceptionState(state, 0, errorException()),
+      );
+    });
+
+    it("Handled error second argument undefined", () => {
+      const state = buildSingleThreadedState({
+        semanticStatements: [],
+        sigma: buildSigma(
+          buildEquivalenceClass(
+            undefined,
+            buildVariable("c", 0),
+            buildVariable("f", 0),
+          ),
+          buildEquivalenceClass(
+            valueRecord("person", { age: buildVariable("a", 0) }),
+            buildVariable("x", 0),
+          ),
+          buildEquivalenceClass(valueNumber(30), buildVariable("a", 0)),
+        ),
+      });
+
+      const statement = buildSemanticStatement(
+        procedureApplicationStatement(
+          lexicalRecordSelection("Record", literalAtom(".")),
+          [
+            lexicalIdentifier("X"),
+            lexicalIdentifier("F"),
+            lexicalIdentifier("C"),
+          ],
+        ),
+        buildEnvironment({
+          X: buildVariable("x", 0),
+          A: buildVariable("a", 0),
+          C: buildVariable("c", 0),
+          F: buildVariable("f", 0),
+        }),
+      );
+
+      expect(reduce(state, statement, 0)).toEqual(
+        buildSystemExceptionState(state, 0, errorException()),
+      );
+    });
+
+    it("Handled error first argument not a record", () => {
+      const state = buildSingleThreadedState({
+        semanticStatements: [],
+        sigma: buildSigma(
+          buildEquivalenceClass(
+            undefined,
+            buildVariable("c", 0),
+            buildVariable("f", 0),
+          ),
+          buildEquivalenceClass(valueNumber(40), buildVariable("x", 0)),
+          buildEquivalenceClass(valueNumber(30), buildVariable("a", 0)),
+        ),
+      });
+
+      const statement = buildSemanticStatement(
+        procedureApplicationStatement(
+          lexicalRecordSelection("Record", literalAtom(".")),
+          [
+            lexicalIdentifier("X"),
+            lexicalIdentifier("F"),
+            lexicalIdentifier("C"),
+          ],
+        ),
+        buildEnvironment({
+          X: buildVariable("x", 0),
+          A: buildVariable("a", 0),
+          C: buildVariable("c", 0),
+          F: buildVariable("f", 0),
+        }),
+      );
+
+      expect(reduce(state, statement, 0)).toEqual(
+        buildSystemExceptionState(state, 0, errorException()),
+      );
+    });
+
+    it("Handled error second argument not an atom", () => {
+      const state = buildSingleThreadedState({
+        semanticStatements: [],
+        sigma: buildSigma(
+          buildEquivalenceClass(undefined, buildVariable("c", 0)),
+          buildEquivalenceClass(
+            valueRecord("person", { age: buildVariable("a", 0) }),
+            buildVariable("x", 0),
+          ),
+          buildEquivalenceClass(valueNumber(30), buildVariable("a", 0)),
+          buildEquivalenceClass(valueNumber(30), buildVariable("f", 0)),
+        ),
+      });
+
+      const statement = buildSemanticStatement(
+        procedureApplicationStatement(
+          lexicalRecordSelection("Record", literalAtom(".")),
+          [
+            lexicalIdentifier("X"),
+            lexicalIdentifier("F"),
+            lexicalIdentifier("C"),
+          ],
+        ),
+        buildEnvironment({
+          X: buildVariable("x", 0),
+          A: buildVariable("a", 0),
+          C: buildVariable("c", 0),
+          F: buildVariable("f", 0),
+        }),
+      );
+
+      expect(reduce(state, statement, 0)).toEqual(
+        buildSystemExceptionState(state, 0, errorException()),
+      );
+    });
   });
 });
