@@ -6,9 +6,9 @@ export default (recurse, statement) => {
   ]);
 
   const patternIdentifiers = recurse(statement.get("pattern"));
-  const trueStatementIdentifiers = recurse(statement.get("true_statement"));
+  const trueStatementIdentifiers = recurse(statement.get("trueStatement"));
 
-  const falseStatementIdentifiers = recurse(statement.get("false_statement"));
+  const falseStatementIdentifiers = recurse(statement.get("falseStatement"));
 
   return caseIdentifier
     .union(falseStatementIdentifiers)

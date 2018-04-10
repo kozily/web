@@ -61,31 +61,31 @@ export const valueCreationStatement = (lhs, rhs) => {
 
 export const conditionalStatement = (
   condition,
-  true_statement,
-  false_statement = undefined,
+  trueStatement,
+  falseStatement = undefined,
 ) => {
   return new Immutable.Map({
     node: "statement",
     type: "conditional",
     condition,
-    true_statement,
-    false_statement,
+    trueStatement,
+    falseStatement,
   });
 };
 
 export const patternMatchingStatement = (
   identifier,
   pattern,
-  true_statement,
-  false_statement = undefined,
+  trueStatement,
+  falseStatement = undefined,
 ) => {
   return new Immutable.Map({
     node: "statement",
     type: "patternMatching",
     identifier,
     pattern,
-    true_statement,
-    false_statement,
+    trueStatement,
+    falseStatement,
   });
 };
 

@@ -76,8 +76,8 @@ stm_conditional -> "if" __ ids_identifier __ "then" __ stm_sequence __ "else" __
       node: "statement",
       type: "conditional",
       condition: d[2],
-      true_statement: d[6],
-      false_statement: d[10],
+      trueStatement: d[6],
+      falseStatement: d[10],
     }
   }
 %}
@@ -89,8 +89,8 @@ stm_pattern_matching -> "case" __ ids_identifier __ "of" __ lit_record_like __ "
       type: "patternMatching",
       identifier: d[2],
       pattern: d[6],
-      true_statement: d[10],
-      false_statement: d[14],
+      trueStatement: d[10],
+      falseStatement: d[14],
     }
   }
 %}

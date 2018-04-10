@@ -9,8 +9,8 @@ export default function(state, semanticStatement, activeThreadIndex) {
 
   const identifier = statement.getIn(["identifier", "identifier"]);
   const pattern = statement.getIn(["pattern"]);
-  const trueStatement = statement.getIn(["true_statement"]);
-  const falseStatement = statement.getIn(["false_statement"]);
+  const trueStatement = statement.getIn(["trueStatement"]);
+  const falseStatement = statement.getIn(["falseStatement"]);
 
   const variable = environment.get(identifier);
   const equivalentClass = lookupVariableInSigma(sigma, variable);

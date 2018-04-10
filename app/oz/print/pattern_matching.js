@@ -3,11 +3,11 @@ export default (recurse, node, identation) => {
   const identifier = node.getIn(["identifier", "identifier"]);
   const printedPattern = recurse(node.get("pattern")).abbreviated;
   const printedMatchStatement = recurse(
-    node.get("true_statement"),
+    node.get("trueStatement"),
     identation + 2,
   ).full;
   const printedFailStatement = recurse(
-    node.get("false_statement"),
+    node.get("falseStatement"),
     identation + 2,
   ).full;
 

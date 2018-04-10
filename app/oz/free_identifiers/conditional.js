@@ -4,8 +4,8 @@ export default (recurse, statement) => {
   const conditionIdentifiers = Immutable.Set([
     statement.getIn(["condition", "identifier"]),
   ]);
-  const trueStatementIdentifiers = recurse(statement.get("true_statement"));
-  const falseStatementIdentifiers = recurse(statement.get("false_statement"));
+  const trueStatementIdentifiers = recurse(statement.get("trueStatement"));
+  const falseStatementIdentifiers = recurse(statement.get("falseStatement"));
 
   return conditionIdentifiers
     .union(trueStatementIdentifiers)
