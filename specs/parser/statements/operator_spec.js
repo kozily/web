@@ -1,7 +1,7 @@
 import Immutable from "immutable";
 import { lexicalIdentifier } from "../../../app/oz/machine/lexical";
 import { literalAtom } from "../../../app/oz/machine/literals";
-import { operatorStatement } from "../../../app/oz/machine/statements";
+import { operatorStatementSyntax } from "../../../app/oz/machine/statementSyntax";
 import parse from "../../../app/oz/parser";
 
 describe("Parsing Z=X.F statements", () => {
@@ -12,7 +12,7 @@ describe("Parsing Z=X.F statements", () => {
   describe("when parsing identifiers", () => {
     it("handles identifier correctly", () => {
       expect(parse("Z=X.F")).toEqual(
-        operatorStatement(
+        operatorStatementSyntax(
           lexicalIdentifier("Z"),
           lexicalIdentifier("X"),
           lexicalIdentifier("F"),
@@ -22,7 +22,7 @@ describe("Parsing Z=X.F statements", () => {
 
     it("handles atom correctly", () => {
       expect(parse("Z=X.age")).toEqual(
-        operatorStatement(
+        operatorStatementSyntax(
           lexicalIdentifier("Z"),
           lexicalIdentifier("X"),
           literalAtom("age"),

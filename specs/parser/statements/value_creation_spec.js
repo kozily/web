@@ -6,9 +6,9 @@ import {
   literalProcedure,
 } from "../../../app/oz/machine/literals";
 import {
-  valueCreationStatement,
-  skipStatement,
-} from "../../../app/oz/machine/statements";
+  valueCreationStatementSyntax,
+  skipStatementSyntax,
+} from "../../../app/oz/machine/statementSyntax";
 import parse from "../../../app/oz/parser";
 
 describe("Parsing X=VALUE statements", () => {
@@ -19,13 +19,13 @@ describe("Parsing X=VALUE statements", () => {
   describe("when parsing numbers", () => {
     it("handles condensed syntax correctly", () => {
       expect(parse("X=5")).toEqual(
-        valueCreationStatement(lexicalIdentifier("X"), literalNumber(5)),
+        valueCreationStatementSyntax(lexicalIdentifier("X"), literalNumber(5)),
       );
     });
 
     it("handles spaced syntax correctly", () => {
       expect(parse("Variable = 12.0")).toEqual(
-        valueCreationStatement(
+        valueCreationStatementSyntax(
           lexicalIdentifier("Variable"),
           literalNumber(12.0),
         ),
@@ -34,7 +34,7 @@ describe("Parsing X=VALUE statements", () => {
 
     it("handles quoted variable syntax correctly", () => {
       expect(parse("`One Variable` = 152")).toEqual(
-        valueCreationStatement(
+        valueCreationStatementSyntax(
           lexicalIdentifier("One Variable"),
           literalNumber(152),
         ),
@@ -45,7 +45,7 @@ describe("Parsing X=VALUE statements", () => {
   describe("when parsing records", () => {
     it("handles condensed syntax correctly", () => {
       expect(parse("X=person(name:N)")).toEqual(
-        valueCreationStatement(
+        valueCreationStatementSyntax(
           lexicalIdentifier("X"),
           literalRecord("person", { name: lexicalIdentifier("N") }),
         ),
@@ -54,7 +54,7 @@ describe("Parsing X=VALUE statements", () => {
 
     it("handles spaced syntax correctly", () => {
       expect(parse("X = person(name:N)")).toEqual(
-        valueCreationStatement(
+        valueCreationStatementSyntax(
           lexicalIdentifier("X"),
           literalRecord("person", { name: lexicalIdentifier("N") }),
         ),
@@ -63,7 +63,7 @@ describe("Parsing X=VALUE statements", () => {
 
     it("handles quoted variable syntax correctly", () => {
       expect(parse("`One Variable` = person(name:N)")).toEqual(
-        valueCreationStatement(
+        valueCreationStatementSyntax(
           lexicalIdentifier("One Variable"),
           literalRecord("person", { name: lexicalIdentifier("N") }),
         ),
@@ -74,11 +74,11 @@ describe("Parsing X=VALUE statements", () => {
   describe("when parsing procedures", () => {
     it("handles condensed syntax correctly", () => {
       expect(parse("X=proc{$ X Y} skip end")).toEqual(
-        valueCreationStatement(
+        valueCreationStatementSyntax(
           lexicalIdentifier("X"),
           literalProcedure(
             [lexicalIdentifier("X"), lexicalIdentifier("Y")],
-            skipStatement(),
+            skipStatementSyntax(),
           ),
         ),
       );
@@ -86,11 +86,11 @@ describe("Parsing X=VALUE statements", () => {
 
     it("handles spaced syntax correctly", () => {
       expect(parse("X = proc{$ X Y} skip end")).toEqual(
-        valueCreationStatement(
+        valueCreationStatementSyntax(
           lexicalIdentifier("X"),
           literalProcedure(
             [lexicalIdentifier("X"), lexicalIdentifier("Y")],
-            skipStatement(),
+            skipStatementSyntax(),
           ),
         ),
       );
@@ -98,11 +98,11 @@ describe("Parsing X=VALUE statements", () => {
 
     it("handles quoted variable syntax correctly", () => {
       expect(parse("`One Variable` = proc{$ X Y} skip end")).toEqual(
-        valueCreationStatement(
+        valueCreationStatementSyntax(
           lexicalIdentifier("One Variable"),
           literalProcedure(
             [lexicalIdentifier("X"), lexicalIdentifier("Y")],
-            skipStatement(),
+            skipStatementSyntax(),
           ),
         ),
       );

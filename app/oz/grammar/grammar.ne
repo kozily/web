@@ -11,7 +11,12 @@ stm_root -> _ stm_sequence _ {% nth(1) %}
 stm_sequence ->
     stm_simple __ stm_sequence {%
       function (d) {
-        return { node: 'statement', type: 'sequence', head: d[0], tail: d[2] };
+        return {
+          node: "statement",
+          type: "sequenceSyntax",
+          head: d[0],
+          tail: d[2] 
+        };
       }
     %}
   | stm_simple {% id %}
@@ -31,8 +36,8 @@ stm_simple ->
 stm_skip -> "skip" {%
   function (d) {
     return {
-      node: 'statement',
-      type: 'skip'
+      node: "statement",
+      type: "skipSyntax"
     };
   }
 %}
@@ -40,8 +45,8 @@ stm_skip -> "skip" {%
 stm_local -> "local" __ ids_identifier __ "in" __ stm_sequence __ "end" {%
   function(d) {
     return {
-      node: 'statement',
-      type: 'local',
+      node: "statement",
+      type: "localSyntax",
       identifier: d[2],
       statement: d[6],
     };
@@ -51,8 +56,8 @@ stm_local -> "local" __ ids_identifier __ "in" __ stm_sequence __ "end" {%
 stm_binding -> ids_identifier _ "=" _ ids_identifier {%
   function(d, position, reject) {
     return {
-      node: 'statement',
-      type: 'binding',
+      node: "statement",
+      type: "bindingSyntax",
       lhs: d[0],
       rhs: d[4],
     };
@@ -62,8 +67,8 @@ stm_binding -> ids_identifier _ "=" _ ids_identifier {%
 stm_value_creation -> ids_identifier _ "=" _ lit_value {%
   function(d, position, reject) {
     return {
-      node: 'statement',
-      type: 'valueCreation',
+      node: "statement",
+      type: "valueCreationSyntax",
       lhs: d[0],
       rhs: d[4],
     };
@@ -74,7 +79,7 @@ stm_conditional -> "if" __ ids_identifier __ "then" __ stm_sequence __ "else" __
   function(d, position, reject) {
     return {
       node: "statement",
-      type: "conditional",
+      type: "conditionalSyntax",
       condition: d[2],
       trueStatement: d[6],
       falseStatement: d[10],
@@ -86,7 +91,7 @@ stm_pattern_matching -> "case" __ ids_identifier __ "of" __ lit_record_like __ "
   function(d, position, reject) {
     return {
       node: "statement",
-      type: "patternMatching",
+      type: "patternMatchingSyntax",
       identifier: d[2],
       pattern: d[6],
       trueStatement: d[10],
@@ -99,7 +104,7 @@ stm_procedure_application -> "{" _ procedure_identifier lit_procedure_args:? _ "
   function(d) {
     return {
       node: "statement",
-      type: "procedureApplication",
+      type: "procedureApplicationSyntax",
       procedure: d[2],
       args: d[3] || [],
     };
@@ -110,7 +115,7 @@ stm_try -> "try" _ stm_sequence _ "catch" _ ids_identifier _ "then" _ stm_sequen
   function(d) {
     return {
       node: "statement",
-      type: "exceptionContext",
+      type: "exceptionContextSyntax",
       triedStatement: d[2],
       exceptionIdentifier: d[6],
       exceptionStatement: d[10],
@@ -122,7 +127,7 @@ stm_raise -> "raise" _ ids_identifier _ "end" {%
   function(d) {
     return {
       node: "statement",
-      type: "exceptionRaise",
+      type: "exceptionRaiseSyntax",
       identifier: d[2],
     };
   }
@@ -132,7 +137,7 @@ stm_operator -> ids_identifier _ "=" _ ids_identifier "." (lit_atom | ids_identi
   function(d, position, reject) {
     return {
       node: "statement",
-      type: "operator",
+      type: "operatorSyntax",
       result: d[0],
       operator: ".",
       lhs: d[4],
@@ -149,14 +154,14 @@ stm_operator -> ids_identifier _ "=" _ ids_identifier "." (lit_atom | ids_identi
 @{%
   function idsBuildIdentifier(d) {
     return {
-      node: 'identifier',
+      node: "identifier",
       identifier: d[0],
     };
   };
 
   function idsBuildRecordIdentifier(d) {
     return {
-      node: 'recordSelection',
+      node: "recordSelection",
       identifier: d[0].identifier,
       feature: d[2],
     };
@@ -211,7 +216,7 @@ lit_value ->
 ##############################################################################
 @{%
   function litBuildRecord(label, features) {
-    return { node: 'literal', type: 'record', value: { label: label, features: features } };
+    return { node: "literal", type: "record", value: { label: label, features: features } };
   }
 %}
 
@@ -245,13 +250,13 @@ lit_record_feature -> lit_atom_syntax ":" ids_identifier {%
   }
 
   LIT_KEYWORDS = [
-    'andthen', 'at', 'attr', 'break', 'case', 'catch', 'choice', 'class',
-    'collect', 'cond', 'continue', 'declare', 'default', 'define', 'dis', 'div',
-    'do', 'else', 'elsecase', 'elseif', 'elseof', 'end', 'export', 'fail', 'false',
-    'feat', 'finally', 'for', 'from', 'fun', 'functor', 'if', 'import', 'in',
-    'lazy', 'local', 'lock', 'meth', 'mod', 'not', 'of', 'or', 'orelse', 'prepare',
-    'proc', 'prop', 'raise', 'require', 'return', 'self', 'skip', 'then', 'thread',
-    'true', 'try', 'unit',
+    "andthen", "at", "attr", "break", "case", "catch", "choice", "class",
+    "collect", "cond", "continue", "declare", "default", "define", "dis", "div",
+    "do", "else", "elsecase", "elseif", "elseof", "end", "export", "fail", "false",
+    "feat", "finally", "for", "from", "fun", "functor", "if", "import", "in",
+    "lazy", "local", "lock", "meth", "mod", "not", "of", "or", "orelse", "prepare",
+    "proc", "prop", "raise", "require", "return", "self", "skip", "then", "thread",
+    "true", "try", "unit",
   ];
 %}
 
@@ -345,7 +350,7 @@ lit_string_syntax -> "\"" ([^"\\] | lib_pseudo_char):* "\"" {%
 ##############################################################################
 @{%
   function litBuildNumber(value) {
-    return { node: 'literal', type: 'number', value: value[0] };
+    return { node: "literal", type: "number", value: value[0] };
   }
 %}
 
@@ -459,7 +464,7 @@ lit_list_with_items -> "[" _ lit_list_items _ "]" {%
   function(d) {
     return d[2].reduceRight(
       function(a, b) {
-        return litBuildRecord('|', {1: b, 2:a});
+        return litBuildRecord("|", {1: b, 2:a});
       },
       litBuildRecord("nil", {})
     );
@@ -503,8 +508,8 @@ lit_tuple -> lit_atom_syntax "(" _ lit_list_items _ ")" {%
 @{%
   function litBuildProcedure(args, body) {
     return {
-      node: 'literal',
-      type: 'procedure',
+      node: "literal",
+      type: "procedure",
       value: { args: (args || []), body: body },
     };
   }

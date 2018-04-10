@@ -19,7 +19,7 @@ export const allStatementTypes = Object.keys(statementTypes);
 export const sequenceStatement = (head, tail) => {
   return Immutable.fromJS({
     node: "statement",
-    type: "sequence",
+    type: statementTypes.sequence,
     head,
     tail,
   });
@@ -28,14 +28,14 @@ export const sequenceStatement = (head, tail) => {
 export const skipStatement = () => {
   return Immutable.fromJS({
     node: "statement",
-    type: "skip",
+    type: statementTypes.skip,
   });
 };
 
 export const localStatement = (identifier, statement) => {
   return new Immutable.Map({
     node: "statement",
-    type: "local",
+    type: statementTypes.local,
     identifier,
     statement,
   });
@@ -44,7 +44,7 @@ export const localStatement = (identifier, statement) => {
 export const bindingStatement = (lhs, rhs) => {
   return new Immutable.Map({
     node: "statement",
-    type: "binding",
+    type: statementTypes.binding,
     lhs,
     rhs,
   });
@@ -53,7 +53,7 @@ export const bindingStatement = (lhs, rhs) => {
 export const valueCreationStatement = (lhs, rhs) => {
   return new Immutable.Map({
     node: "statement",
-    type: "valueCreation",
+    type: statementTypes.valueCreation,
     lhs,
     rhs,
   });
@@ -66,7 +66,7 @@ export const conditionalStatement = (
 ) => {
   return new Immutable.Map({
     node: "statement",
-    type: "conditional",
+    type: statementTypes.conditional,
     condition,
     trueStatement,
     falseStatement,
@@ -81,7 +81,7 @@ export const patternMatchingStatement = (
 ) => {
   return new Immutable.Map({
     node: "statement",
-    type: "patternMatching",
+    type: statementTypes.patternMatching,
     identifier,
     pattern,
     trueStatement,
@@ -92,7 +92,7 @@ export const patternMatchingStatement = (
 export const procedureApplicationStatement = (procedure, args = []) => {
   return new Immutable.fromJS({
     node: "statement",
-    type: "procedureApplication",
+    type: statementTypes.procedureApplication,
     procedure,
     args,
   });
@@ -105,7 +105,7 @@ export const exceptionContextStatement = (
 ) => {
   return new Immutable.fromJS({
     node: "statement",
-    type: "exceptionContext",
+    type: statementTypes.exceptionContext,
     triedStatement,
     exceptionIdentifier,
     exceptionStatement,
@@ -115,7 +115,7 @@ export const exceptionContextStatement = (
 export const exceptionRaiseStatement = identifier => {
   return new Immutable.fromJS({
     node: "statement",
-    type: "exceptionRaise",
+    type: statementTypes.exceptionRaise,
     identifier,
   });
 };
@@ -126,19 +126,8 @@ export const exceptionCatchStatement = (
 ) => {
   return new Immutable.fromJS({
     node: "statement",
-    type: "exceptionCatch",
+    type: statementTypes.exceptionCatch,
     exceptionIdentifier,
     exceptionStatement,
-  });
-};
-
-export const operatorStatement = (result, lhs, rhs) => {
-  return new Immutable.fromJS({
-    node: "statement",
-    type: "operator",
-    result,
-    operator: ".",
-    lhs,
-    rhs,
   });
 };

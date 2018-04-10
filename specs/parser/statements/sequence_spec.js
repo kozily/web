@@ -1,8 +1,8 @@
 import Immutable from "immutable";
 import {
-  skipStatement,
-  sequenceStatement,
-} from "../../../app/oz/machine/statements";
+  skipStatementSyntax,
+  sequenceStatementSyntax,
+} from "../../../app/oz/machine/statementSyntax";
 import parse from "../../../app/oz/parser";
 
 describe("Parsing sequence statements", () => {
@@ -12,21 +12,21 @@ describe("Parsing sequence statements", () => {
 
   it("handles a single space between statements correctly", () => {
     expect(parse("skip skip")).toEqual(
-      sequenceStatement(skipStatement(), skipStatement()),
+      sequenceStatementSyntax(skipStatementSyntax(), skipStatementSyntax()),
     );
   });
 
   it("handles multiple whitespace characters correctly", () => {
     expect(parse("skip\n\t  skip")).toEqual(
-      sequenceStatement(skipStatement(), skipStatement()),
+      sequenceStatementSyntax(skipStatementSyntax(), skipStatementSyntax()),
     );
   });
 
   it("handles multiple nested sequences correctly", () => {
     expect(parse("skip skip skip")).toEqual(
-      sequenceStatement(
-        skipStatement(),
-        sequenceStatement(skipStatement(), skipStatement()),
+      sequenceStatementSyntax(
+        skipStatementSyntax(),
+        sequenceStatementSyntax(skipStatementSyntax(), skipStatementSyntax()),
       ),
     );
   });

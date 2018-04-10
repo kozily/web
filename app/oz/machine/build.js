@@ -80,5 +80,10 @@ export const buildFromKernelAST = ast => {
 
 export var argumentIndex = 0;
 
-export const makeAuxiliaryIdentifier = () =>
-  lexicalIdentifier(`__${argumentIndex++}__`);
+export const makeAuxiliaryIdentifier = () => {
+  return lexicalIdentifier(`__${argumentIndex++}__`);
+};
+
+export const getLastAuxiliaryIdentifier = () => {
+  return lexicalIdentifier(`__${argumentIndex - 1}__`);
+};

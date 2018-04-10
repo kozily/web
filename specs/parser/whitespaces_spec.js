@@ -1,5 +1,5 @@
 import Immutable from "immutable";
-import { skipStatement } from "../../app/oz/machine/statements";
+import { skipStatementSyntax } from "../../app/oz/machine/statementSyntax";
 import parse from "../../app/oz/parser";
 
 describe("Parsing whitespace around statements", () => {
@@ -8,6 +8,6 @@ describe("Parsing whitespace around statements", () => {
   });
 
   it("handles it correctly", () => {
-    expect(parse("   skip \n\t  ")).toEqual(skipStatement());
+    expect(parse("   skip \n\t  ")).toEqual(skipStatementSyntax());
   });
 });
