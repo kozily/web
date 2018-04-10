@@ -6,6 +6,7 @@ import {
 } from "../machine/statements";
 import { literalAtom } from "../machine/literals";
 import { lexicalIdentifier, lexicalRecordSelection } from "../machine/lexical";
+import { makeAuxiliaryIdentifier } from "../machine/build";
 
 const buildRecordSelection = (lhs, rhs, result) => {
   const recordSelectionProcedureApp = procedureApplicationStatement(
@@ -24,16 +25,14 @@ export default (recurse, statement) => {
       statement.getIn(["result", "identifier"]),
     );
   } else {
+    const aux = makeAuxiliaryIdentifier();
     return localStatement(
-      lexicalIdentifier("__AUX_ARG__"),
+      aux,
       sequenceStatement(
-        valueCreationStatement(
-          lexicalIdentifier("__AUX_ARG__"),
-          statement.get("rhs"),
-        ),
+        valueCreationStatement(aux, statement.get("rhs")),
         buildRecordSelection(
           statement.getIn(["lhs", "identifier"]),
-          "__AUX_ARG__",
+          aux.get("identifier"),
           statement.getIn(["result", "identifier"]),
         ),
       ),

@@ -1,4 +1,5 @@
 import Immutable from "immutable";
+import { lexicalIdentifier } from "./lexical";
 
 export const buildEnvironment = (contents = {}) => {
   return Immutable.Map(contents);
@@ -76,3 +77,8 @@ export const buildFromKernelAST = ast => {
     semanticStatements: [buildSemanticStatement(ast)],
   });
 };
+
+export var argumentIndex = 0;
+
+export const makeAuxiliaryIdentifier = () =>
+  lexicalIdentifier(`__${argumentIndex++}__`);

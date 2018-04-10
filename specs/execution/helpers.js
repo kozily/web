@@ -1,33 +1,34 @@
 import { exceptionRaiseStatement } from "../../app/oz/machine/statements";
-import { lexicalIdentifier } from "../../app/oz/machine/lexical";
 import {
   buildSemanticStatement,
   buildEquivalenceClass,
   buildVariable,
   buildEnvironment,
+  argumentIndex,
 } from "../../app/oz/machine/build";
+import { lexicalIdentifier } from "../../app/oz/machine/lexical";
+
 export const buildSystemExceptionState = (
   state,
   activeThreadIndex,
   exception,
 ) => {
+  const aux = lexicalIdentifier(`__${argumentIndex - 1}__`);
+  const auxIdentifier = aux.get("identifier");
   return state
     .updateIn(["threads", activeThreadIndex, "stack"], stack =>
       stack.push(
         buildSemanticStatement(
-          exceptionRaiseStatement(lexicalIdentifier("__SYSTEM_EXCEPTION__")),
+          exceptionRaiseStatement(aux),
           buildEnvironment({
-            __SYSTEM_EXCEPTION__: buildVariable("__SYSTEM_EXCEPTION__", 0),
+            [auxIdentifier]: buildVariable(auxIdentifier, 0),
           }),
         ),
       ),
     )
     .update("sigma", sigma =>
       sigma.add(
-        buildEquivalenceClass(
-          exception,
-          buildVariable("__SYSTEM_EXCEPTION__", 0),
-        ),
+        buildEquivalenceClass(exception, buildVariable(auxIdentifier, 0)),
       ),
     );
 };

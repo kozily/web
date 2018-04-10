@@ -1,5 +1,8 @@
 import { makeNewVariable, unify, createValue } from "../machine/sigma";
-import { buildEquivalenceClass } from "../machine/build";
+import {
+  buildEquivalenceClass,
+  makeAuxiliaryIdentifier,
+} from "../machine/build";
 import { failureException, raiseSystemException } from "../machine/exceptions";
 
 export default function(state, semanticStatement, activeThreadIndex) {
@@ -13,9 +16,10 @@ export default function(state, semanticStatement, activeThreadIndex) {
   const literal = statement.get("rhs");
   const sigmaValue = createValue(environment, literal);
 
+  const aux = makeAuxiliaryIdentifier();
   const newVariable = makeNewVariable({
     in: state.get("sigma"),
-    for: "__VALUE_CREATION__",
+    for: aux.get("identifier"),
   });
   const newEquivalenceClass = buildEquivalenceClass(sigmaValue, newVariable);
   const newSigma = sigma.add(newEquivalenceClass);

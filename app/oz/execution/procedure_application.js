@@ -25,59 +25,43 @@ export default function(state, semanticStatement, activeThreadIndex) {
 
   if (nodeCallIdentifier == "recordSelection") {
     if (
-      callIdentifier === "Record" &&
-      isRecord(statement.getIn(["procedure", "feature"])) &&
-      isAtom(statement.getIn(["procedure", "feature"])) &&
-      statement.getIn(["procedure", "feature", "value", "label"]) === "."
+      callIdentifier != "Record" ||
+      !isRecord(statement.getIn(["procedure", "feature"])) ||
+      !isAtom(statement.getIn(["procedure", "feature"])) ||
+      statement.getIn(["procedure", "feature", "value", "label"]) != "."
     ) {
-      if (callArguments.size != 3) {
-        throw new Error(
-          `The builtIn recordSelection operator supports 3 arguments ${callArguments}`,
-        );
-      }
-      const userRecordDefinedVariables = callArguments.map(x =>
-        environment.get(x),
-      );
-      const bindingVariable = userRecordDefinedVariables.last();
-      if (userRecordDefinedVariables.get(0) != undefined) {
-        const userRecordDefinedValues = userRecordDefinedVariables
-          .pop()
-          .map(x => lookupVariableInSigma(sigma, x).get("value"));
-        if (
-          userRecordDefinedValues.map(x => isRecord(x)).every(e => e == true)
-        ) {
-          const arg1 = userRecordDefinedValues.get(0);
-          const arg2 = userRecordDefinedValues.get(1);
-          if (isAtom(arg2)) {
-            const variable2Proc = arg1
-              .getIn(["value", "features"])
-              .get(arg2.getIn(["value", "label"]));
-            if (variable2Proc === undefined) {
-              throw new Error(
-                "The record does not contain a label selected in recordSelection",
-              );
-            }
-            return state.update("sigma", sigma =>
-              unify(sigma, bindingVariable, variable2Proc),
-            );
-          } else {
-            throw new Error(
-              "The second argument of recordSelection must be an atom",
-            );
-          }
-        } else {
-          throw new Error(
-            "The first two arguments of recordSelection must be records",
-          );
-        }
-      } else {
-        throw new Error(`The builtIn the builtIn is not implemented yet.`);
-      }
-    } else {
-      throw new Error(
-        "The recordSelection can only be called by {Record.'.' X F Z} ",
-      );
+      return raiseSystemException(state, activeThreadIndex, errorException());
     }
+    if (callArguments.size != 3) {
+      return raiseSystemException(state, activeThreadIndex, errorException());
+    }
+    const userRecordDefinedVariables = callArguments.map(x =>
+      environment.get(x),
+    );
+    const bindingVariable = userRecordDefinedVariables.last();
+    if (userRecordDefinedVariables.get(0) === undefined) {
+      return raiseSystemException(state, activeThreadIndex, errorException());
+    }
+    const userRecordDefinedValues = userRecordDefinedVariables
+      .pop()
+      .map(x => lookupVariableInSigma(sigma, x).get("value"));
+    if (userRecordDefinedValues.map(x => isRecord(x)).some(e => e == false)) {
+      return raiseSystemException(state, activeThreadIndex, errorException());
+    }
+    const arg1 = userRecordDefinedValues.get(0);
+    const arg2 = userRecordDefinedValues.get(1);
+    if (!isAtom(arg2)) {
+      return raiseSystemException(state, activeThreadIndex, errorException());
+    }
+    const variable2Proc = arg1
+      .getIn(["value", "features"])
+      .get(arg2.getIn(["value", "label"]));
+    if (variable2Proc === undefined) {
+      return raiseSystemException(state, activeThreadIndex, errorException());
+    }
+    return state.update("sigma", sigma =>
+      unify(sigma, bindingVariable, variable2Proc),
+    );
   }
 
   const variable = environment.get(callIdentifier);
