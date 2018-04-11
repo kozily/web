@@ -12,6 +12,7 @@ import {
   valueProcedure,
   valueNumber,
   valueRecord,
+  valueAtom,
 } from "../../app/oz/machine/values";
 import { errorException } from "../../app/oz/machine/exceptions";
 import { buildSystemExceptionState } from "./helpers";
@@ -270,7 +271,7 @@ describe("Reducing {X ...} statements", () => {
             buildVariable("x", 0),
           ),
           buildEquivalenceClass(valueNumber(30), buildVariable("a", 0)),
-          buildEquivalenceClass(valueRecord("age"), buildVariable("f", 0)),
+          buildEquivalenceClass(valueAtom("age"), buildVariable("f", 0)),
         ),
       });
 
@@ -295,7 +296,7 @@ describe("Reducing {X ...} statements", () => {
         buildSingleThreadedState({
           semanticStatements: [],
           sigma: buildSigma(
-            buildEquivalenceClass(valueRecord("age"), buildVariable("f", 0)),
+            buildEquivalenceClass(valueAtom("age"), buildVariable("f", 0)),
             buildEquivalenceClass(
               valueRecord("person", { age: buildVariable("a", 0) }),
               buildVariable("x", 0),
@@ -312,14 +313,14 @@ describe("Reducing {X ...} statements", () => {
 
     it("Handled error in argument size ", () => {
       const state = buildSingleThreadedState({
-        semanticStatements: [],
+        semanticStatements: [buildSemanticStatement(skipStatement())],
         sigma: buildSigma(
           buildEquivalenceClass(
             valueRecord("person", { age: buildVariable("a", 0) }),
             buildVariable("x", 0),
           ),
           buildEquivalenceClass(valueNumber(30), buildVariable("a", 0)),
-          buildEquivalenceClass(valueRecord("age"), buildVariable("f", 0)),
+          buildEquivalenceClass(valueAtom("age"), buildVariable("f", 0)),
         ),
       });
 
@@ -342,10 +343,10 @@ describe("Reducing {X ...} statements", () => {
 
     it("Handled error first argument undefined", () => {
       const state = buildSingleThreadedState({
-        semanticStatements: [],
+        semanticStatements: [buildSemanticStatement(skipStatement())],
         sigma: buildSigma(
           buildEquivalenceClass(undefined, buildVariable("c", 0)),
-          buildEquivalenceClass(valueRecord("age"), buildVariable("f", 0)),
+          buildEquivalenceClass(valueAtom("age"), buildVariable("f", 0)),
           buildEquivalenceClass(undefined, buildVariable("x", 0)),
           buildEquivalenceClass(valueNumber(30), buildVariable("a", 0)),
         ),
@@ -367,15 +368,21 @@ describe("Reducing {X ...} statements", () => {
           F: buildVariable("f", 0),
         }),
       );
-
       expect(reduce(state, statement, 0)).toEqual(
-        buildSystemExceptionState(state, 0, errorException()),
+        buildSingleThreadedState({
+          threadMetadata: buildThreadMetadata({ status: "blocked" }),
+          semanticStatements: [
+            statement,
+            buildSemanticStatement(skipStatement()),
+          ],
+          sigma: state.get("sigma"),
+        }),
       );
     });
 
     it("Handled error second argument undefined", () => {
       const state = buildSingleThreadedState({
-        semanticStatements: [],
+        semanticStatements: [buildSemanticStatement(skipStatement())],
         sigma: buildSigma(
           buildEquivalenceClass(
             undefined,
@@ -408,19 +415,23 @@ describe("Reducing {X ...} statements", () => {
       );
 
       expect(reduce(state, statement, 0)).toEqual(
-        buildSystemExceptionState(state, 0, errorException()),
+        buildSingleThreadedState({
+          threadMetadata: buildThreadMetadata({ status: "blocked" }),
+          semanticStatements: [
+            statement,
+            buildSemanticStatement(skipStatement()),
+          ],
+          sigma: state.get("sigma"),
+        }),
       );
     });
 
     it("Handled error first argument not a record", () => {
       const state = buildSingleThreadedState({
-        semanticStatements: [],
+        semanticStatements: [buildSemanticStatement(skipStatement())],
         sigma: buildSigma(
-          buildEquivalenceClass(
-            undefined,
-            buildVariable("c", 0),
-            buildVariable("f", 0),
-          ),
+          buildEquivalenceClass(undefined, buildVariable("c", 0)),
+          buildEquivalenceClass(valueAtom("age"), buildVariable("f", 0)),
           buildEquivalenceClass(valueNumber(40), buildVariable("x", 0)),
           buildEquivalenceClass(valueNumber(30), buildVariable("a", 0)),
         ),
@@ -450,7 +461,7 @@ describe("Reducing {X ...} statements", () => {
 
     it("Handled error second argument not an atom", () => {
       const state = buildSingleThreadedState({
-        semanticStatements: [],
+        semanticStatements: [buildSemanticStatement(skipStatement())],
         sigma: buildSigma(
           buildEquivalenceClass(undefined, buildVariable("c", 0)),
           buildEquivalenceClass(

@@ -78,7 +78,7 @@ export const buildFromKernelAST = ast => {
   });
 };
 
-export var argumentIndex = 0;
+var argumentIndex = 0;
 
 export const makeAuxiliaryIdentifier = () => {
   return lexicalIdentifier(`__${argumentIndex++}__`);

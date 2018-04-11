@@ -1,13 +1,13 @@
 import { lookupVariableInSigma, unify } from "../machine/sigma";
 import { buildSemanticStatement } from "../machine/build";
 import { errorException, raiseSystemException } from "../machine/exceptions";
+import { blockCurrentThread } from "../machine/threads";
 
 const isRecord = statement => {
   return statement.get("type") === "record";
 };
 
-const isAtom = (...args) => {
-  const [record] = args;
+const isAtom = record => {
   return (
     record.getIn(["value", "label"]) != undefined &&
     record.getIn(["value", "features"]).isEmpty()
@@ -32,9 +32,11 @@ export default function(state, semanticStatement, activeThreadIndex) {
     ) {
       return raiseSystemException(state, activeThreadIndex, errorException());
     }
+
     if (callArguments.size !== 3) {
       return raiseSystemException(state, activeThreadIndex, errorException());
     }
+
     const userRecordDefinedVariables = callArguments.map(x =>
       environment.get(x),
     );
@@ -42,12 +44,11 @@ export default function(state, semanticStatement, activeThreadIndex) {
     const userRecordDefinedValues = userRecordDefinedVariables
       .pop()
       .map(x => lookupVariableInSigma(sigma, x).get("value"));
-    if (
-      userRecordDefinedValues.map(x => x === undefined).some(e => e === true)
-    ) {
-      return raiseSystemException(state, activeThreadIndex, errorException());
+    if (userRecordDefinedValues.some(x => x === undefined)) {
+      return blockCurrentThread(state, semanticStatement, activeThreadIndex);
     }
-    if (userRecordDefinedValues.map(x => isRecord(x)).some(e => e === false)) {
+
+    if (userRecordDefinedValues.some(x => !isRecord(x))) {
       return raiseSystemException(state, activeThreadIndex, errorException());
     }
     const arg1 = userRecordDefinedValues.get(0);
@@ -69,11 +70,7 @@ export default function(state, semanticStatement, activeThreadIndex) {
   const procedureValue = equivalenceClass.get("value");
 
   if (procedureValue === undefined) {
-    return state
-      .setIn(["threads", activeThreadIndex, "metadata", "status"], "blocked")
-      .updateIn(["threads", activeThreadIndex, "stack"], stack =>
-        stack.push(semanticStatement),
-      );
+    return blockCurrentThread(state, semanticStatement, activeThreadIndex);
   }
 
   if (procedureValue.get("type") !== "procedure")

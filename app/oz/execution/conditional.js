@@ -1,6 +1,7 @@
 import { lookupVariableInSigma } from "../machine/sigma";
 import { buildSemanticStatement } from "../machine/build";
 import { errorException, raiseSystemException } from "../machine/exceptions";
+import { blockCurrentThread } from "../machine/threads";
 
 export default function(state, semanticStatement, activeThreadIndex) {
   const sigma = state.get("sigma");
@@ -17,11 +18,7 @@ export default function(state, semanticStatement, activeThreadIndex) {
   const value = equivalentClass.get("value");
 
   if (value === undefined) {
-    return state
-      .setIn(["threads", activeThreadIndex, "metadata", "status"], "blocked")
-      .updateIn(["threads", activeThreadIndex, "stack"], stack =>
-        stack.push(semanticStatement),
-      );
+    return blockCurrentThread(state, semanticStatement, activeThreadIndex);
   }
 
   if (value.get("type") !== "record")

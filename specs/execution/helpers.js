@@ -4,16 +4,15 @@ import {
   buildEquivalenceClass,
   buildVariable,
   buildEnvironment,
-  argumentIndex,
+  getLastAuxiliaryIdentifier,
 } from "../../app/oz/machine/build";
-import { lexicalIdentifier } from "../../app/oz/machine/lexical";
 
 export const buildSystemExceptionState = (
   state,
   activeThreadIndex,
   exception,
 ) => {
-  const aux = lexicalIdentifier(`__${argumentIndex - 1}__`);
+  const aux = getLastAuxiliaryIdentifier();
   const auxIdentifier = aux.get("identifier");
   return state
     .updateIn(["threads", activeThreadIndex, "stack"], stack =>
