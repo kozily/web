@@ -1,6 +1,6 @@
 import Immutable from "immutable";
 import parser from "../oz/parser";
-import kernelizer from "../oz/kernelizer";
+import { compile } from "../oz/compilation";
 import { buildState, buildFromKernelAST } from "../oz/machine/build";
 import { executeAllSteps } from "../oz/runtime";
 
@@ -31,8 +31,8 @@ export const previous = () => {
 export const reducer = (previousState = initialState, action) => {
   switch (action.type) {
     case "RUNTIME_RUN": {
-      const parsed = parser(previousState.get("source"));
-      const kernel = kernelizer(parsed);
+      const ast = parser(previousState.get("source"));
+      const kernel = compile(ast);
       const runtime = buildFromKernelAST(kernel);
       const steps = executeAllSteps(runtime);
       return previousState.set("steps", steps).set("currentStep", 0);

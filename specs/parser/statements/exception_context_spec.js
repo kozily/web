@@ -1,10 +1,10 @@
 import Immutable from "immutable";
 import { lexicalIdentifier } from "../../../app/oz/machine/lexical";
 import {
-  exceptionContextStatement,
-  skipStatement,
-  sequenceStatement,
-} from "../../../app/oz/machine/statements";
+  exceptionContextStatementSyntax,
+  skipStatementSyntax,
+  sequenceStatementSyntax,
+} from "../../../app/oz/machine/statementSyntax";
 import parse from "../../../app/oz/parser";
 
 describe("Parsing try statements", () => {
@@ -14,20 +14,20 @@ describe("Parsing try statements", () => {
 
   it("handles condensed syntax correctly", () => {
     expect(parse("try skip catch X then skip skip end")).toEqual(
-      exceptionContextStatement(
-        skipStatement(),
+      exceptionContextStatementSyntax(
+        skipStatementSyntax(),
         lexicalIdentifier("X"),
-        sequenceStatement(skipStatement(), skipStatement()),
+        sequenceStatementSyntax(skipStatementSyntax(), skipStatementSyntax()),
       ),
     );
   });
 
   it("handles spaced syntax correctly", () => {
     expect(parse("try\n\tskip\ncatch X then\n\tskip\n\tskip\nend")).toEqual(
-      exceptionContextStatement(
-        skipStatement(),
+      exceptionContextStatementSyntax(
+        skipStatementSyntax(),
         lexicalIdentifier("X"),
-        sequenceStatement(skipStatement(), skipStatement()),
+        sequenceStatementSyntax(skipStatementSyntax(), skipStatementSyntax()),
       ),
     );
   });

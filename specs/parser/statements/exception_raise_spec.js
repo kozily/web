@@ -1,6 +1,6 @@
 import Immutable from "immutable";
 import { lexicalIdentifier } from "../../../app/oz/machine/lexical";
-import { exceptionRaiseStatement } from "../../../app/oz/machine/statements";
+import { exceptionRaiseStatementSyntax } from "../../../app/oz/machine/statementSyntax";
 import parse from "../../../app/oz/parser";
 
 describe("Parsing raise statements", () => {
@@ -10,13 +10,13 @@ describe("Parsing raise statements", () => {
 
   it("handles condensed syntax correctly", () => {
     expect(parse("raise X end")).toEqual(
-      exceptionRaiseStatement(lexicalIdentifier("X")),
+      exceptionRaiseStatementSyntax(lexicalIdentifier("X")),
     );
   });
 
   it("handles spaced syntax correctly", () => {
     expect(parse("raise\n\t     X\n\nend")).toEqual(
-      exceptionRaiseStatement(lexicalIdentifier("X")),
+      exceptionRaiseStatementSyntax(lexicalIdentifier("X")),
     );
   });
 });
