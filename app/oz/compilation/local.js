@@ -1,8 +1,11 @@
 import { localStatement } from "../machine/statements";
 
 export default (recurse, statement) => {
-  return localStatement(
-    statement.get("identifier"),
-    recurse(statement.get("statement")),
+  const childStatement = recurse(statement.get("statement"));
+  const identifiers = statement.get("identifiers");
+
+  return identifiers.reduceRight(
+    (child, identifier) => localStatement(identifier, child),
+    childStatement,
   );
 };

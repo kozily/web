@@ -32,11 +32,11 @@ export const skipStatementSyntax = () => {
   });
 };
 
-export const localStatementSyntax = (identifier, statement) => {
-  return new Immutable.Map({
+export const localStatementSyntax = (identifiers, statement) => {
+  return new Immutable.fromJS({
     node: "statement",
     type: statementSyntaxTypes.localSyntax,
-    identifier,
+    identifiers: identifiers,
     statement,
   });
 };
