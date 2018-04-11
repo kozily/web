@@ -42,16 +42,24 @@ stm_skip -> "skip" {%
   }
 %}
 
-stm_local -> "local" __ ids_identifier __ "in" __ stm_sequence __ "end" {%
+stm_local -> "local" __ stm_local_identifier_list __ "in" __ stm_sequence __ "end" {%
   function(d) {
     return {
       node: "statement",
       type: "localSyntax",
-      identifier: d[2],
+      identifiers: d[2],
       statement: d[6],
     };
   }
 %}
+
+stm_local_identifier_list ->
+    ids_identifier
+  | stm_local_identifier_list __ ids_identifier {%
+    function(d) {
+      return d[0].concat(d[2]);
+    }
+  %}
 
 stm_binding -> ids_identifier _ "=" _ ids_identifier {%
   function(d, position, reject) {

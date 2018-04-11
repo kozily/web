@@ -14,12 +14,33 @@ describe("Compiling local statements", () => {
 
   it("compiles appropriately", () => {
     const statement = localStatementSyntax(
-      lexicalIdentifier("X"),
+      [lexicalIdentifier("X")],
       skipStatementSyntax(),
     );
 
     expect(compile(statement)).toEqual(
       localStatement(lexicalIdentifier("X"), skipStatement()),
+    );
+  });
+
+  it("compiles appropriately when using multiple identifierrs", () => {
+    const statement = localStatementSyntax(
+      [
+        lexicalIdentifier("X"),
+        lexicalIdentifier("Y"),
+        lexicalIdentifier("Variable"),
+      ],
+      skipStatementSyntax(),
+    );
+
+    expect(compile(statement)).toEqual(
+      localStatement(
+        lexicalIdentifier("X"),
+        localStatement(
+          lexicalIdentifier("Y"),
+          localStatement(lexicalIdentifier("Variable"), skipStatement()),
+        ),
+      ),
     );
   });
 });
