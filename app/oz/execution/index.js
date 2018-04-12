@@ -10,6 +10,7 @@ import procedureApplication from "./procedure_application";
 import exceptionContext from "./exception_context";
 import exceptionRaise from "./exception_raise";
 import exceptionCatch from "./exception_catch";
+import thread from "./thread";
 
 export const executors = {
   [statementTypes.skip]: skip,
@@ -23,6 +24,7 @@ export const executors = {
   [statementTypes.exceptionContext]: exceptionContext,
   [statementTypes.exceptionRaise]: exceptionRaise,
   [statementTypes.exceptionCatch]: exceptionCatch,
+  [statementTypes.thread]: thread,
 };
 
 export const execute = (state, semanticStatement, activeThreadIndex) => {
