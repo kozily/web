@@ -49,10 +49,13 @@ export const executeSingleStep = state => {
 
   const semanticStatement = activeThread.get("stack").peek();
 
-  const reducibleState = state.updateIn(
-    ["threads", activeThreadIndex, "stack"],
-    stack => stack.pop(),
-  );
+  const reducibleState = state
+    .update("threads", threads =>
+      threads.map((thread, index) =>
+        thread.setIn(["metadata", "current"], index === activeThreadIndex),
+      ),
+    )
+    .updateIn(["threads", activeThreadIndex, "stack"], stack => stack.pop());
 
   const result = execute(reducibleState, semanticStatement, activeThreadIndex);
   return processWaitConditions(result);

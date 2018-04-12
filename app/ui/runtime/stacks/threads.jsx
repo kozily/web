@@ -1,5 +1,5 @@
 import React from "react";
-import { Header, Grid } from "semantic-ui-react";
+import { Header, Grid, Transition } from "semantic-ui-react";
 import Thread from "./thread";
 
 export const RuntimeStacksThreads = props => {
@@ -8,13 +8,13 @@ export const RuntimeStacksThreads = props => {
       <Header size="tiny" textAlign="center">
         {props.title}
       </Header>
-      <Grid columns="2">
+      <Transition.Group animation="fade up" as={Grid} columns="2">
         {props.threads.map(thread => (
           <Grid.Column key={thread.get("name")}>
             <Thread thread={thread} />
           </Grid.Column>
         ))}
-      </Grid>
+      </Transition.Group>
     </div>
   );
 };

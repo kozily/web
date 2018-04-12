@@ -19,11 +19,19 @@ export const RuntimeStacksThread = ({ thread }) => {
   const name = thread.get("name");
   const stack = thread.get("stack").toSeq();
   const waitCondition = thread.getIn(["metadata", "waitCondition"]);
+  const isCurrent = thread.getIn(["metadata", "current"]);
 
   return (
-    <Menu vertical attached fluid size="tiny">
-      <Menu.Item header>
-        <Header color={threadColor(thread)}>{name}</Header>
+    <Menu
+      inverted={isCurrent}
+      color={threadColor(thread)}
+      vertical
+      attached
+      fluid
+      size="tiny"
+    >
+      <Menu.Item active header>
+        <Menu.Header>{name}</Menu.Header>
         {waitCondition ? (
           <Header.Subheader>
             <WaitCondition waitCondition={waitCondition} />

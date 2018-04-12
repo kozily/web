@@ -23,10 +23,12 @@ export const threadStatus = {
 export const buildThreadMetadata = ({
   status = threadStatus.ready,
   waitCondition = null,
+  current = false,
 } = {}) => {
   return Immutable.Map({
     status,
     waitCondition,
+    current,
   });
 };
 
