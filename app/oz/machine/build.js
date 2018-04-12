@@ -15,9 +15,18 @@ export const buildSemanticStatement = (
   });
 };
 
-export const buildThreadMetadata = ({ status = "ready" } = {}) => {
+export const threadStatus = {
+  ready: "ready",
+  blocked: "blocked",
+};
+
+export const buildThreadMetadata = ({
+  status = threadStatus.ready,
+  waitCondition = null,
+} = {}) => {
   return Immutable.Map({
     status,
+    waitCondition,
   });
 };
 

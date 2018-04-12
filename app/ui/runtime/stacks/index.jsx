@@ -2,6 +2,7 @@ import React from "react";
 import { Segment, Grid, Header } from "semantic-ui-react";
 import { connect } from "react-redux";
 import Threads from "./threads";
+import { threadStatus } from "../../../oz/machine/build";
 
 const threadsWithStatus = (threads, status) =>
   threads.filter(t => t.getIn(["metadata", "status"]) === status);
@@ -18,17 +19,15 @@ export const RuntimeStacks = props => {
         <Grid.Column>
           <Threads
             title="Ready"
-            color="green"
             icon="check circle"
-            threads={threadsWithStatus(threads, "ready")}
+            threads={threadsWithStatus(threads, threadStatus.ready)}
           />
         </Grid.Column>
         <Grid.Column>
           <Threads
             title="Blocked"
-            color="red"
             icon="remove circle"
-            threads={threadsWithStatus(threads, "blocked")}
+            threads={threadsWithStatus(threads, threadStatus.blocked)}
           />
         </Grid.Column>
       </Grid>

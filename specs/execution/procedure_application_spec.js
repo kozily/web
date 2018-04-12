@@ -17,6 +17,7 @@ import {
 import { errorException } from "../../app/oz/machine/exceptions";
 import { buildSystemExceptionState } from "./helpers";
 import {
+  threadStatus,
   buildSingleThreadedState,
   buildSemanticStatement,
   buildSigma,
@@ -205,7 +206,10 @@ describe("Reducing {X ...} statements", () => {
 
     expect(reduce(state, statement, 0)).toEqual(
       buildSingleThreadedState({
-        threadMetadata: buildThreadMetadata({ status: "blocked" }),
+        threadMetadata: buildThreadMetadata({
+          status: threadStatus.blocked,
+          waitCondition: buildVariable("p", 0),
+        }),
         semanticStatements: [
           statement,
           buildSemanticStatement(skipStatement()),
@@ -215,53 +219,8 @@ describe("Reducing {X ...} statements", () => {
     );
   });
 
-  it("Executes builtIn sum procedure correctly", () => {
-    const state = buildSingleThreadedState({
-      semanticStatements: [buildSemanticStatement(skipStatement())],
-      sigma: buildSigma(
-        buildEquivalenceClass(
-          valueProcedure(
-            [lexicalIdentifier("I"), lexicalIdentifier("O")],
-            skipStatement(),
-          ),
-          buildVariable("p", 0),
-        ),
-        buildEquivalenceClass(valueNumber(10), buildVariable("x", 0)),
-        buildEquivalenceClass(undefined, buildVariable("y", 0)),
-      ),
-    });
-
-    const statement = buildSemanticStatement(
-      procedureApplicationStatement(lexicalIdentifier("P"), [
-        lexicalIdentifier("X"),
-        lexicalIdentifier("Y"),
-      ]),
-      buildEnvironment({
-        P: buildVariable("p", 0),
-        X: buildVariable("x", 0),
-        Y: buildVariable("y", 0),
-      }),
-    );
-
-    expect(reduce(state, statement, 0)).toEqual(
-      buildSingleThreadedState({
-        semanticStatements: [
-          buildSemanticStatement(
-            skipStatement(),
-            buildEnvironment({
-              I: buildVariable("x", 0),
-              O: buildVariable("y", 0),
-            }),
-          ),
-          buildSemanticStatement(skipStatement()),
-        ],
-        sigma: state.get("sigma"),
-      }),
-    );
-  });
-
-  describe("Reducing {X ...} recordSelection statements", () => {
-    it("handled correctly", () => {
+  describe("Reducing {Record.'.' ...} statements", () => {
+    it("reduces correctly", () => {
       const state = buildSingleThreadedState({
         semanticStatements: [],
         sigma: buildSigma(
@@ -311,7 +270,7 @@ describe("Reducing {X ...} statements", () => {
       );
     });
 
-    it("Handled error in argument size ", () => {
+    it("raises an exception when using wrong number of arguments", () => {
       const state = buildSingleThreadedState({
         semanticStatements: [buildSemanticStatement(skipStatement())],
         sigma: buildSigma(
@@ -341,7 +300,7 @@ describe("Reducing {X ...} statements", () => {
       );
     });
 
-    it("Handled error first argument undefined", () => {
+    it("blocks the current thread when the record variable is unbound", () => {
       const state = buildSingleThreadedState({
         semanticStatements: [buildSemanticStatement(skipStatement())],
         sigma: buildSigma(
@@ -370,7 +329,10 @@ describe("Reducing {X ...} statements", () => {
       );
       expect(reduce(state, statement, 0)).toEqual(
         buildSingleThreadedState({
-          threadMetadata: buildThreadMetadata({ status: "blocked" }),
+          threadMetadata: buildThreadMetadata({
+            status: threadStatus.blocked,
+            waitCondition: buildVariable("x", 0),
+          }),
           semanticStatements: [
             statement,
             buildSemanticStatement(skipStatement()),
@@ -380,7 +342,7 @@ describe("Reducing {X ...} statements", () => {
       );
     });
 
-    it("Handled error second argument undefined", () => {
+    it("blocks the current thread when the field variable is unbound", () => {
       const state = buildSingleThreadedState({
         semanticStatements: [buildSemanticStatement(skipStatement())],
         sigma: buildSigma(
@@ -416,7 +378,10 @@ describe("Reducing {X ...} statements", () => {
 
       expect(reduce(state, statement, 0)).toEqual(
         buildSingleThreadedState({
-          threadMetadata: buildThreadMetadata({ status: "blocked" }),
+          threadMetadata: buildThreadMetadata({
+            status: threadStatus.blocked,
+            waitCondition: buildVariable("f", 0),
+          }),
           semanticStatements: [
             statement,
             buildSemanticStatement(skipStatement()),
@@ -426,7 +391,7 @@ describe("Reducing {X ...} statements", () => {
       );
     });
 
-    it("Handled error first argument not a record", () => {
+    it("raises an exception when the first variable is not a record", () => {
       const state = buildSingleThreadedState({
         semanticStatements: [buildSemanticStatement(skipStatement())],
         sigma: buildSigma(
@@ -459,7 +424,7 @@ describe("Reducing {X ...} statements", () => {
       );
     });
 
-    it("Handled error second argument not an atom", () => {
+    it("raises an exception when the second argument is not an atom", () => {
       const state = buildSingleThreadedState({
         semanticStatements: [buildSemanticStatement(skipStatement())],
         sigma: buildSigma(

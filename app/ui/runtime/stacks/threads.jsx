@@ -11,7 +11,7 @@ export const RuntimeStacksThreads = props => {
       <Grid columns="2">
         {props.threads.map(thread => (
           <Grid.Column key={thread.get("name")}>
-            <Thread color={props.color} thread={thread} />
+            <Thread thread={thread} />
           </Grid.Column>
         ))}
       </Grid>

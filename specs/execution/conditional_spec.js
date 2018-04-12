@@ -10,6 +10,7 @@ import { literalNumber, literalRecord } from "../../app/oz/machine/literals";
 import { errorException } from "../../app/oz/machine/exceptions";
 import { buildSystemExceptionState } from "./helpers";
 import {
+  threadStatus,
   buildSingleThreadedState,
   buildSemanticStatement,
   buildSigma,
@@ -261,7 +262,10 @@ describe("Reducing if statements", () => {
 
       expect(reduce(state, statement, 0)).toEqual(
         buildSingleThreadedState({
-          threadMetadata: buildThreadMetadata({ status: "blocked" }),
+          threadMetadata: buildThreadMetadata({
+            status: threadStatus.blocked,
+            waitCondition: buildVariable("x", 0),
+          }),
           semanticStatements: [
             statement,
             buildSemanticStatement(skipStatement()),
