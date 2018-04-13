@@ -10,13 +10,15 @@ export const RuntimeStacksSemanticStatement = props => {
   const environment = props.semanticStatement.get("environment");
 
   const item = (
-    <Menu.Item active={props.active} content={printedStatement.abbreviated} />
+    <Menu.Item active={props.active}>
+      <Code>{printedStatement.abbreviated}</Code>
+    </Menu.Item>
   );
 
   return (
     <Popup wide hoverable trigger={item}>
       <Header textAlign="center" size="tiny" content="Statement" />
-      <Code>{printedStatement.full}</Code>
+      <pre>{printedStatement.full}</pre>
       <Header textAlign="center" size="tiny" content="Environment" />
       <Environment environment={environment} />
     </Popup>
