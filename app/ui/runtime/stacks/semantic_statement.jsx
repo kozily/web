@@ -1,7 +1,7 @@
 import React from "react";
 import { Popup, Menu, Header } from "semantic-ui-react";
 import { print } from "../../../oz/print";
-import Statement from "./statement";
+import Code from "../code";
 import Environment from "./environment";
 
 export const RuntimeStacksSemanticStatement = props => {
@@ -16,7 +16,7 @@ export const RuntimeStacksSemanticStatement = props => {
   return (
     <Popup wide hoverable trigger={item}>
       <Header textAlign="center" size="tiny" content="Statement" />
-      <Statement printedStatement={printedStatement.full} />
+      <Code>{printedStatement.full}</Code>
       <Header textAlign="center" size="tiny" content="Environment" />
       <Environment environment={environment} />
     </Popup>

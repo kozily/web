@@ -1,5 +1,7 @@
-import { statementTypes } from "../machine/statements";
+import { valueCreationStatement } from "../machine/statements";
 
 export default (recurse, node) => {
-  return node.set("type", statementTypes.valueCreation);
+  const lhs = node.get("lhs");
+  const rhs = recurse(node.get("rhs"));
+  return valueCreationStatement(lhs, rhs);
 };

@@ -60,9 +60,21 @@ export const buildSigma = (...equivalenceClasses) => {
   return Immutable.Set(equivalenceClasses);
 };
 
+export const buildTrigger = (procedure, neededVariable) => {
+  return Immutable.fromJS({
+    procedure,
+    neededVariable,
+  });
+};
+
+export const buildTau = (...triggers) => {
+  return Immutable.Set(triggers);
+};
+
 export const buildSingleThreadedState = ({
   semanticStatements = [],
   sigma = buildSigma(),
+  tau = buildTau(),
   threadMetadata = buildThreadMetadata(),
 } = {}) => {
   return buildState({
@@ -73,13 +85,19 @@ export const buildSingleThreadedState = ({
       }),
     ],
     sigma,
+    tau,
   });
 };
 
-export const buildState = ({ threads = [], sigma = buildSigma() } = {}) => {
+export const buildState = ({
+  threads = [],
+  sigma = buildSigma(),
+  tau = buildTau(),
+} = {}) => {
   return Immutable.Map({
     threads: Immutable.List(threads),
     sigma,
+    tau,
   });
 };
 

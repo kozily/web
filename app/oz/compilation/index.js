@@ -11,6 +11,7 @@ import procedureApplication from "./procedure_application";
 import exceptionContext from "./exception_context";
 import exceptionRaise from "./exception_raise";
 import thread from "./thread";
+import byNeed from "./by_need";
 import operator from "./operator";
 import number from "./number";
 import record from "./record";
@@ -30,6 +31,7 @@ export const compilers = {
     [statementSyntaxTypes.exceptionRaiseSyntax]: exceptionRaise,
     [statementSyntaxTypes.operatorSyntax]: operator,
     [statementSyntaxTypes.threadSyntax]: thread,
+    [statementSyntaxTypes.byNeedSyntax]: byNeed,
   },
   literal: {
     [valueTypes.number]: number,

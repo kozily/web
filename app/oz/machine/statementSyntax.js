@@ -13,6 +13,7 @@ export const statementSyntaxTypes = {
   exceptionRaiseSyntax: "exceptionRaiseSyntax",
   operatorSyntax: "operatorSyntax",
   threadSyntax: "threadSyntax",
+  byNeedSyntax: "byNeedSyntax",
 };
 
 export const allStatementSyntaxTypes = Object.keys(statementSyntaxTypes);
@@ -137,5 +138,14 @@ export const threadStatementSyntax = body => {
     node: "statement",
     type: statementSyntaxTypes.threadSyntax,
     body,
+  });
+};
+
+export const byNeedStatementSyntax = (procedure, neededIdentifier) => {
+  return new Immutable.fromJS({
+    node: "statement",
+    type: statementSyntaxTypes.byNeedSyntax,
+    procedure,
+    neededIdentifier,
   });
 };

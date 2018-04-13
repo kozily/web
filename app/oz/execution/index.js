@@ -11,6 +11,7 @@ import exceptionContext from "./exception_context";
 import exceptionRaise from "./exception_raise";
 import exceptionCatch from "./exception_catch";
 import thread from "./thread";
+import byNeed from "./by_need";
 
 export const executors = {
   [statementTypes.skip]: skip,
@@ -25,6 +26,7 @@ export const executors = {
   [statementTypes.exceptionRaise]: exceptionRaise,
   [statementTypes.exceptionCatch]: exceptionCatch,
   [statementTypes.thread]: thread,
+  [statementTypes.byNeed]: byNeed,
 };
 
 export const execute = (state, semanticStatement, activeThreadIndex) => {
