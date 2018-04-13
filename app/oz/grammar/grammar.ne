@@ -6,6 +6,12 @@
 ##############################################################################
 # This section defines parsing rules for executable statements
 ##############################################################################
+@{%
+  STM_SPECIAL_PROCEDURES = [
+    "ByNeed",
+  ];
+%}
+
 stm_root -> _ stm_sequence _ {% nth(1) %}
 
 stm_sequence ->
@@ -33,6 +39,7 @@ stm_simple ->
   | stm_raise {% id %}
   | stm_operator {% id %}
   | stm_thread {% id %}
+  | stm_by_need {% id %}
 
 stm_skip -> "skip" {%
   function (d) {
@@ -110,17 +117,22 @@ stm_pattern_matching -> "case" __ ids_identifier __ "of" __ lit_record_like __ "
 %}
 
 stm_procedure_application -> "{" _ procedure_identifier lit_procedure_args:? _ "}" {%
-  function(d) {
-    return {
-      node: "statement",
-      type: "procedureApplicationSyntax",
-      procedure: d[2],
-      args: d[3] || [],
-    };
+  function(d, position, reject) {
+    var procedure = d[2];
+    if (procedure.node === "identifier" && STM_SPECIAL_PROCEDURES.indexOf(procedure.identifier) !== -1) {
+      return reject;
+    } else {
+      return {
+        node: "statement",
+        type: "procedureApplicationSyntax",
+        procedure: d[2],
+        args: d[3] || [],
+      };
+    }
   }
 %}
 
-stm_try -> "try" _ stm_sequence _ "catch" _ ids_identifier _ "then" _ stm_sequence _ "end" {%
+stm_try -> "try" __ stm_sequence __ "catch" __ ids_identifier __ "then" __ stm_sequence __ "end" {%
   function(d) {
     return {
       node: "statement",
@@ -132,7 +144,7 @@ stm_try -> "try" _ stm_sequence _ "catch" _ ids_identifier _ "then" _ stm_sequen
   }
 %}
 
-stm_raise -> "raise" _ ids_identifier _ "end" {%
+stm_raise -> "raise" __ ids_identifier __ "end" {%
   function(d) {
     return {
       node: "statement",
@@ -155,12 +167,23 @@ stm_operator -> ids_identifier _ "=" _ ids_identifier "." (lit_atom | ids_identi
   }
 %}
 
-stm_thread -> "thread" _ stm_sequence _ "end" {%
+stm_thread -> "thread" __ stm_sequence __ "end" {%
   function(d, position, reject) {
     return {
       node: "statement",
       type: "threadSyntax",
       body: d[2],
+    };
+  }
+%}
+
+stm_by_need -> "{" _ "ByNeed" __ ids_identifier __ ids_identifier _ "}" {%
+  function(d, position, reject) {
+    return {
+      node: "statement",
+      type: "byNeedSyntax",
+      procedure: d[4],
+      neededIdentifier: d[6],
     };
   }
 %}

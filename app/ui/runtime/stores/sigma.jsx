@@ -1,39 +1,60 @@
 import React from "react";
 import { Menu, Table, Popup } from "semantic-ui-react";
 import EquivalenceClass from "./equivalence_class";
+import Code from "../code";
 import { print } from "../../../oz/print";
 
-export const RuntimeStoreValue = ({ value }) => {
-  if (value) {
-    const printedValue = print(value);
-    const contents = <pre>{printedValue.abbreviated}</pre>;
+export const RuntimeStoreRow = ({ equivalenceClass }) => {
+  const value = equivalenceClass.get("value");
+
+  if (!value) {
     return (
-      <Popup wide hoverable trigger={contents}>
-        <pre>{printedValue.full}</pre>
-      </Popup>
+      <Table.Row>
+        <Table.Cell>
+          <EquivalenceClass equivalenceClass={equivalenceClass} />
+        </Table.Cell>
+        <Table.Cell>
+          <Code>Unbound</Code>
+        </Table.Cell>
+      </Table.Row>
     );
   }
 
-  return <span>Unbound</span>;
+  const printedValue = print(value);
+  const content = (
+    <Table.Row>
+      <Table.Cell>
+        <EquivalenceClass equivalenceClass={equivalenceClass} />
+      </Table.Cell>
+      <Table.Cell>
+        <Code>{printedValue.abbreviated}</Code>
+      </Table.Cell>
+    </Table.Row>
+  );
+
+  return (
+    <Popup wide hoverable trigger={content}>
+      <Code>{printedValue.full}</Code>
+    </Popup>
+  );
 };
 
 export const RuntimeStoresSigma = props => {
   return (
     <div>
       <Menu borderless attached="top" size="tiny">
-        <Menu.Item header content={props.title} />
+        <Menu.Item header content={"Immutable (\u03c3)"} />
       </Menu>
       <Table attached selectable compact>
+        <Table.Header>
+          <Table.Row>
+            <Table.HeaderCell>Variable</Table.HeaderCell>
+            <Table.HeaderCell>Value</Table.HeaderCell>
+          </Table.Row>
+        </Table.Header>
         <Table.Body>
           {props.store.map((equivalenceClass, index) => (
-            <Table.Row key={index}>
-              <Table.Cell>
-                <EquivalenceClass equivalenceClass={equivalenceClass} />
-              </Table.Cell>
-              <Table.Cell>
-                <RuntimeStoreValue value={equivalenceClass.get("value")} />
-              </Table.Cell>
-            </Table.Row>
+            <RuntimeStoreRow key={index} equivalenceClass={equivalenceClass} />
           ))}
         </Table.Body>
       </Table>

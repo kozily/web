@@ -13,6 +13,7 @@ export const statementTypes = {
   exceptionRaise: "exceptionRaise",
   exceptionCatch: "exceptionCatch",
   thread: "thread",
+  byNeed: "byNeed",
 };
 
 export const allStatementTypes = Object.keys(statementTypes);
@@ -138,5 +139,14 @@ export const threadStatement = body => {
     node: "statement",
     type: statementTypes.thread,
     body,
+  });
+};
+
+export const byNeedStatement = (procedure, neededIdentifier) => {
+  return Immutable.fromJS({
+    node: "statement",
+    type: statementTypes.byNeed,
+    procedure,
+    neededIdentifier,
   });
 };
