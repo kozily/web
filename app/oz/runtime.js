@@ -1,7 +1,7 @@
 import Immutable from "immutable";
 import { execute } from "./execution";
 import { threadStatus } from "./machine/build";
-import { lookupVariableInSigma } from "./machine/sigma";
+import { processWaitConditions, processTriggers } from "./machine/threads";
 
 export const isExecutableThread = thread => {
   return (
@@ -12,29 +12,6 @@ export const isExecutableThread = thread => {
 
 export const isFinalState = state => {
   return state.get("threads").every(thread => !isExecutableThread(thread));
-};
-
-export const processWaitConditions = state => {
-  return state.update("threads", threads =>
-    threads.map(thread => {
-      const waitCondition = thread.getIn(["metadata", "waitCondition"]);
-      if (!waitCondition) {
-        return thread;
-      }
-
-      const waitConditionEquivalenceClass = lookupVariableInSigma(
-        state.get("sigma"),
-        waitCondition,
-      );
-      if (!waitConditionEquivalenceClass.get("value")) {
-        return thread;
-      }
-
-      return thread.update("metadata", metadata =>
-        metadata.set("status", threadStatus.ready).set("waitCondition", null),
-      );
-    }),
-  );
 };
 
 export const executeSingleStep = state => {
@@ -57,8 +34,11 @@ export const executeSingleStep = state => {
     )
     .updateIn(["threads", activeThreadIndex, "stack"], stack => stack.pop());
 
-  const result = execute(reducibleState, semanticStatement, activeThreadIndex);
-  return processWaitConditions(result);
+  return processTriggers(
+    processWaitConditions(
+      execute(reducibleState, semanticStatement, activeThreadIndex),
+    ),
+  );
 };
 
 export const executeAllSteps = (state, result = new Immutable.List()) => {
