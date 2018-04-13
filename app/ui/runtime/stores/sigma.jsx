@@ -34,7 +34,7 @@ export const RuntimeStoreRow = ({ equivalenceClass }) => {
 
   return (
     <Popup wide hoverable trigger={content}>
-      <Code>{printedValue.full}</Code>
+      <pre>{printedValue.full}</pre>
     </Popup>
   );
 };
