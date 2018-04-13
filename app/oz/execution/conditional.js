@@ -18,7 +18,12 @@ export default function(state, semanticStatement, activeThreadIndex) {
   const value = equivalentClass.get("value");
 
   if (value === undefined) {
-    return blockCurrentThread(state, semanticStatement, activeThreadIndex);
+    return blockCurrentThread(
+      state,
+      semanticStatement,
+      activeThreadIndex,
+      variable,
+    );
   }
 
   if (value.get("type") !== "record")

@@ -1,23 +1,33 @@
 import React from "react";
 import { Menu, Button } from "semantic-ui-react";
 import { connect } from "react-redux";
-import { next, previous } from "../../state/runtime";
+import { first, last, next, previous } from "../../state/runtime";
 
 export const RuntimeMenu = props => {
   const actions = [
+    {
+      key: "fast backward",
+      icon: "fast backward",
+      disabled: !props.hasPreviousStep,
+      onClick: props.onFirst,
+    },
     {
       key: "step backward",
       icon: "step backward",
       disabled: !props.hasPreviousStep,
       onClick: props.onPrevious,
     },
-    { key: "play", icon: "play", disabled: true },
-    { key: "pause", icon: "pause", disabled: true },
     {
       key: "step forward",
       icon: "step forward",
       disabled: !props.hasNextStep,
       onClick: props.onNext,
+    },
+    {
+      key: "fast forward",
+      icon: "fast forward",
+      disabled: !props.hasNextStep,
+      onClick: props.onLast,
     },
   ];
   return (
@@ -40,6 +50,8 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   onNext: () => dispatch(next()),
   onPrevious: () => dispatch(previous()),
+  onFirst: () => dispatch(first()),
+  onLast: () => dispatch(last()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(RuntimeMenu);

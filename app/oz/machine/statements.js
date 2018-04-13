@@ -12,6 +12,7 @@ export const statementTypes = {
   exceptionContext: "exceptionContext",
   exceptionRaise: "exceptionRaise",
   exceptionCatch: "exceptionCatch",
+  thread: "thread",
 };
 
 export const allStatementTypes = Object.keys(statementTypes);
@@ -129,5 +130,13 @@ export const exceptionCatchStatement = (
     type: statementTypes.exceptionCatch,
     exceptionIdentifier,
     exceptionStatement,
+  });
+};
+
+export const threadStatement = body => {
+  return new Immutable.fromJS({
+    node: "statement",
+    type: statementTypes.thread,
+    body,
   });
 };

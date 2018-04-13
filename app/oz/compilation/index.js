@@ -10,6 +10,7 @@ import patternMatching from "./pattern_matching";
 import procedureApplication from "./procedure_application";
 import exceptionContext from "./exception_context";
 import exceptionRaise from "./exception_raise";
+import thread from "./thread";
 import operator from "./operator";
 import number from "./number";
 import record from "./record";
@@ -28,6 +29,7 @@ export const compilers = {
     [statementSyntaxTypes.exceptionContextSyntax]: exceptionContext,
     [statementSyntaxTypes.exceptionRaiseSyntax]: exceptionRaise,
     [statementSyntaxTypes.operatorSyntax]: operator,
+    [statementSyntaxTypes.threadSyntax]: thread,
   },
   literal: {
     [valueTypes.number]: number,

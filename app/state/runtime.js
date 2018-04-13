@@ -22,6 +22,18 @@ export const next = () => {
   };
 };
 
+export const first = () => {
+  return {
+    type: "RUNTIME_FIRST",
+  };
+};
+
+export const last = () => {
+  return {
+    type: "RUNTIME_LAST",
+  };
+};
+
 export const previous = () => {
   return {
     type: "RUNTIME_PREVIOUS",
@@ -47,6 +59,13 @@ export const reducer = (previousState = initialState, action) => {
       const currentStep = previousState.get("currentStep");
       const previousStep = currentStep > 0 ? currentStep - 1 : currentStep;
       return previousState.set("currentStep", previousStep);
+    }
+    case "RUNTIME_FIRST": {
+      return previousState.set("currentStep", 0);
+    }
+    case "RUNTIME_LAST": {
+      const lastStep = previousState.get("steps").size - 1;
+      return previousState.set("currentStep", lastStep);
     }
     case "CHANGE_SOURCE_CODE": {
       return previousState.set("source", action.payload);

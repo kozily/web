@@ -32,6 +32,7 @@ stm_simple ->
   | stm_try {% id %}
   | stm_raise {% id %}
   | stm_operator {% id %}
+  | stm_thread {% id %}
 
 stm_skip -> "skip" {%
   function (d) {
@@ -150,6 +151,16 @@ stm_operator -> ids_identifier _ "=" _ ids_identifier "." (lit_atom | ids_identi
       operator: ".",
       lhs: d[4],
       rhs: d[6][0],
+    };
+  }
+%}
+
+stm_thread -> "thread" _ stm_sequence _ "end" {%
+  function(d, position, reject) {
+    return {
+      node: "statement",
+      type: "threadSyntax",
+      body: d[2],
     };
   }
 %}

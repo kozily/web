@@ -7,6 +7,7 @@ import {
 import { lexicalIdentifier } from "../../app/oz/machine/lexical";
 import { literalNumber, literalRecord } from "../../app/oz/machine/literals";
 import {
+  threadStatus,
   buildSingleThreadedState,
   buildSemanticStatement,
   buildSigma,
@@ -262,7 +263,10 @@ describe("Reducing case statements", () => {
 
     expect(reduce(state, statement, 0)).toEqual(
       buildSingleThreadedState({
-        threadMetadata: buildThreadMetadata({ status: "blocked" }),
+        threadMetadata: buildThreadMetadata({
+          status: threadStatus.blocked,
+          waitCondition: buildVariable("x", 0),
+        }),
         semanticStatements: [
           statement,
           buildSemanticStatement(skipStatement()),

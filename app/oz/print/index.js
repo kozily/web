@@ -11,6 +11,7 @@ import procedureApplication from "./procedure_application";
 import exceptionContext from "./exception_context";
 import exceptionRaise from "./exception_raise";
 import exceptionCatch from "./exception_catch";
+import thread from "./thread";
 import number from "./number";
 import record from "./record";
 import procedure from "./procedure";
@@ -28,6 +29,7 @@ export const printers = {
     [statementTypes.exceptionContext]: exceptionContext,
     [statementTypes.exceptionRaise]: exceptionRaise,
     [statementTypes.exceptionCatch]: exceptionCatch,
+    [statementTypes.thread]: thread,
   },
   literal: {
     [valueTypes.number]: number,
