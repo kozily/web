@@ -6,13 +6,12 @@ import {
   buildEquivalenceClass,
 } from "./build";
 import { valueRecord, valueBuiltIn } from "./values";
-import { builtIns } from "./builtIns";
+import { builtIns, allBuiltInTypes } from "./builtIns";
 
 export const initialize = () => {
-  const builtInMapped = Object.keys(builtIns).reduce((acc, recordBuiltIn) => {
+  const builtInMapped = allBuiltInTypes.reduce((acc, recordBuiltIn) => {
     const variableRecord = buildVariable(recordBuiltIn.toLowerCase(), 0);
-    const recordMap = Immutable.fromJS({ [recordBuiltIn]: variableRecord });
-    const environment = recordMap;
+    const environment = Immutable.fromJS({ [recordBuiltIn]: variableRecord });
 
     const featuresInsideRecord = Object.keys(builtIns[recordBuiltIn]).reduce(
       (acc, item) => {
@@ -43,8 +42,12 @@ export const initialize = () => {
         return buildEquivalenceClass(pair.get("value"), pair.get("variable"));
       });
     const sigma = sigmaFeaturesMap.push(sigmaRecordMap);
-    return Immutable.fromJS({ environment, sigma });
-  }, {});
+    const result = Immutable.fromJS({
+      environment: acc.get("environment").merge(environment),
+      sigma: acc.get("sigma").concat(sigma),
+    });
+    return result;
+  }, Immutable.Map({ environment: Immutable.Map(), sigma: Immutable.List() }));
 
   const environment = buildEnvironment(builtInMapped.get("environment"));
   const sigma = buildSigma(...builtInMapped.get("sigma").toArray());

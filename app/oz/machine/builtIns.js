@@ -2,6 +2,7 @@ import { valueTypes, valueNumber } from "./values";
 
 export const builtInTypes = {
   Number: "Number",
+  Float: "Float",
 };
 export const allBuiltInTypes = Object.keys(builtInTypes);
 
@@ -42,6 +43,19 @@ export const builtIns = {
     },
     "/": {
       name: "Numberdivision",
+      handler: args => {
+        const arg1 = args.get(0);
+        const arg2 = args.get(1);
+        typeValidation(arg1, arg2, valueTypes.number);
+        const divisor = arg2.get("value");
+        if (divisor === 0) throw new Error("cannot divide by zero");
+        return valueNumber(Math.floor(arg1.get("value") / divisor));
+      },
+    },
+  },
+  [builtInTypes.Float]: {
+    "/": {
+      name: "Floatdivision",
       handler: args => {
         const arg1 = args.get(0);
         const arg2 = args.get(1);

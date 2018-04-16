@@ -30,7 +30,7 @@ describe("Reducing {Number ...} builtin statements", () => {
     jasmine.addCustomEqualityTester(Immutable.is);
   });
 
-  it("handled numberaddition correctly", () => {
+  it("handled number addition correctly", () => {
     const state = buildSingleThreadedState({
       semanticStatements: [buildSemanticStatement(skipStatement())],
       sigma: buildSigma(
@@ -403,7 +403,7 @@ describe("Reducing {Number ...} builtin statements", () => {
       buildSingleThreadedState({
         semanticStatements: [buildSemanticStatement(skipStatement())],
         sigma: buildSigma(
-          buildEquivalenceClass(valueNumber(1.5), buildVariable("c", 0)),
+          buildEquivalenceClass(valueNumber(1), buildVariable("c", 0)),
           buildEquivalenceClass(valueNumber(30), buildVariable("a", 0)),
           buildEquivalenceClass(valueNumber(20), buildVariable("b", 0)),
         ),
@@ -473,7 +473,7 @@ describe("Reducing {Number ...} builtin statements", () => {
     );
   });
 
-  it("handled number multipication as built in correctly", () => {
+  it("handled number division as built in correctly", () => {
     const state = buildSingleThreadedState({
       semanticStatements: [buildSemanticStatement(skipStatement())],
       sigma: buildSigma(
@@ -505,7 +505,7 @@ describe("Reducing {Number ...} builtin statements", () => {
       buildSingleThreadedState({
         semanticStatements: [buildSemanticStatement(skipStatement())],
         sigma: buildSigma(
-          buildEquivalenceClass(valueNumber(1.5), buildVariable("c", 0)),
+          buildEquivalenceClass(valueNumber(1), buildVariable("c", 0)),
           buildEquivalenceClass(
             valueBuiltIn("/", "Number"),
             buildVariable("o", 0),

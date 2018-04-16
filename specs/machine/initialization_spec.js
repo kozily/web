@@ -14,9 +14,10 @@ describe("Validates initialization", () => {
   });
 
   describe("Number must exists in environment and in sigma", () => {
-    it("numberplus must be generated", () => {
+    it("number must be generated", () => {
       const environment = buildEnvironment({
         Number: buildVariable("number", 0),
+        Float: buildVariable("float", 0),
       });
       const sigma = buildSigma(
         buildEquivalenceClass(
@@ -36,6 +37,10 @@ describe("Validates initialization", () => {
           buildVariable("numberdivision", 0),
         ),
         buildEquivalenceClass(
+          valueBuiltIn("/", "Float"),
+          buildVariable("floatdivision", 0),
+        ),
+        buildEquivalenceClass(
           valueRecord("Number", {
             "+": buildVariable("numberaddition", 0),
             "-": buildVariable("numbersubtraction", 0),
@@ -43,6 +48,12 @@ describe("Validates initialization", () => {
             "/": buildVariable("numberdivision", 0),
           }),
           buildVariable("number", 0),
+        ),
+        buildEquivalenceClass(
+          valueRecord("Float", {
+            "/": buildVariable("floatdivision", 0),
+          }),
+          buildVariable("float", 0),
         ),
       );
 

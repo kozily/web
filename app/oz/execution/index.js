@@ -14,6 +14,7 @@ import exceptionCatch from "./exception_catch";
 import thread from "./thread";
 import byNeed from "./by_need";
 import builtInNumber from "./builtin/number";
+import builtInFloat from "./builtin/float";
 
 export const executors = {
   statement: {
@@ -34,6 +35,7 @@ export const executors = {
   value: {
     builtIn: {
       [builtInTypes.Number]: builtInNumber,
+      [builtInTypes.Float]: builtInFloat,
     },
   },
 };
