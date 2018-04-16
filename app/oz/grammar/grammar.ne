@@ -118,7 +118,7 @@ stm_pattern_matching -> "case" __ ids_identifier __ "of" __ lit_record_like __ "
 stm_procedure_application -> "{" _ ids_identifier lit_procedure_args:? _ "}" {%
   function(d, position, reject) {
     var procedure = d[2];
-    if (procedure.node === "identifier" && STM_SPECIAL_PROCEDURES.indexOf(procedure.identifier) !== -1) {
+    if (STM_SPECIAL_PROCEDURES.indexOf(procedure.identifier) !== -1) {
       return reject;
     } else {
       return {
