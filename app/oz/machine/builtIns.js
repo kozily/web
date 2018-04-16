@@ -26,5 +26,23 @@ export const builtIns = {
         return valueNumber(arg1.get("value") + arg2.get("value"));
       },
     },
+    "-": {
+      name: "Numberminus",
+      handler: (args, state, activeThreadIndex) => {
+        const arg1 = args.get(0);
+        const arg2 = args.get(1);
+        if (
+          arg1.get("type") != arg2.get("type") &&
+          arg1.get("type") === valueTypes.number
+        ) {
+          return raiseSystemException(
+            state,
+            activeThreadIndex,
+            errorException(),
+          );
+        }
+        return valueNumber(arg1.get("value") - arg2.get("value"));
+      },
+    },
   },
 };

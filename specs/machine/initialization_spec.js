@@ -24,7 +24,14 @@ describe("Validates initialization", () => {
           buildVariable("numberplus", 0),
         ),
         buildEquivalenceClass(
-          valueRecord("Number", { "+": buildVariable("numberplus", 0) }),
+          valueBuiltIn("-", "Number"),
+          buildVariable("numberminus", 0),
+        ),
+        buildEquivalenceClass(
+          valueRecord("Number", {
+            "+": buildVariable("numberplus", 0),
+            "-": buildVariable("numberminus", 0),
+          }),
           buildVariable("number", 0),
         ),
       );
