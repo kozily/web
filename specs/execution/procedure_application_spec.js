@@ -222,7 +222,7 @@ describe("Reducing {X ...} statements", () => {
   describe("Reducing {Record.'.' ...} statements", () => {
     it("reduces correctly", () => {
       const state = buildSingleThreadedState({
-        semanticStatements: [],
+        semanticStatements: [buildSemanticStatement(skipStatement())],
         sigma: buildSigma(
           buildEquivalenceClass(undefined, buildVariable("c", 0)),
           buildEquivalenceClass(
@@ -253,7 +253,7 @@ describe("Reducing {X ...} statements", () => {
 
       expect(reduce(state, statement, 0)).toEqual(
         buildSingleThreadedState({
-          semanticStatements: [],
+          semanticStatements: [buildSemanticStatement(skipStatement())],
           sigma: buildSigma(
             buildEquivalenceClass(valueAtom("age"), buildVariable("f", 0)),
             buildEquivalenceClass(

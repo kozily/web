@@ -1,5 +1,13 @@
 import Immutable from "immutable";
 
+export const literalTypes = {
+  number: "number",
+  record: "record",
+  procedure: "procedure",
+};
+
+export const allLiteralTypes = Object.keys(literalTypes);
+
 export const literalRecord = (label, features = {}) => {
   return Immutable.fromJS({
     node: "literal",

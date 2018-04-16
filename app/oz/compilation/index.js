@@ -1,5 +1,5 @@
 import { statementSyntaxTypes } from "../machine/statementSyntax";
-import { valueTypes } from "../machine/values";
+import { literalTypes } from "../machine/literals";
 import skip from "./skip";
 import binding from "./binding";
 import sequence from "./sequence";
@@ -34,9 +34,9 @@ export const compilers = {
     [statementSyntaxTypes.byNeedSyntax]: byNeed,
   },
   literal: {
-    [valueTypes.number]: number,
-    [valueTypes.record]: record,
-    [valueTypes.procedure]: procedure,
+    [literalTypes.number]: number,
+    [literalTypes.record]: record,
+    [literalTypes.procedure]: procedure,
   },
 };
 

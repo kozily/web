@@ -1,7 +1,18 @@
-import { lookupVariableInSigma, unify } from "../machine/sigma";
-import { buildSemanticStatement } from "../machine/build";
+import {
+  makeNewVariable,
+  lookupVariableInSigma,
+  unify,
+  createValue,
+} from "../machine/sigma";
+import {
+  buildSemanticStatement,
+  makeAuxiliaryIdentifier,
+  buildEquivalenceClass,
+} from "../machine/build";
 import { errorException, raiseSystemException } from "../machine/exceptions";
 import { blockCurrentThread } from "../machine/threads";
+import { builtIns } from "../machine/builtIns";
+import { literalNumber } from "../machine/literals";
 
 const isRecord = node => {
   return node.get("type") === "record";
@@ -25,11 +36,7 @@ export default function(state, semanticStatement, activeThreadIndex) {
   const callArguments = statement.get("args").map(x => x.get("identifier"));
 
   if (nodeCallIdentifier === "recordSelection") {
-    if (
-      callIdentifier !== "Record" ||
-      !isAtom(statement.getIn(["procedure", "feature"])) ||
-      statement.getIn(["procedure", "feature", "value", "label"]) !== "."
-    ) {
+    if (!isAtom(statement.getIn(["procedure", "feature"]))) {
       return raiseSystemException(state, activeThreadIndex, errorException());
     }
 
@@ -37,55 +44,104 @@ export default function(state, semanticStatement, activeThreadIndex) {
       return raiseSystemException(state, activeThreadIndex, errorException());
     }
 
-    const argumentVariables = callArguments.map(x => environment.get(x));
-    const firstArgumentVariable = argumentVariables.get(0);
-    const firstArgumentEquivalenceClass = lookupVariableInSigma(
-      sigma,
-      firstArgumentVariable,
+    const userRecordDefinedVariables = callArguments.map(x =>
+      environment.get(x),
     );
-    const firstArgumentValue = firstArgumentEquivalenceClass.get("value");
-    const secondArgumentVariable = argumentVariables.get(1);
-    const secondArgumentEquivalenceClass = lookupVariableInSigma(
-      sigma,
-      secondArgumentVariable,
-    );
-    const secondArgumentValue = secondArgumentEquivalenceClass.get("value");
-    const bindingVariable = argumentVariables.get(2);
+    const bindingVariable = userRecordDefinedVariables.last();
+    const argumentVariables = userRecordDefinedVariables.pop();
 
-    if (firstArgumentValue === undefined) {
+    const userRecordDefinedValues = argumentVariables.map(x =>
+      lookupVariableInSigma(sigma, x).get("value"),
+    );
+    if (userRecordDefinedValues.get(0) === undefined) {
       return blockCurrentThread(
         state,
         semanticStatement,
         activeThreadIndex,
-        firstArgumentVariable,
+        argumentVariables.first(),
       );
     }
-
-    if (!isRecord(firstArgumentValue)) {
-      return raiseSystemException(state, activeThreadIndex, errorException());
-    }
-
-    if (secondArgumentValue === undefined) {
+    if (userRecordDefinedValues.get(1) === undefined) {
       return blockCurrentThread(
         state,
         semanticStatement,
         activeThreadIndex,
-        secondArgumentVariable,
+        argumentVariables.last(),
       );
     }
 
-    if (!isAtom(secondArgumentValue)) {
-      return raiseSystemException(state, activeThreadIndex, errorException());
-    }
-
-    const featureVariable = firstArgumentValue.getIn([
+    const featureSelected = statement.getIn([
+      "procedure",
+      "feature",
       "value",
-      "features",
-      secondArgumentValue.getIn(["value", "label"]),
+      "label",
     ]);
+    if (callIdentifier !== "Record" || featureSelected !== ".") {
+      // must be a builtin
+      if (builtIns[callIdentifier][featureSelected] === undefined) {
+        raiseSystemException(state, activeThreadIndex, errorException());
+      } else {
+        const arg1 = userRecordDefinedValues.get(0);
+        const arg2 = userRecordDefinedValues.get(1);
+        if (arg1.get("type") != arg2.get("type")) {
+          return raiseSystemException(
+            state,
+            activeThreadIndex,
+            errorException(),
+          );
+        }
+        const expression = arg1
+          .get("value")
+          .toString()
+          .concat(featureSelected)
+          .concat(arg2.get("value").toString());
+        const value = createValue(environment, literalNumber(eval(expression)));
+        const aux = makeAuxiliaryIdentifier();
+        const newVariable = makeNewVariable({
+          in: state.get("sigma"),
+          for: aux.get("identifier"),
+        });
+        const newEquivalenceClass = buildEquivalenceClass(value, newVariable);
+        const newSigma = sigma.add(newEquivalenceClass);
 
+        try {
+          const unifiedSigma = unify(newSigma, bindingVariable, newVariable);
+          const resultingEquivalenceClass = lookupVariableInSigma(
+            unifiedSigma,
+            newVariable,
+          );
+          const cleanUnifiedSigma = unifiedSigma
+            .delete(resultingEquivalenceClass)
+            .add(
+              resultingEquivalenceClass.update("variables", variables =>
+                variables.delete(newVariable),
+              ),
+            );
+
+          return state.set("sigma", cleanUnifiedSigma);
+        } catch (error) {
+          return raiseSystemException(
+            state,
+            activeThreadIndex,
+            errorException(),
+          );
+        }
+      }
+    }
+
+    if (userRecordDefinedValues.some(x => !isRecord(x))) {
+      return raiseSystemException(state, activeThreadIndex, errorException());
+    }
+    const arg1 = userRecordDefinedValues.get(0);
+    const arg2 = userRecordDefinedValues.get(1);
+    if (!isAtom(arg2)) {
+      return raiseSystemException(state, activeThreadIndex, errorException());
+    }
+    const variable2Point = arg1
+      .getIn(["value", "features"])
+      .get(arg2.getIn(["value", "label"]));
     return state.update("sigma", sigma =>
-      unify(sigma, bindingVariable, featureVariable),
+      unify(sigma, bindingVariable, variable2Point),
     );
   }
 

@@ -1,7 +1,7 @@
 import Immutable from "immutable";
 import { compilers } from "../../app/oz/compilation";
 import { allStatementSyntaxTypes } from "../../app/oz/machine/statementSyntax";
-import { allValueTypes } from "../../app/oz/machine/values";
+import { allLiteralTypes } from "../../app/oz/machine/literals";
 
 describe("Compiling", () => {
   beforeEach(() => {
@@ -17,7 +17,7 @@ describe("Compiling", () => {
 
   it("has a compiler for all values", () => {
     const typesWithCompiler = Immutable.Set(Object.keys(compilers.literal));
-    const types = Immutable.Set(allValueTypes);
+    const types = Immutable.Set(allLiteralTypes);
 
     expect(typesWithCompiler).toEqual(types);
   });

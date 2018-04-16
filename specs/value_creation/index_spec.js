@@ -1,6 +1,6 @@
 import Immutable from "immutable";
 import { valueCreators } from "../../app/oz/value_creation";
-import { allValueTypes } from "../../app/oz/machine/values";
+import { allLiteralTypes } from "../../app/oz/machine/literals";
 
 describe("Creating values", () => {
   beforeEach(() => {
@@ -9,7 +9,7 @@ describe("Creating values", () => {
 
   it("has a value creator for all types", () => {
     const typesWithValueCreators = Immutable.Set(Object.keys(valueCreators));
-    const types = Immutable.Set(allValueTypes);
+    const types = Immutable.Set(allLiteralTypes);
 
     expect(typesWithValueCreators).toEqual(types);
   });

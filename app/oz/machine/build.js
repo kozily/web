@@ -1,5 +1,6 @@
 import Immutable from "immutable";
 import { lexicalIdentifier } from "./lexical";
+import { initialize } from "./initialization";
 
 export const buildEnvironment = (contents = {}) => {
   return Immutable.Map(contents);
@@ -102,8 +103,10 @@ export const buildState = ({
 };
 
 export const buildFromKernelAST = ast => {
+  const init = initialize();
   return buildSingleThreadedState({
-    semanticStatements: [buildSemanticStatement(ast)],
+    semanticStatements: [buildSemanticStatement(ast, init.get("environment"))],
+    sigma: init.get("sigma"),
   });
 };
 
