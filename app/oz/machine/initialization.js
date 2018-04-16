@@ -12,27 +12,16 @@ export const initialize = () => {
   const builtInMapped = Object.keys(builtIns).reduce((acc, recordBuiltIn) => {
     const variableRecord = buildVariable(recordBuiltIn.toLowerCase(), 0);
     const recordMap = Immutable.fromJS({ [recordBuiltIn]: variableRecord });
-    const featuresMap = Object.keys(builtIns[recordBuiltIn]).reduce(
-      (acc, item) => {
-        acc[builtIns[recordBuiltIn][item]] = buildVariable(
-          builtIns[recordBuiltIn][item].toLowerCase(),
-          0,
-        );
-        return Immutable.fromJS(acc);
-      },
-      {},
-    );
-    const environment = recordMap.merge(featuresMap);
+    const environment = recordMap;
 
     const featuresInsideRecord = Object.keys(builtIns[recordBuiltIn]).reduce(
       (acc, item) => {
-        acc[item] = buildVariable(
-          builtIns[recordBuiltIn][item].toLowerCase(),
-          0,
+        return acc.set(
+          item,
+          buildVariable(builtIns[recordBuiltIn][item].name.toLowerCase(), 0),
         );
-        return Immutable.fromJS(acc);
       },
-      {},
+      Immutable.Map(),
     );
     const sigmaRecordMap = buildEquivalenceClass(
       valueRecord(recordBuiltIn, featuresInsideRecord),
@@ -40,15 +29,16 @@ export const initialize = () => {
     );
     const sigmaFeaturesMap = Object.keys(builtIns[recordBuiltIn])
       .reduce((acc, item) => {
-        acc.push({
-          value: valueBuiltIn(item, recordBuiltIn),
-          variable: buildVariable(
-            builtIns[recordBuiltIn][item].toLowerCase(),
-            0,
-          ),
-        });
-        return Immutable.fromJS(acc);
-      }, [])
+        return acc.push(
+          Immutable.Map({
+            value: valueBuiltIn(item, recordBuiltIn),
+            variable: buildVariable(
+              builtIns[recordBuiltIn][item].name.toLowerCase(),
+              0,
+            ),
+          }),
+        );
+      }, Immutable.List())
       .map(pair => {
         return buildEquivalenceClass(pair.get("value"), pair.get("variable"));
       });

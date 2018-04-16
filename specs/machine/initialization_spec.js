@@ -17,7 +17,6 @@ describe("Validates initialization", () => {
     it("numberplus must be generated", () => {
       const environment = buildEnvironment({
         Number: buildVariable("number", 0),
-        Numberplus: buildVariable("numberplus", 0),
       });
       const sigma = buildSigma(
         buildEquivalenceClass(

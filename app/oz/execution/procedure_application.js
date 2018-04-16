@@ -2,7 +2,6 @@ import {
   makeNewVariable,
   lookupVariableInSigma,
   unify,
-  createValue,
 } from "../machine/sigma";
 import {
   buildSemanticStatement,
@@ -12,7 +11,6 @@ import {
 import { errorException, raiseSystemException } from "../machine/exceptions";
 import { blockCurrentThread } from "../machine/threads";
 import { builtIns } from "../machine/builtIns";
-import { literalNumber } from "../machine/literals";
 
 const isRecord = node => {
   return node.get("type") === "record";
@@ -78,54 +76,40 @@ export default function(state, semanticStatement, activeThreadIndex) {
     ]);
     if (callIdentifier !== "Record" || featureSelected !== ".") {
       // must be a builtin
-      if (builtIns[callIdentifier][featureSelected] === undefined) {
-        raiseSystemException(state, activeThreadIndex, errorException());
-      } else {
-        const arg1 = userRecordDefinedValues.get(0);
-        const arg2 = userRecordDefinedValues.get(1);
-        if (arg1.get("type") != arg2.get("type")) {
-          return raiseSystemException(
-            state,
-            activeThreadIndex,
-            errorException(),
-          );
-        }
-        const expression = arg1
-          .get("value")
-          .toString()
-          .concat(featureSelected)
-          .concat(arg2.get("value").toString());
-        const value = createValue(environment, literalNumber(eval(expression)));
-        const aux = makeAuxiliaryIdentifier();
-        const newVariable = makeNewVariable({
-          in: state.get("sigma"),
-          for: aux.get("identifier"),
-        });
-        const newEquivalenceClass = buildEquivalenceClass(value, newVariable);
-        const newSigma = sigma.add(newEquivalenceClass);
+      const builtIn = builtIns[callIdentifier][featureSelected];
+      if (builtIn === undefined) {
+        return raiseSystemException(state, activeThreadIndex, errorException());
+      }
+      const value = builtIn.handler(
+        userRecordDefinedValues,
+        state,
+        activeThreadIndex,
+      );
+      const aux = makeAuxiliaryIdentifier();
+      const newVariable = makeNewVariable({
+        in: state.get("sigma"),
+        for: aux.get("identifier"),
+      });
+      const newEquivalenceClass = buildEquivalenceClass(value, newVariable);
+      const newSigma = sigma.add(newEquivalenceClass);
 
-        try {
-          const unifiedSigma = unify(newSigma, bindingVariable, newVariable);
-          const resultingEquivalenceClass = lookupVariableInSigma(
-            unifiedSigma,
-            newVariable,
+      try {
+        const unifiedSigma = unify(newSigma, bindingVariable, newVariable);
+        const resultingEquivalenceClass = lookupVariableInSigma(
+          unifiedSigma,
+          newVariable,
+        );
+        const cleanUnifiedSigma = unifiedSigma
+          .delete(resultingEquivalenceClass)
+          .add(
+            resultingEquivalenceClass.update("variables", variables =>
+              variables.delete(newVariable),
+            ),
           );
-          const cleanUnifiedSigma = unifiedSigma
-            .delete(resultingEquivalenceClass)
-            .add(
-              resultingEquivalenceClass.update("variables", variables =>
-                variables.delete(newVariable),
-              ),
-            );
 
-          return state.set("sigma", cleanUnifiedSigma);
-        } catch (error) {
-          return raiseSystemException(
-            state,
-            activeThreadIndex,
-            errorException(),
-          );
-        }
+        return state.set("sigma", cleanUnifiedSigma);
+      } catch (error) {
+        return raiseSystemException(state, activeThreadIndex, errorException());
       }
     }
 
@@ -159,9 +143,61 @@ export default function(state, semanticStatement, activeThreadIndex) {
     );
   }
 
-  if (procedureValue.get("type") !== "procedure")
+  if (
+    procedureValue.get("type") !== "procedure" &&
+    procedureValue.get("type") !== "builtIn"
+  )
     return raiseSystemException(state, activeThreadIndex, errorException());
 
+  if (procedureValue.get("type") === "builtIn") {
+    if (callArguments.size !== 3) {
+      return raiseSystemException(state, activeThreadIndex, errorException());
+    }
+
+    const userRecordDefinedVariables = callArguments.map(x =>
+      environment.get(x),
+    );
+    const bindingVariable = userRecordDefinedVariables.last();
+    const userRecordDefinedValues = userRecordDefinedVariables
+      .pop()
+      .map(x => lookupVariableInSigma(sigma, x).get("value"));
+    if (userRecordDefinedValues.some(x => x === undefined)) {
+      return blockCurrentThread(state, semanticStatement, activeThreadIndex);
+    }
+    const builtIn =
+      builtIns[procedureValue.get("namespace")][procedureValue.get("operator")];
+    const value = builtIn.handler(
+      userRecordDefinedValues,
+      state,
+      activeThreadIndex,
+    );
+    const aux = makeAuxiliaryIdentifier();
+    const newVariable = makeNewVariable({
+      in: state.get("sigma"),
+      for: aux.get("identifier"),
+    });
+    const newEquivalenceClass = buildEquivalenceClass(value, newVariable);
+    const newSigma = sigma.add(newEquivalenceClass);
+
+    try {
+      const unifiedSigma = unify(newSigma, bindingVariable, newVariable);
+      const resultingEquivalenceClass = lookupVariableInSigma(
+        unifiedSigma,
+        newVariable,
+      );
+      const cleanUnifiedSigma = unifiedSigma
+        .delete(resultingEquivalenceClass)
+        .add(
+          resultingEquivalenceClass.update("variables", variables =>
+            variables.delete(newVariable),
+          ),
+        );
+
+      return state.set("sigma", cleanUnifiedSigma);
+    } catch (error) {
+      return raiseSystemException(state, activeThreadIndex, errorException());
+    }
+  }
   const declaredArguments = procedureValue
     .getIn(["value", "args"])
     .map(x => x.get("identifier"));
