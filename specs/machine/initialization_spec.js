@@ -21,21 +21,26 @@ describe("Validates initialization", () => {
       const sigma = buildSigma(
         buildEquivalenceClass(
           valueBuiltIn("+", "Number"),
-          buildVariable("numberplus", 0),
+          buildVariable("numberaddition", 0),
         ),
         buildEquivalenceClass(
           valueBuiltIn("-", "Number"),
-          buildVariable("numberminus", 0),
+          buildVariable("numbersubtraction", 0),
         ),
         buildEquivalenceClass(
           valueBuiltIn("*", "Number"),
           buildVariable("numbermultiplication", 0),
         ),
         buildEquivalenceClass(
+          valueBuiltIn("/", "Number"),
+          buildVariable("numberdivision", 0),
+        ),
+        buildEquivalenceClass(
           valueRecord("Number", {
-            "+": buildVariable("numberplus", 0),
-            "-": buildVariable("numberminus", 0),
+            "+": buildVariable("numberaddition", 0),
+            "-": buildVariable("numbersubtraction", 0),
             "*": buildVariable("numbermultiplication", 0),
+            "/": buildVariable("numberdivision", 0),
           }),
           buildVariable("number", 0),
         ),

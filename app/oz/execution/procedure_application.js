@@ -80,20 +80,16 @@ export default function(state, semanticStatement, activeThreadIndex) {
       if (builtIn === undefined) {
         return raiseSystemException(state, activeThreadIndex, errorException());
       }
-      const value = builtIn.handler(
-        userRecordDefinedValues,
-        state,
-        activeThreadIndex,
-      );
-      const aux = makeAuxiliaryIdentifier();
-      const newVariable = makeNewVariable({
-        in: state.get("sigma"),
-        for: aux.get("identifier"),
-      });
-      const newEquivalenceClass = buildEquivalenceClass(value, newVariable);
-      const newSigma = sigma.add(newEquivalenceClass);
-
       try {
+        const value = builtIn.handler(userRecordDefinedValues);
+        const aux = makeAuxiliaryIdentifier();
+        const newVariable = makeNewVariable({
+          in: state.get("sigma"),
+          for: aux.get("identifier"),
+        });
+        const newEquivalenceClass = buildEquivalenceClass(value, newVariable);
+        const newSigma = sigma.add(newEquivalenceClass);
+
         const unifiedSigma = unify(newSigma, bindingVariable, newVariable);
         const resultingEquivalenceClass = lookupVariableInSigma(
           unifiedSigma,
