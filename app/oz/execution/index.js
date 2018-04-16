@@ -1,5 +1,4 @@
 import { statementTypes } from "../machine/statements";
-import { builtInTypes } from "../machine/builtIns";
 import skip from "./skip";
 import sequence from "./sequence";
 import local from "./local";
@@ -13,8 +12,6 @@ import exceptionRaise from "./exception_raise";
 import exceptionCatch from "./exception_catch";
 import thread from "./thread";
 import byNeed from "./by_need";
-import builtInNumber from "./builtin/number";
-import builtInFloat from "./builtin/float";
 
 export const executors = {
   statement: {
@@ -32,23 +29,12 @@ export const executors = {
     [statementTypes.thread]: thread,
     [statementTypes.byNeed]: byNeed,
   },
-  value: {
-    builtIn: {
-      [builtInTypes.Number]: builtInNumber,
-      [builtInTypes.Float]: builtInFloat,
-    },
-  },
 };
 
 export const execute = (state, semanticStatement, activeThreadIndex) => {
   const statement = semanticStatement.get("statement");
   const node = statement.get("node");
   const type = statement.get("type");
-  if (node === "value" && type === "builtIn") {
-    const executor = executors[node][type][statement.get("namespace")];
-    return executor(state, semanticStatement, activeThreadIndex);
-  } else {
-    const executor = executors[node][type];
-    return executor(state, semanticStatement, activeThreadIndex);
-  }
+  const executor = executors[node][type];
+  return executor(state, semanticStatement, activeThreadIndex);
 };

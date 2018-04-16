@@ -2,7 +2,6 @@ import Immutable from "immutable";
 import { collectors } from "../../app/oz/free_identifiers";
 import { allStatementTypes } from "../../app/oz/machine/statements";
 import { allLiteralTypes } from "../../app/oz/machine/literals";
-import { allValueTypes } from "../../app/oz/machine/values";
 
 describe("Collecting free identifiers", () => {
   beforeEach(() => {
@@ -25,12 +24,5 @@ describe("Collecting free identifiers", () => {
     const types = Immutable.Set(allLiteralTypes);
 
     expect(literalsWithCollectors).toEqual(types);
-  });
-
-  it("has a collector for all values", () => {
-    const valuesWithCollectors = Immutable.Set(Object.keys(collectors.value));
-    const types = Immutable.Set(allValueTypes);
-
-    expect(valuesWithCollectors).toEqual(types);
   });
 });

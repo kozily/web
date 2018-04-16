@@ -21,7 +21,7 @@ stm_sequence ->
           node: "statement",
           type: "sequenceSyntax",
           head: d[0],
-          tail: d[2] 
+          tail: d[2]
         };
       }
     %}
@@ -37,7 +37,6 @@ stm_simple ->
   | stm_procedure_application {% id %}
   | stm_try {% id %}
   | stm_raise {% id %}
-  | stm_operator {% id %}
   | stm_thread {% id %}
   | stm_by_need {% id %}
 
@@ -116,7 +115,7 @@ stm_pattern_matching -> "case" __ ids_identifier __ "of" __ lit_record_like __ "
   }
 %}
 
-stm_procedure_application -> "{" _ procedure_identifier lit_procedure_args:? _ "}" {%
+stm_procedure_application -> "{" _ ids_identifier lit_procedure_args:? _ "}" {%
   function(d, position, reject) {
     var procedure = d[2];
     if (procedure.node === "identifier" && STM_SPECIAL_PROCEDURES.indexOf(procedure.identifier) !== -1) {
@@ -154,19 +153,6 @@ stm_raise -> "raise" __ ids_identifier __ "end" {%
   }
 %}
 
-stm_operator -> ids_identifier _ "=" _ ids_identifier "." (lit_atom | ids_identifier ) {%
-  function(d, position, reject) {
-    return {
-      node: "statement",
-      type: "operatorSyntax",
-      result: d[0],
-      operator: ".",
-      lhs: d[4],
-      rhs: d[6][0],
-    };
-  }
-%}
-
 stm_thread -> "thread" __ stm_sequence __ "end" {%
   function(d, position, reject) {
     return {
@@ -200,19 +186,7 @@ stm_by_need -> "{" _ "ByNeed" __ ids_identifier __ ids_identifier _ "}" {%
       identifier: d[0],
     };
   };
-
-  function idsBuildRecordIdentifier(d) {
-    return {
-      node: "recordSelection",
-      identifier: d[0].identifier,
-      feature: d[2],
-    };
-  };
 %}
-
-procedure_identifier ->
-    ids_identifier {% id %}
-  | ids_identifier "." lit_atom {% idsBuildRecordIdentifier %}
 
 ids_identifier ->
     ids_identifier_syntax {% idsBuildIdentifier %}

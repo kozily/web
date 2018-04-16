@@ -12,7 +12,7 @@ export const buildSystemExceptionState = (
   activeThreadIndex,
   exception,
 ) => {
-  const aux = getLastAuxiliaryIdentifier();
+  const aux = getLastAuxiliaryIdentifier("system_exception");
   const auxIdentifier = aux.get("identifier");
   return state
     .updateIn(["threads", activeThreadIndex, "stack"], stack =>

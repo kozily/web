@@ -25,7 +25,7 @@ export const errorException = () => {
 };
 
 export const raiseSystemException = (state, activeThreadIndex, exception) => {
-  const aux = makeAuxiliaryIdentifier();
+  const aux = makeAuxiliaryIdentifier("system_exception");
   const auxIdentifier = aux.get("identifier");
   const exceptionVariable = makeNewVariable({
     in: state.get("sigma"),

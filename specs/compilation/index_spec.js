@@ -15,7 +15,7 @@ describe("Compiling", () => {
     expect(typesWithCompiler).toEqual(types);
   });
 
-  it("has a compiler for all values", () => {
+  it("has a compiler for all literals", () => {
     const typesWithCompiler = Immutable.Set(Object.keys(compilers.literal));
     const types = Immutable.Set(allLiteralTypes);
 
