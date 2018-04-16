@@ -189,4 +189,87 @@ describe("Reducing {Number ...} builtin statements", () => {
       }),
     );
   });
+
+  it("handled number multiplication correctly", () => {
+    const state = buildSingleThreadedState({
+      semanticStatements: [buildSemanticStatement(skipStatement())],
+      sigma: buildSigma(
+        buildEquivalenceClass(undefined, buildVariable("c", 0)),
+        buildEquivalenceClass(valueNumber(30), buildVariable("a", 0)),
+        buildEquivalenceClass(valueNumber(20), buildVariable("b", 0)),
+      ),
+    });
+
+    const statement = buildSemanticStatement(
+      procedureApplicationStatement(
+        lexicalRecordSelection("Number", literalAtom("*")),
+        [
+          lexicalIdentifier("A"),
+          lexicalIdentifier("B"),
+          lexicalIdentifier("C"),
+        ],
+      ),
+      buildEnvironment({
+        C: buildVariable("c", 0),
+        A: buildVariable("a", 0),
+        B: buildVariable("b", 0),
+      }),
+    );
+
+    const result = reduce(state, statement, 0);
+    expect(result).toEqual(
+      buildSingleThreadedState({
+        semanticStatements: [buildSemanticStatement(skipStatement())],
+        sigma: buildSigma(
+          buildEquivalenceClass(valueNumber(600), buildVariable("c", 0)),
+          buildEquivalenceClass(valueNumber(30), buildVariable("a", 0)),
+          buildEquivalenceClass(valueNumber(20), buildVariable("b", 0)),
+        ),
+      }),
+    );
+  });
+
+  it("handled number multipication as built in correctly", () => {
+    const state = buildSingleThreadedState({
+      semanticStatements: [buildSemanticStatement(skipStatement())],
+      sigma: buildSigma(
+        buildEquivalenceClass(undefined, buildVariable("c", 0)),
+        buildEquivalenceClass(
+          valueBuiltIn("*", "Number"),
+          buildVariable("o", 0),
+        ),
+        buildEquivalenceClass(valueNumber(30), buildVariable("a", 0)),
+        buildEquivalenceClass(valueNumber(20), buildVariable("b", 0)),
+      ),
+    });
+
+    const statement = buildSemanticStatement(
+      procedureApplicationStatement(lexicalIdentifier("O"), [
+        lexicalIdentifier("A"),
+        lexicalIdentifier("B"),
+        lexicalIdentifier("C"),
+      ]),
+      buildEnvironment({
+        C: buildVariable("c", 0),
+        O: buildVariable("o", 0),
+        A: buildVariable("a", 0),
+        B: buildVariable("b", 0),
+      }),
+    );
+
+    expect(reduce(state, statement, 0)).toEqual(
+      buildSingleThreadedState({
+        semanticStatements: [buildSemanticStatement(skipStatement())],
+        sigma: buildSigma(
+          buildEquivalenceClass(valueNumber(600), buildVariable("c", 0)),
+          buildEquivalenceClass(
+            valueBuiltIn("*", "Number"),
+            buildVariable("o", 0),
+          ),
+          buildEquivalenceClass(valueNumber(30), buildVariable("a", 0)),
+          buildEquivalenceClass(valueNumber(20), buildVariable("b", 0)),
+        ),
+      }),
+    );
+  });
 });
