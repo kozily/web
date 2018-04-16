@@ -1,5 +1,5 @@
 import { statementTypes } from "../machine/statements";
-import { builtInTypes } from "../machine/builtins";
+import { builtInTypes } from "../machine/builtIns";
 import skip from "./skip";
 import sequence from "./sequence";
 import local from "./local";
