@@ -1,8 +1,9 @@
-import { valueTypes, valueNumber } from "./values";
+import { valueTypes, valueNumber, valueBoolean } from "./values";
 
 export const builtInTypes = {
   Number: "Number",
   Float: "Float",
+  Value: "Value",
 };
 export const allBuiltInTypes = Object.keys(builtInTypes);
 
@@ -63,6 +64,62 @@ export const builtIns = {
         const divisor = arg2.get("value");
         if (divisor === 0) throw new Error("cannot divide by zero");
         return valueNumber(arg1.get("value") / divisor);
+      },
+    },
+  },
+  [builtInTypes.Value]: {
+    "==": {
+      name: "valueequality",
+      handler: args => {
+        const arg1 = args.get(0);
+        const arg2 = args.get(1);
+        typeValidation(arg1, arg2, valueTypes.number);
+        return valueBoolean(arg1.get("value") === arg2.get("value"));
+      },
+    },
+    "\\=": {
+      name: "valuenonequality",
+      handler: args => {
+        const arg1 = args.get(0);
+        const arg2 = args.get(1);
+        typeValidation(arg1, arg2, valueTypes.number);
+        return valueBoolean(arg1.get("value") !== arg2.get("value"));
+      },
+    },
+    "=<": {
+      name: "valuelessthanorequal",
+      handler: args => {
+        const arg1 = args.get(0);
+        const arg2 = args.get(1);
+        typeValidation(arg1, arg2, valueTypes.number);
+        return valueBoolean(arg1.get("value") <= arg2.get("value"));
+      },
+    },
+    "<": {
+      name: "valuelessthan",
+      handler: args => {
+        const arg1 = args.get(0);
+        const arg2 = args.get(1);
+        typeValidation(arg1, arg2, valueTypes.number);
+        return valueBoolean(arg1.get("value") < arg2.get("value"));
+      },
+    },
+    ">=": {
+      name: "valuegreaterthanorequal",
+      handler: args => {
+        const arg1 = args.get(0);
+        const arg2 = args.get(1);
+        typeValidation(arg1, arg2, valueTypes.number);
+        return valueBoolean(arg1.get("value") >= arg2.get("value"));
+      },
+    },
+    ">": {
+      name: "valuegreaterthan",
+      handler: args => {
+        const arg1 = args.get(0);
+        const arg2 = args.get(1);
+        typeValidation(arg1, arg2, valueTypes.number);
+        return valueBoolean(arg1.get("value") > arg2.get("value"));
       },
     },
   },
