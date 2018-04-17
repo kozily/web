@@ -1,12 +1,12 @@
-import { valueTypes } from "../machine/values";
+import { literalTypes } from "../machine/literals";
 import number from "./number";
 import record from "./record";
 import procedure from "./procedure";
 
 export const valueCreators = {
-  [valueTypes.number]: number,
-  [valueTypes.record]: record,
-  [valueTypes.procedure]: procedure,
+  [literalTypes.number]: number,
+  [literalTypes.record]: record,
+  [literalTypes.procedure]: procedure,
 };
 
 export const createValue = (environment, literal) => {

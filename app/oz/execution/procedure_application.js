@@ -2,6 +2,7 @@ import { lookupVariableInSigma, unify } from "../machine/sigma";
 import { buildSemanticStatement } from "../machine/build";
 import { errorException, raiseSystemException } from "../machine/exceptions";
 import { blockCurrentThread } from "../machine/threads";
+import { newSigmaAfterBuiltIn } from "./builtin";
 
 const isRecord = node => {
   return node.get("type") === "record";
@@ -25,11 +26,7 @@ export default function(state, semanticStatement, activeThreadIndex) {
   const callArguments = statement.get("args").map(x => x.get("identifier"));
 
   if (nodeCallIdentifier === "recordSelection") {
-    if (
-      callIdentifier !== "Record" ||
-      !isAtom(statement.getIn(["procedure", "feature"])) ||
-      statement.getIn(["procedure", "feature", "value", "label"]) !== "."
-    ) {
+    if (!isAtom(statement.getIn(["procedure", "feature"]))) {
       return raiseSystemException(state, activeThreadIndex, errorException());
     }
 
@@ -37,55 +34,67 @@ export default function(state, semanticStatement, activeThreadIndex) {
       return raiseSystemException(state, activeThreadIndex, errorException());
     }
 
-    const argumentVariables = callArguments.map(x => environment.get(x));
-    const firstArgumentVariable = argumentVariables.get(0);
-    const firstArgumentEquivalenceClass = lookupVariableInSigma(
-      sigma,
-      firstArgumentVariable,
-    );
-    const firstArgumentValue = firstArgumentEquivalenceClass.get("value");
-    const secondArgumentVariable = argumentVariables.get(1);
-    const secondArgumentEquivalenceClass = lookupVariableInSigma(
-      sigma,
-      secondArgumentVariable,
-    );
-    const secondArgumentValue = secondArgumentEquivalenceClass.get("value");
-    const bindingVariable = argumentVariables.get(2);
+    const procedureVariables = callArguments.map(x => environment.get(x));
+    const resultVariable = procedureVariables.last();
+    const argumentVariables = procedureVariables.pop();
 
-    if (firstArgumentValue === undefined) {
+    const argumentValues = argumentVariables.map(x =>
+      lookupVariableInSigma(sigma, x).get("value"),
+    );
+    if (argumentValues.get(0) === undefined) {
       return blockCurrentThread(
         state,
         semanticStatement,
         activeThreadIndex,
-        firstArgumentVariable,
+        argumentVariables.first(),
       );
     }
-
-    if (!isRecord(firstArgumentValue)) {
-      return raiseSystemException(state, activeThreadIndex, errorException());
-    }
-
-    if (secondArgumentValue === undefined) {
+    if (argumentValues.get(1) === undefined) {
       return blockCurrentThread(
         state,
         semanticStatement,
         activeThreadIndex,
-        secondArgumentVariable,
+        argumentVariables.last(),
       );
     }
 
-    if (!isAtom(secondArgumentValue)) {
-      return raiseSystemException(state, activeThreadIndex, errorException());
-    }
-
-    const featureVariable = firstArgumentValue.getIn([
+    const operator = statement.getIn([
+      "procedure",
+      "feature",
       "value",
-      "features",
-      secondArgumentValue.getIn(["value", "label"]),
+      "label",
     ]);
+    if (callIdentifier !== "Record" || operator !== ".") {
+      // must be a builtin
+      try {
+        return state.set(
+          "sigma",
+          newSigmaAfterBuiltIn(
+            sigma,
+            callIdentifier,
+            operator,
+            argumentValues,
+            resultVariable,
+          ),
+        );
+      } catch (error) {
+        return raiseSystemException(state, activeThreadIndex, errorException());
+      }
+    }
 
+    if (argumentValues.some(x => !isRecord(x))) {
+      return raiseSystemException(state, activeThreadIndex, errorException());
+    }
+    const arg1 = argumentValues.get(0);
+    const arg2 = argumentValues.get(1);
+    if (!isAtom(arg2)) {
+      return raiseSystemException(state, activeThreadIndex, errorException());
+    }
+    const variable2Point = arg1
+      .getIn(["value", "features"])
+      .get(arg2.getIn(["value", "label"]));
     return state.update("sigma", sigma =>
-      unify(sigma, bindingVariable, featureVariable),
+      unify(sigma, resultVariable, variable2Point),
     );
   }
 
@@ -103,9 +112,56 @@ export default function(state, semanticStatement, activeThreadIndex) {
     );
   }
 
-  if (procedureValue.get("type") !== "procedure")
+  if (
+    procedureValue.get("type") !== "procedure" &&
+    procedureValue.get("type") !== "builtIn"
+  )
     return raiseSystemException(state, activeThreadIndex, errorException());
 
+  if (procedureValue.get("type") === "builtIn") {
+    if (callArguments.size !== 3) {
+      return raiseSystemException(state, activeThreadIndex, errorException());
+    }
+
+    const procedureVariables = callArguments.map(x => environment.get(x));
+    const resultVariable = procedureVariables.last();
+    const argumentVariables = procedureVariables.pop();
+
+    const argumentValues = argumentVariables.map(x =>
+      lookupVariableInSigma(sigma, x).get("value"),
+    );
+    if (argumentValues.get(0) === undefined) {
+      return blockCurrentThread(
+        state,
+        semanticStatement,
+        activeThreadIndex,
+        argumentVariables.first(),
+      );
+    }
+    if (argumentValues.get(1) === undefined) {
+      return blockCurrentThread(
+        state,
+        semanticStatement,
+        activeThreadIndex,
+        argumentVariables.last(),
+      );
+    }
+
+    try {
+      return state.set(
+        "sigma",
+        newSigmaAfterBuiltIn(
+          sigma,
+          procedureValue.get("namespace"),
+          procedureValue.get("operator"),
+          argumentValues,
+          resultVariable,
+        ),
+      );
+    } catch (error) {
+      return raiseSystemException(state, activeThreadIndex, errorException());
+    }
+  }
   const declaredArguments = procedureValue
     .getIn(["value", "args"])
     .map(x => x.get("identifier"));

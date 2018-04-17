@@ -1,4 +1,9 @@
-import { makeNewVariable, unify, createValue } from "../machine/sigma";
+import {
+  lookupVariableInSigma,
+  makeNewVariable,
+  unify,
+  createValue,
+} from "../machine/sigma";
 import {
   buildEquivalenceClass,
   makeAuxiliaryIdentifier,
@@ -26,8 +31,9 @@ export default function(state, semanticStatement, activeThreadIndex) {
   try {
     const unifiedSigma = unify(newSigma, variable, newVariable);
 
-    const resultingEquivalenceClass = unifiedSigma.find(x =>
-      x.get("variables").contains(newVariable),
+    const resultingEquivalenceClass = lookupVariableInSigma(
+      unifiedSigma,
+      newVariable,
     );
 
     const cleanUnifiedSigma = unifiedSigma

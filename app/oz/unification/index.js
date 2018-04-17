@@ -7,6 +7,7 @@ export const unificators = {
   [valueTypes.number]: number,
   [valueTypes.record]: record,
   [valueTypes.procedure]: procedure,
+  [valueTypes.builtIn]: procedure,
 };
 
 export const unifyValue = (

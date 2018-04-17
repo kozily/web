@@ -1,6 +1,7 @@
 import Immutable from "immutable";
 import { printers } from "../../app/oz/print";
 import { allStatementTypes } from "../../app/oz/machine/statements";
+import { allLiteralTypes } from "../../app/oz/machine/literals";
 import { allValueTypes } from "../../app/oz/machine/values";
 
 describe("Printing", () => {
@@ -17,8 +18,15 @@ describe("Printing", () => {
 
   it("has a printer for all literals", () => {
     const literalsWithPrinters = Immutable.Set(Object.keys(printers.literal));
-    const literals = Immutable.Set(allValueTypes);
+    const literals = Immutable.Set(allLiteralTypes);
 
     expect(literalsWithPrinters).toEqual(literals);
+  });
+
+  it("has a printer for all values", () => {
+    const valuesWithPrinters = Immutable.Set(Object.keys(printers.value));
+    const values = Immutable.Set(allValueTypes);
+
+    expect(valuesWithPrinters).toEqual(values);
   });
 });
