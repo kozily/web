@@ -4,8 +4,6 @@
 ##############################################################################
 # STM - STATEMENTS
 ##############################################################################
-# This section defines parsing rules for executable statements
-##############################################################################
 @{%
   STM_SPECIAL_PROCEDURES = [
     "ByNeed",
@@ -79,8 +77,11 @@ stm_binding -> ids_identifier _ "=" _ ids_identifier {%
   }
 %}
 
-stm_value_creation -> ids_identifier _ "=" _ lit_value {%
+stm_value_creation -> ids_identifier _ "=" _ exp_expression {%
   function(d, position, reject) {
+    if (d[4].node === "identifier") {
+      return reject;
+    }
     return {
       node: "statement",
       type: "valueCreationSyntax",
@@ -175,9 +176,42 @@ stm_by_need -> "{" _ "ByNeed" __ ids_identifier __ ids_identifier _ "}" {%
 %}
 
 ##############################################################################
-# IDS - IDENTIFIERS
+# EXP - EXPRESSIONS
 ##############################################################################
-# This section defines parsing rules for standalone identifiers
+exp_expression ->
+    exp_sum {% id %}
+
+exp_sum ->
+    exp_product {% id %}
+  | exp_sum _ ("+"|"-") _ exp_product {% function(d) {
+    return {
+      node: "expression",
+      type: "operator",
+      operator: d[2][0],
+      lhs: d[0],
+      rhs: d[4],
+    };
+  } %}
+
+exp_product ->
+    exp_terminal {% id %}
+  | exp_product _ ("*"|"div"|"mod"|"/") _ exp_terminal {% function(d) {
+    return {
+      node: "expression",
+      type: "operator",
+      operator: d[2][0],
+      lhs: d[0],
+      rhs: d[4],
+    };
+  } %}
+
+exp_terminal ->
+    ids_identifier {% id %}
+  | lit_value {% id %}
+  | "(" _ exp_expression _ ")" {% nth(2) %}
+
+##############################################################################
+# IDS - IDENTIFIERS
 ##############################################################################
 @{%
   function idsBuildIdentifier(d) {
@@ -210,9 +244,6 @@ ids_identifier_quoted -> "`" ([^`\\] | lib_pseudo_char):* "`" {%
 
 ##############################################################################
 # LIT - LITERALS
-##############################################################################
-# This section defines parsing rules for value literals, such as records, atoms
-# and booleans.
 ##############################################################################
 
 lit_value ->
@@ -547,8 +578,6 @@ lit_procedure_args ->
 
 ##############################################################################
 # LIB - UTILITIES
-##############################################################################
-# This section defines common rules, terminals and functions
 ##############################################################################
 
 @{%

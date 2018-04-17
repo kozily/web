@@ -54,6 +54,19 @@ export const builtIns = {
       dividendNotZero,
     ),
   },
+  Record: {
+    ".": {
+      name: "RecordFeatureSelection",
+      validateArgs: args => {
+        return (
+          binaryOperator(args) &&
+          args.getIn([0, "type"]) === valueTypes.record &&
+          args.getIn([1, "type"]) === valueTypes.record &&
+          args.getIn([1, "value", "features"]).isEmpty()
+        );
+      },
+    },
+  },
 };
 
 export const allBuiltInTypes = Object.keys(builtIns);

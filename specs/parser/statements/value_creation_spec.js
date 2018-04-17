@@ -5,6 +5,7 @@ import {
   literalRecord,
   literalProcedure,
 } from "../../../app/oz/machine/literals";
+import { operatorExpression } from "../../../app/oz/machine/expressions";
 import {
   valueCreationStatementSyntax,
   skipStatementSyntax,
@@ -107,5 +108,14 @@ describe("Parsing X=VALUE statements", () => {
         ),
       );
     });
+  });
+
+  it("handles rhs expressions", () => {
+    expect(parse("X = 2 + 3")).toEqual(
+      valueCreationStatementSyntax(
+        lexicalIdentifier("X"),
+        operatorExpression("+", literalNumber(2), literalNumber(3)),
+      ),
+    );
   });
 });
