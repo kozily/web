@@ -36,44 +36,44 @@ describe("State initialization", () => {
 
     expect(lookupBuiltInInSigma(sigma, "number")).toEqual(
       valueRecord("Number", {
-        "+": buildVariable("numberaddition", 0),
-        "-": buildVariable("numbersubtraction", 0),
-        "*": buildVariable("numbermultiplication", 0),
-        div: buildVariable("numberdivision", 0),
-        mod: buildVariable("numbermodulo", 0),
+        "+": buildVariable("nsum", 0),
+        "-": buildVariable("nsub", 0),
+        "*": buildVariable("nmul", 0),
+        div: buildVariable("ndiv", 0),
+        mod: buildVariable("nmod", 0),
       }),
     );
-    expect(lookupBuiltInInSigma(sigma, "numberaddition")).toEqual(
+    expect(lookupBuiltInInSigma(sigma, "nsum")).toEqual(
       valueBuiltIn("+", "Number"),
     );
-    expect(lookupBuiltInInSigma(sigma, "numbersubtraction")).toEqual(
+    expect(lookupBuiltInInSigma(sigma, "nsub")).toEqual(
       valueBuiltIn("-", "Number"),
     );
-    expect(lookupBuiltInInSigma(sigma, "numbermultiplication")).toEqual(
+    expect(lookupBuiltInInSigma(sigma, "nmul")).toEqual(
       valueBuiltIn("*", "Number"),
     );
-    expect(lookupBuiltInInSigma(sigma, "numberdivision")).toEqual(
+    expect(lookupBuiltInInSigma(sigma, "ndiv")).toEqual(
       valueBuiltIn("div", "Number"),
     );
-    expect(lookupBuiltInInSigma(sigma, "numbermodulo")).toEqual(
+    expect(lookupBuiltInInSigma(sigma, "nmod")).toEqual(
       valueBuiltIn("mod", "Number"),
     );
 
     expect(lookupBuiltInInSigma(sigma, "float")).toEqual(
       valueRecord("Float", {
-        "/": buildVariable("floatdivision", 0),
+        "/": buildVariable("fdiv", 0),
       }),
     );
-    expect(lookupBuiltInInSigma(sigma, "floatdivision")).toEqual(
+    expect(lookupBuiltInInSigma(sigma, "fdiv")).toEqual(
       valueBuiltIn("/", "Float"),
     );
 
     expect(lookupBuiltInInSigma(sigma, "record")).toEqual(
       valueRecord("Record", {
-        ".": buildVariable("recordfeatureselection", 0),
+        ".": buildVariable("rsel", 0),
       }),
     );
-    expect(lookupBuiltInInSigma(sigma, "recordfeatureselection")).toEqual(
+    expect(lookupBuiltInInSigma(sigma, "rsel")).toEqual(
       valueBuiltIn(".", "Record"),
     );
   });

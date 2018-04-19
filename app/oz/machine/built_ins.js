@@ -1,4 +1,5 @@
 import { valueTypes, valueNumber } from "./values";
+import { lookupVariableInSigma } from "../machine/sigma";
 
 const binaryOperator = args => {
   return args.size === 2;
@@ -12,58 +13,105 @@ const dividendNotZero = args => {
   return args.getIn([1, "value"]) !== 0;
 };
 
-const binaryNumberOperator = (
-  name,
-  operation,
-  additionalArgsValidations = () => true,
-) => {
-  return {
-    name,
-    validateArgs: args =>
-      binaryOperator(args) &&
-      typedOperator(valueTypes.number)(args) &&
-      additionalArgsValidations(args),
-    computeValue: args => {
-      const arg1 = args.get(0);
-      const arg2 = args.get(1);
-      return valueNumber(operation(arg1.get("value"), arg2.get("value")));
-    },
-  };
-};
-
 export const builtIns = {
   Number: {
-    "+": binaryNumberOperator("NumberAddition", (lhs, rhs) => lhs + rhs),
-    "-": binaryNumberOperator("NumberSubtraction", (lhs, rhs) => lhs - rhs),
-    "*": binaryNumberOperator("NumberMultiplication", (lhs, rhs) => lhs * rhs),
-    div: binaryNumberOperator(
-      "NumberDivision",
-      (lhs, rhs) => Math.floor(lhs / rhs),
-      dividendNotZero,
-    ),
-    mod: binaryNumberOperator(
-      "NumberModulo",
-      (lhs, rhs) => lhs % rhs,
-      dividendNotZero,
-    ),
+    "+": {
+      name: "nsum",
+      validateArgs: args =>
+        binaryOperator(args) && typedOperator(valueTypes.number)(args),
+      evaluate: args => {
+        const value = valueNumber(
+          args.getIn([0, "value"]) + args.getIn([1, "value"]),
+        );
+        return { value };
+      },
+    },
+    "-": {
+      name: "nsub",
+      validateArgs: args =>
+        binaryOperator(args) && typedOperator(valueTypes.number)(args),
+      evaluate: args => {
+        const value = valueNumber(
+          args.getIn([0, "value"]) - args.getIn([1, "value"]),
+        );
+        return { value };
+      },
+    },
+    "*": {
+      name: "nmul",
+      validateArgs: args =>
+        binaryOperator(args) && typedOperator(valueTypes.number)(args),
+      evaluate: args => {
+        const value = valueNumber(
+          args.getIn([0, "value"]) * args.getIn([1, "value"]),
+        );
+        return { value };
+      },
+    },
+    div: {
+      name: "ndiv",
+      validateArgs: args =>
+        binaryOperator(args) &&
+        typedOperator(valueTypes.number)(args) &&
+        dividendNotZero(args),
+      evaluate: args => {
+        const value = valueNumber(
+          Math.floor(args.getIn([0, "value"]) / args.getIn([1, "value"])),
+        );
+        return { value };
+      },
+    },
+    mod: {
+      name: "nmod",
+      validateArgs: args =>
+        binaryOperator(args) &&
+        typedOperator(valueTypes.number)(args) &&
+        dividendNotZero(args),
+      evaluate: args => {
+        const value = valueNumber(
+          args.getIn([0, "value"]) % args.getIn([1, "value"]),
+        );
+        return { value };
+      },
+    },
   },
   Float: {
-    "/": binaryNumberOperator(
-      "FloatDivision",
-      (lhs, rhs) => lhs / rhs,
-      dividendNotZero,
-    ),
+    "/": {
+      name: "fdiv",
+      validateArgs: args =>
+        binaryOperator(args) &&
+        typedOperator(valueTypes.number)(args) &&
+        dividendNotZero(args),
+      evaluate: args => {
+        const value = valueNumber(
+          args.getIn([0, "value"]) / args.getIn([1, "value"]),
+        );
+        return { value };
+      },
+    },
   },
   Record: {
     ".": {
-      name: "RecordFeatureSelection",
-      validateArgs: args => {
-        return (
-          binaryOperator(args) &&
-          args.getIn([0, "type"]) === valueTypes.record &&
-          args.getIn([1, "type"]) === valueTypes.record &&
-          args.getIn([1, "value", "features"]).isEmpty()
-        );
+      name: "rsel",
+      validateArgs: args =>
+        binaryOperator(args) &&
+        args.getIn([0, "type"]) === valueTypes.record &&
+        args.getIn([1, "type"]) === valueTypes.record &&
+        args.getIn([1, "value", "features"]).isEmpty() &&
+        !!args.getIn([
+          0,
+          "value",
+          "features",
+          args.getIn([1, "value", "label"]),
+        ]),
+      evaluate: (args, sigma) => {
+        const record = args.getIn([0, "value"]);
+        const feature = args.getIn([1, "value", "label"]);
+
+        const variable = record.getIn(["features", feature]);
+        const value = lookupVariableInSigma(sigma, variable).get("value");
+
+        return { value, variable };
       },
     },
   },

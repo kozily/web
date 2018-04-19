@@ -111,3 +111,15 @@ export const unifyVariableToValue = (sigma, variable, value) => {
       ),
     );
 };
+
+export const unifyVariableToEvaluation = (
+  sigma,
+  variable,
+  expressionEvaluation,
+) => {
+  if (expressionEvaluation.variable) {
+    return unify(sigma, variable, expressionEvaluation.variable);
+  }
+
+  return unifyVariableToValue(sigma, variable, expressionEvaluation.value);
+};

@@ -1,4 +1,5 @@
 import Immutable from "immutable";
+import { literalExpression } from "../../../app/oz/machine/expressions";
 import { lexicalIdentifier } from "../../../app/oz/machine/lexical";
 import {
   literalRecord,
@@ -20,27 +21,31 @@ describe("Parsing literal expressions", () => {
 
   it("parses records successfully", () => {
     expect(parse("person(age:A)")).toEqual(
-      literalRecord("person", {
-        age: lexicalIdentifier("A"),
-      }),
+      literalExpression(
+        literalRecord("person", {
+          age: lexicalIdentifier("A"),
+        }),
+      ),
     );
   });
 
   it("parses atoms successfully", () => {
-    expect(parse("person")).toEqual(literalAtom("person"));
+    expect(parse("person")).toEqual(literalExpression(literalAtom("person")));
   });
 
   it("parses booleans successfully", () => {
-    expect(parse("true")).toEqual(literalBoolean(true));
+    expect(parse("true")).toEqual(literalExpression(literalBoolean(true)));
   });
 
   it("parses numbers successfully", () => {
-    expect(parse("12")).toEqual(literalNumber(12));
+    expect(parse("12")).toEqual(literalExpression(literalNumber(12)));
   });
 
   it("parses procedures successfully", () => {
     expect(parse("proc {$ O} skip end")).toEqual(
-      literalProcedure([lexicalIdentifier("O")], skipStatementSyntax()),
+      literalExpression(
+        literalProcedure([lexicalIdentifier("O")], skipStatementSyntax()),
+      ),
     );
   });
 });

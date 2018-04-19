@@ -6,6 +6,7 @@ import {
   sequenceStatement,
 } from "../../app/oz/machine/statements";
 import { lexicalIdentifier } from "../../app/oz/machine/lexical";
+import { literalExpression } from "../../app/oz/machine/expressions";
 import {
   literalNumber,
   literalRecord,
@@ -21,7 +22,7 @@ describe("Collecting free identifiers in a value creation statement", () => {
     it("collects the lhs identifier", () => {
       const statement = valueCreationStatement(
         lexicalIdentifier("X"),
-        literalNumber(155),
+        literalExpression(literalNumber(155)),
       );
 
       expect(collectFreeIdentifiers(statement)).toEqual(Immutable.Set(["X"]));
@@ -32,10 +33,12 @@ describe("Collecting free identifiers in a value creation statement", () => {
     it("collects the lhs identifier and all the identifiers in the record", () => {
       const statement = valueCreationStatement(
         lexicalIdentifier("X"),
-        literalRecord("person", {
-          age: lexicalIdentifier("A"),
-          name: lexicalIdentifier("N"),
-        }),
+        literalExpression(
+          literalRecord("person", {
+            age: lexicalIdentifier("A"),
+            name: lexicalIdentifier("N"),
+          }),
+        ),
       );
 
       expect(collectFreeIdentifiers(statement)).toEqual(
@@ -48,11 +51,13 @@ describe("Collecting free identifiers in a value creation statement", () => {
     it("collects the lhs identifier and all the identifiers in the procedure", () => {
       const statement = valueCreationStatement(
         lexicalIdentifier("X"),
-        literalProcedure(
-          [lexicalIdentifier("A"), lexicalIdentifier("B")],
-          sequenceStatement(
-            bindingStatement(lexicalIdentifier("Y"), lexicalIdentifier("A")),
-            bindingStatement(lexicalIdentifier("B"), lexicalIdentifier("Z")),
+        literalExpression(
+          literalProcedure(
+            [lexicalIdentifier("A"), lexicalIdentifier("B")],
+            sequenceStatement(
+              bindingStatement(lexicalIdentifier("Y"), lexicalIdentifier("A")),
+              bindingStatement(lexicalIdentifier("B"), lexicalIdentifier("Z")),
+            ),
           ),
         ),
       );

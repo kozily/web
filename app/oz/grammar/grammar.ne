@@ -79,7 +79,7 @@ stm_binding -> ids_identifier _ "=" _ ids_identifier {%
 
 stm_value_creation -> ids_identifier _ "=" _ exp_expression {%
   function(d, position, reject) {
-    if (d[4].node === "identifier") {
+    if (d[4].type === "identifier") {
       return reject;
     }
     return {
@@ -183,7 +183,10 @@ exp_expression ->
 
 exp_sum ->
     exp_product {% id %}
-  | exp_sum _ ("+"|"-") _ exp_product {% function(d) {
+  | exp_sum_term {% id %}
+
+exp_sum_term -> exp_sum _ ("+"|"-") _ exp_product {%
+  function(d) {
     return {
       node: "expression",
       type: "operator",
@@ -191,11 +194,15 @@ exp_sum ->
       lhs: d[0],
       rhs: d[4],
     };
-  } %}
+  }
+%}
 
 exp_product ->
     exp_terminal {% id %}
-  | exp_product _ ("*"|"div"|"mod"|"/") _ exp_terminal {% function(d) {
+  | exp_product_term {% id %}
+
+exp_product_term -> exp_product _ ("*"|"div"|"mod"|"/") _ exp_terminal {%
+  function(d) {
     return {
       node: "expression",
       type: "operator",
@@ -203,12 +210,35 @@ exp_product ->
       lhs: d[0],
       rhs: d[4],
     };
-  } %}
+  }
+%}
 
 exp_terminal ->
-    ids_identifier {% id %}
-  | lit_value {% id %}
-  | "(" _ exp_expression _ ")" {% nth(2) %}
+    exp_terminal_identifier {% id %}
+  | exp_terminal_literal {% id %}
+  | exp_terminal_paren {% id %}
+
+exp_terminal_identifier -> ids_identifier {%
+  function(d) {
+    return {
+      node: "expression",
+      type: "identifier",
+      identifier: d[0],
+    };
+  }
+%}
+
+exp_terminal_literal -> lit_value {%
+  function (d) {
+    return {
+      node: "expression",
+      type: "literal",
+      literal: d[0],
+    };
+  }
+%}
+
+exp_terminal_paren -> "(" _ exp_expression _ ")" {% nth(2) %}
 
 ##############################################################################
 # IDS - IDENTIFIERS

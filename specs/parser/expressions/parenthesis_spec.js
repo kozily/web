@@ -1,20 +1,28 @@
 import Immutable from "immutable";
 import { literalNumber } from "../../../app/oz/machine/literals";
 import { lexicalIdentifier } from "../../../app/oz/machine/lexical";
-import { operatorExpression } from "../../../app/oz/machine/expressions";
+import {
+  operatorExpression,
+  identifierExpression,
+  literalExpression,
+} from "../../../app/oz/machine/expressions";
 import { parserFor } from "../../../app/oz/parser";
 import expressionsGrammar from "../../../app/oz/grammar/expressions.ne";
 
 const parse = parserFor(expressionsGrammar);
 
-describe("Parsing identifiers expressions", () => {
+describe("Parsing parenthesis expressions", () => {
   beforeEach(() => {
     jasmine.addCustomEqualityTester(Immutable.is);
   });
 
   it("parses a root parenthesis expression successfully", () => {
     expect(parse("( A + B )")).toEqual(
-      operatorExpression("+", lexicalIdentifier("A"), lexicalIdentifier("B")),
+      operatorExpression(
+        "+",
+        identifierExpression(lexicalIdentifier("A")),
+        identifierExpression(lexicalIdentifier("B")),
+      ),
     );
   });
 
@@ -22,8 +30,12 @@ describe("Parsing identifiers expressions", () => {
     expect(parse("( A + B ) * C")).toEqual(
       operatorExpression(
         "*",
-        operatorExpression("+", lexicalIdentifier("A"), lexicalIdentifier("B")),
-        lexicalIdentifier("C"),
+        operatorExpression(
+          "+",
+          identifierExpression(lexicalIdentifier("A")),
+          identifierExpression(lexicalIdentifier("B")),
+        ),
+        identifierExpression(lexicalIdentifier("C")),
       ),
     );
   });
@@ -34,14 +46,14 @@ describe("Parsing identifiers expressions", () => {
         "*",
         operatorExpression(
           "+",
-          lexicalIdentifier("A"),
+          identifierExpression(lexicalIdentifier("A")),
           operatorExpression(
             "+",
-            lexicalIdentifier("B"),
-            lexicalIdentifier("C"),
+            identifierExpression(lexicalIdentifier("B")),
+            identifierExpression(lexicalIdentifier("C")),
           ),
         ),
-        literalNumber(2),
+        literalExpression(literalNumber(2)),
       ),
     );
   });

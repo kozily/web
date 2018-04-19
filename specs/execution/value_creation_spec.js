@@ -2,6 +2,7 @@ import Immutable from "immutable";
 import { valueCreationStatement } from "../../app/oz/machine/statements";
 import { lexicalIdentifier } from "../../app/oz/machine/lexical";
 import { literalNumber } from "../../app/oz/machine/literals";
+import { literalExpression } from "../../app/oz/machine/expressions";
 import { valueNumber } from "../../app/oz/machine/values";
 import { failureException } from "../../app/oz/machine/exceptions";
 import { buildSystemExceptionState } from "./helpers";
@@ -33,7 +34,10 @@ describe("Reducing X=VALUE statements", () => {
       });
 
       const statement = buildSemanticStatement(
-        valueCreationStatement(lexicalIdentifier("X"), literalNumber(155)),
+        valueCreationStatement(
+          lexicalIdentifier("X"),
+          literalExpression(literalNumber(155)),
+        ),
         buildEnvironment({
           X: buildVariable("x", 0),
         }),
@@ -63,7 +67,10 @@ describe("Reducing X=VALUE statements", () => {
       });
 
       const statement = buildSemanticStatement(
-        valueCreationStatement(lexicalIdentifier("X"), literalNumber(155)),
+        valueCreationStatement(
+          lexicalIdentifier("X"),
+          literalExpression(literalNumber(155)),
+        ),
         buildEnvironment({
           X: buildVariable("x", 0),
         }),

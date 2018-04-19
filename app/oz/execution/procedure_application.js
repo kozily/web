@@ -1,4 +1,7 @@
-import { lookupVariableInSigma, unifyVariableToValue } from "../machine/sigma";
+import {
+  lookupVariableInSigma,
+  unifyVariableToEvaluation,
+} from "../machine/sigma";
 import { buildSemanticStatement } from "../machine/build";
 import {
   failureException,
@@ -59,10 +62,10 @@ export default function(state, semanticStatement, activeThreadIndex) {
       return raiseSystemException(state, activeThreadIndex, errorException());
     }
 
-    const newValue = builtIn.computeValue(argsValues);
+    const evaluationResult = builtIn.evaluate(argsValues, sigma);
     try {
       return state.update("sigma", sigma =>
-        unifyVariableToValue(sigma, resultVariable, newValue),
+        unifyVariableToEvaluation(sigma, resultVariable, evaluationResult),
       );
     } catch (error) {
       return raiseSystemException(state, activeThreadIndex, failureException());
