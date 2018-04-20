@@ -58,6 +58,7 @@ export const printers = {
 };
 
 export const print = (node, identation = 0) => {
+  if (!node) return { full: "", abbreviated: "" };
   const printer = printers[node.get("node")][node.get("type")];
   return printer(print, node, identation);
 };

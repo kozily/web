@@ -48,6 +48,7 @@ export const compilers = {
 };
 
 export const compile = node => {
+  if (!node) return null;
   const compiler = compilers[node.get("node")][node.get("type")];
   return compiler(compile, node);
 };
