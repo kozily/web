@@ -1,5 +1,5 @@
 import Immutable from "immutable";
-import { builtIns } from "../machine/built_ins";
+import { builtIns } from "../built_ins";
 
 export default (recurse, expression, environment, sigma) => {
   const operator = expression.get("operator");

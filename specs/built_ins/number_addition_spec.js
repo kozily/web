@@ -1,5 +1,5 @@
 import Immutable from "immutable";
-import { builtIns } from "../../app/oz/machine/built_ins";
+import { builtIns } from "../../app/oz/built_ins";
 import { valueNumber, valueAtom } from "../../app/oz/machine/values";
 
 const operator = builtIns["Number"]["+"];

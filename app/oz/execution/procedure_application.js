@@ -8,7 +8,7 @@ import {
   errorException,
   raiseSystemException,
 } from "../machine/exceptions";
-import { builtIns } from "../machine/built_ins";
+import { builtIns } from "../built_ins";
 import { blockCurrentThread } from "../machine/threads";
 
 export default function(state, semanticStatement, activeThreadIndex) {
