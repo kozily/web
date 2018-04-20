@@ -97,6 +97,10 @@ describe("State initialization", () => {
       valueRecord("Value", {
         "==": buildVariable("veq", 0),
         "\\=": buildVariable("vneq", 0),
+        "<": buildVariable("vlt", 0),
+        "<=": buildVariable("vle", 0),
+        ">": buildVariable("vgt", 0),
+        ">=": buildVariable("vge", 0),
       }),
     );
     expect(lookupBuiltInInSigma(sigma, "veq")).toEqual(
@@ -104,6 +108,18 @@ describe("State initialization", () => {
     );
     expect(lookupBuiltInInSigma(sigma, "vneq")).toEqual(
       valueBuiltIn("\\=", "Value"),
+    );
+    expect(lookupBuiltInInSigma(sigma, "vlt")).toEqual(
+      valueBuiltIn("<", "Value"),
+    );
+    expect(lookupBuiltInInSigma(sigma, "vle")).toEqual(
+      valueBuiltIn("<=", "Value"),
+    );
+    expect(lookupBuiltInInSigma(sigma, "vgt")).toEqual(
+      valueBuiltIn(">", "Value"),
+    );
+    expect(lookupBuiltInInSigma(sigma, "vge")).toEqual(
+      valueBuiltIn(">=", "Value"),
     );
   });
 });
