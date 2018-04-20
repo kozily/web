@@ -27,4 +27,17 @@ describe("Evaluating identifier expressions", () => {
     expect(result.value).toEqual(valueNumber(10));
     expect(result.variable).toEqual(buildVariable("a", 0));
   });
+
+  it("evaluates to undefined if the stored value is undefined", () => {
+    const expression = identifierExpression(lexicalIdentifier("A"));
+    const environment = buildEnvironment({
+      A: buildVariable("a", 0),
+    });
+    const sigma = buildSigma(
+      buildEquivalenceClass(undefined, buildVariable("a", 0)),
+    );
+    const result = evaluate(expression, environment, sigma);
+    expect(result.value).toEqual(undefined);
+    expect(result.variable).toEqual(buildVariable("a", 0));
+  });
 });

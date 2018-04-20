@@ -20,9 +20,15 @@ export const builtIns = {
       validateArgs: args =>
         binaryOperator(args) && typedOperator(valueTypes.number)(args),
       evaluate: args => {
-        const value = valueNumber(
-          args.getIn([0, "value"]) + args.getIn([1, "value"]),
-        );
+        const lhs = args.getIn([0, "value"]);
+        const rhs = args.getIn([1, "value"]);
+        if (!lhs) {
+          return { missingArg: 0 };
+        }
+        if (!rhs) {
+          return { missingArg: 1 };
+        }
+        const value = valueNumber(lhs + rhs);
         return { value };
       },
     },
@@ -31,9 +37,15 @@ export const builtIns = {
       validateArgs: args =>
         binaryOperator(args) && typedOperator(valueTypes.number)(args),
       evaluate: args => {
-        const value = valueNumber(
-          args.getIn([0, "value"]) - args.getIn([1, "value"]),
-        );
+        const lhs = args.getIn([0, "value"]);
+        const rhs = args.getIn([1, "value"]);
+        if (!lhs) {
+          return { missingArg: 0 };
+        }
+        if (!rhs) {
+          return { missingArg: 1 };
+        }
+        const value = valueNumber(lhs - rhs);
         return { value };
       },
     },
@@ -42,9 +54,15 @@ export const builtIns = {
       validateArgs: args =>
         binaryOperator(args) && typedOperator(valueTypes.number)(args),
       evaluate: args => {
-        const value = valueNumber(
-          args.getIn([0, "value"]) * args.getIn([1, "value"]),
-        );
+        const lhs = args.getIn([0, "value"]);
+        const rhs = args.getIn([1, "value"]);
+        if (!lhs) {
+          return { missingArg: 0 };
+        }
+        if (!rhs) {
+          return { missingArg: 1 };
+        }
+        const value = lhs && rhs ? valueNumber(lhs * rhs) : undefined;
         return { value };
       },
     },
@@ -55,9 +73,16 @@ export const builtIns = {
         typedOperator(valueTypes.number)(args) &&
         dividendNotZero(args),
       evaluate: args => {
-        const value = valueNumber(
-          Math.floor(args.getIn([0, "value"]) / args.getIn([1, "value"])),
-        );
+        const lhs = args.getIn([0, "value"]);
+        const rhs = args.getIn([1, "value"]);
+        if (!lhs) {
+          return { missingArg: 0 };
+        }
+        if (!rhs) {
+          return { missingArg: 1 };
+        }
+        const value =
+          lhs && rhs ? valueNumber(Math.floor(lhs / rhs)) : undefined;
         return { value };
       },
     },
@@ -68,9 +93,15 @@ export const builtIns = {
         typedOperator(valueTypes.number)(args) &&
         dividendNotZero(args),
       evaluate: args => {
-        const value = valueNumber(
-          args.getIn([0, "value"]) % args.getIn([1, "value"]),
-        );
+        const lhs = args.getIn([0, "value"]);
+        const rhs = args.getIn([1, "value"]);
+        if (!lhs) {
+          return { missingArg: 0 };
+        }
+        if (!rhs) {
+          return { missingArg: 1 };
+        }
+        const value = valueNumber(lhs % rhs);
         return { value };
       },
     },
@@ -83,9 +114,15 @@ export const builtIns = {
         typedOperator(valueTypes.number)(args) &&
         dividendNotZero(args),
       evaluate: args => {
-        const value = valueNumber(
-          args.getIn([0, "value"]) / args.getIn([1, "value"]),
-        );
+        const lhs = args.getIn([0, "value"]);
+        const rhs = args.getIn([1, "value"]);
+        if (!lhs) {
+          return { missingArg: 0 };
+        }
+        if (!rhs) {
+          return { missingArg: 1 };
+        }
+        const value = valueNumber(lhs / rhs);
         return { value };
       },
     },
@@ -107,10 +144,14 @@ export const builtIns = {
       evaluate: (args, sigma) => {
         const record = args.getIn([0, "value"]);
         const feature = args.getIn([1, "value", "label"]);
-
+        if (!record) {
+          return { missingArg: 0 };
+        }
+        if (!feature) {
+          return { missingArg: 1 };
+        }
         const variable = record.getIn(["features", feature]);
         const value = lookupVariableInSigma(sigma, variable).get("value");
-
         return { value, variable };
       },
     },

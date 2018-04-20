@@ -198,10 +198,10 @@ exp_sum_term -> exp_sum _ ("+"|"-") _ exp_product {%
 %}
 
 exp_product ->
-    exp_terminal {% id %}
+    exp_feature_selection {% id %}
   | exp_product_term {% id %}
 
-exp_product_term -> exp_product _ ("*"|"div"|"mod"|"/") _ exp_terminal {%
+exp_product_term -> exp_product _ ("*"|"div"|"mod"|"/") _ exp_feature_selection {%
   function(d) {
     return {
       node: "expression",
@@ -209,6 +209,22 @@ exp_product_term -> exp_product _ ("*"|"div"|"mod"|"/") _ exp_terminal {%
       operator: d[2][0],
       lhs: d[0],
       rhs: d[4],
+    };
+  }
+%}
+
+exp_feature_selection ->
+    exp_terminal {% id %}
+  | exp_feature_selection_term {% id %}
+
+exp_feature_selection_term -> exp_feature_selection "." exp_terminal {%
+  function(d, position, reject) {
+    return {
+      node: "expression",
+      type: "operator",
+      operator: ".",
+      lhs: d[0],
+      rhs: d[2],
     };
   }
 %}

@@ -8,13 +8,11 @@ import {
 import { lexicalIdentifier } from "../../app/oz/machine/lexical";
 import { literalNumber, literalRecord } from "../../app/oz/machine/literals";
 import { errorException } from "../../app/oz/machine/exceptions";
-import { buildSystemExceptionState } from "./helpers";
+import { buildSystemExceptionState, buildBlockedState } from "./helpers";
 import {
-  threadStatus,
   buildSingleThreadedState,
   buildSemanticStatement,
   buildSigma,
-  buildThreadMetadata,
   buildEquivalenceClass,
   buildVariable,
   buildEnvironment,
@@ -261,17 +259,7 @@ describe("Reducing if statements", () => {
       );
 
       expect(reduce(state, statement, 0)).toEqual(
-        buildSingleThreadedState({
-          threadMetadata: buildThreadMetadata({
-            status: threadStatus.blocked,
-            waitCondition: buildVariable("x", 0),
-          }),
-          semanticStatements: [
-            statement,
-            buildSemanticStatement(skipStatement()),
-          ],
-          sigma: state.get("sigma"),
-        }),
+        buildBlockedState(state, statement, 0, buildVariable("x", 0)),
       );
     });
   });
