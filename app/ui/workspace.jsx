@@ -2,17 +2,15 @@ import React from "react";
 import Code from "./code";
 import Runtime from "./runtime";
 import { Grid, Container } from "semantic-ui-react";
+import { connect } from "react-redux";
 
-export const Workspace = () => {
+export const Workspace = props => {
   return (
     <Container fluid>
       <Grid padded>
         <Grid.Row>
-          <Grid.Column width={4}>
-            <Code />
-          </Grid.Column>
-          <Grid.Column width={12}>
-            <Runtime />
+          <Grid.Column>
+            {props.activeItem === "code" ? <Code /> : <Runtime />}
           </Grid.Column>
         </Grid.Row>
       </Grid>
@@ -20,4 +18,8 @@ export const Workspace = () => {
   );
 };
 
-export default Workspace;
+const mapStateToProps = state => ({
+  activeItem: state.getIn(["tabs", "activeItem"]),
+});
+
+export default connect(mapStateToProps)(Workspace);
