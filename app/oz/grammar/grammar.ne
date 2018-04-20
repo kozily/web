@@ -179,7 +179,23 @@ stm_by_need -> "{" _ "ByNeed" __ ids_identifier __ ids_identifier _ "}" {%
 # EXP - EXPRESSIONS
 ##############################################################################
 exp_expression ->
+    exp_comparison {% id %}
+
+exp_comparison ->
     exp_sum {% id %}
+  | exp_comparison_term {% id %}
+
+exp_comparison_term -> exp_sum _ ("=="|"\\="|"<"|"<="|">"|">=") _ exp_sum {%
+  function(d) {
+    return {
+      node: "expression",
+      type: "operator",
+      operator: d[2][0],
+      lhs: d[0],
+      rhs: d[4],
+    };
+  }
+%}
 
 exp_sum ->
     exp_product {% id %}
