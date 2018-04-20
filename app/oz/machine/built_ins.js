@@ -62,7 +62,7 @@ export const builtIns = {
         if (!rhs) {
           return { missingArg: 1 };
         }
-        const value = lhs && rhs ? valueNumber(lhs * rhs) : undefined;
+        const value = valueNumber(lhs * rhs);
         return { value };
       },
     },
@@ -81,8 +81,7 @@ export const builtIns = {
         if (!rhs) {
           return { missingArg: 1 };
         }
-        const value =
-          lhs && rhs ? valueNumber(Math.floor(lhs / rhs)) : undefined;
+        const value = valueNumber(Math.floor(lhs / rhs));
         return { value };
       },
     },
