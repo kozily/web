@@ -8,6 +8,7 @@ import {
   valueCreationStatement,
   skipStatement,
 } from "../../app/oz/machine/statements";
+import { literalExpression } from "../../app/oz/machine/expressions";
 import { lexicalIdentifier } from "../../app/oz/machine/lexical";
 import { literalNumber, literalProcedure } from "../../app/oz/machine/literals";
 
@@ -19,24 +20,31 @@ describe("Compiling value creation statements", () => {
   it("compiles appropriately when using simple values", () => {
     const statement = valueCreationStatementSyntax(
       lexicalIdentifier("X"),
-      literalNumber(3),
+      literalExpression(literalNumber(3)),
     );
 
     expect(compile(statement)).toEqual(
-      valueCreationStatement(lexicalIdentifier("X"), literalNumber(3)),
+      valueCreationStatement(
+        lexicalIdentifier("X"),
+        literalExpression(literalNumber(3)),
+      ),
     );
   });
 
   it("compiles appropriately when using procedures", () => {
     const statement = valueCreationStatementSyntax(
       lexicalIdentifier("X"),
-      literalProcedure([lexicalIdentifier("X")], skipStatementSyntax()),
+      literalExpression(
+        literalProcedure([lexicalIdentifier("X")], skipStatementSyntax()),
+      ),
     );
 
     expect(compile(statement)).toEqual(
       valueCreationStatement(
         lexicalIdentifier("X"),
-        literalProcedure([lexicalIdentifier("X")], skipStatement()),
+        literalExpression(
+          literalProcedure([lexicalIdentifier("X")], skipStatement()),
+        ),
       ),
     );
   });

@@ -1,9 +1,5 @@
 import Immutable from "immutable";
-import {
-  lexicalIdentifier,
-  lexicalRecordSelection,
-} from "../../../app/oz/machine/lexical";
-import { literalRecord } from "../../../app/oz/machine/literals";
+import { lexicalIdentifier } from "../../../app/oz/machine/lexical";
 import { procedureApplicationStatementSyntax } from "../../../app/oz/machine/statementSyntax";
 import parse from "../../../app/oz/parser";
 
@@ -47,20 +43,6 @@ describe("Parsing {X ...} statements", () => {
       ).toEqual(
         procedureApplicationStatementSyntax(
           lexicalIdentifier("SomeProcedure"),
-          [
-            lexicalIdentifier("FirstArgument"),
-            lexicalIdentifier("SecondArgument"),
-          ],
-        ),
-      );
-    });
-
-    it("handles module syntax correctly", () => {
-      expect(
-        parse("{\n   Record.'.' \t   FirstArgument      SecondArgument\n\t}"),
-      ).toEqual(
-        procedureApplicationStatementSyntax(
-          lexicalRecordSelection("Record", literalRecord(".")),
           [
             lexicalIdentifier("FirstArgument"),
             lexicalIdentifier("SecondArgument"),

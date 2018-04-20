@@ -1,10 +1,15 @@
 import Immutable from "immutable";
 import { valueCreationStatement } from "../../app/oz/machine/statements";
 import { lexicalIdentifier } from "../../app/oz/machine/lexical";
-import { literalNumber } from "../../app/oz/machine/literals";
-import { valueNumber } from "../../app/oz/machine/values";
+import { literalNumber, literalAtom } from "../../app/oz/machine/literals";
+import {
+  literalExpression,
+  identifierExpression,
+  operatorExpression,
+} from "../../app/oz/machine/expressions";
+import { valueNumber, valueRecord } from "../../app/oz/machine/values";
 import { failureException } from "../../app/oz/machine/exceptions";
-import { buildSystemExceptionState } from "./helpers";
+import { buildSystemExceptionState, buildBlockedState } from "./helpers";
 import {
   buildSingleThreadedState,
   buildSemanticStatement,
@@ -33,7 +38,10 @@ describe("Reducing X=VALUE statements", () => {
       });
 
       const statement = buildSemanticStatement(
-        valueCreationStatement(lexicalIdentifier("X"), literalNumber(155)),
+        valueCreationStatement(
+          lexicalIdentifier("X"),
+          literalExpression(literalNumber(155)),
+        ),
         buildEnvironment({
           X: buildVariable("x", 0),
         }),
@@ -63,7 +71,10 @@ describe("Reducing X=VALUE statements", () => {
       });
 
       const statement = buildSemanticStatement(
-        valueCreationStatement(lexicalIdentifier("X"), literalNumber(155)),
+        valueCreationStatement(
+          lexicalIdentifier("X"),
+          literalExpression(literalNumber(155)),
+        ),
         buildEnvironment({
           X: buildVariable("x", 0),
         }),
@@ -84,6 +95,154 @@ describe("Reducing X=VALUE statements", () => {
             ),
           ),
         }),
+      );
+    });
+  });
+
+  describe("when the value is an expression", () => {
+    it("executes correctly when the expression returns a variable but not a value", () => {
+      const state = buildSingleThreadedState({
+        sigma: buildSigma(
+          buildEquivalenceClass(undefined, buildVariable("x", 0)),
+          buildEquivalenceClass(
+            valueRecord("person", { age: buildVariable("a", 0) }),
+            buildVariable("p", 0),
+          ),
+          buildEquivalenceClass(undefined, buildVariable("a", 0)),
+        ),
+      });
+
+      const statement = buildSemanticStatement(
+        valueCreationStatement(
+          lexicalIdentifier("X"),
+          operatorExpression(
+            ".",
+            identifierExpression(lexicalIdentifier("P")),
+            literalExpression(literalAtom("age")),
+          ),
+        ),
+        buildEnvironment({
+          P: buildVariable("p", 0),
+          X: buildVariable("x", 0),
+        }),
+      );
+
+      expect(reduce(state, statement, 0)).toEqual(
+        buildSingleThreadedState({
+          sigma: buildSigma(
+            buildEquivalenceClass(
+              undefined,
+              buildVariable("x", 0),
+              buildVariable("a", 0),
+            ),
+            buildEquivalenceClass(
+              valueRecord("person", { age: buildVariable("a", 0) }),
+              buildVariable("p", 0),
+            ),
+          ),
+        }),
+      );
+    });
+
+    it("executes correctly when the expression returns a variable and a value", () => {
+      const state = buildSingleThreadedState({
+        sigma: buildSigma(
+          buildEquivalenceClass(undefined, buildVariable("x", 0)),
+          buildEquivalenceClass(
+            valueRecord("person", { age: buildVariable("a", 0) }),
+            buildVariable("p", 0),
+          ),
+          buildEquivalenceClass(valueNumber(3), buildVariable("a", 0)),
+        ),
+      });
+
+      const statement = buildSemanticStatement(
+        valueCreationStatement(
+          lexicalIdentifier("X"),
+          operatorExpression(
+            ".",
+            identifierExpression(lexicalIdentifier("P")),
+            literalExpression(literalAtom("age")),
+          ),
+        ),
+        buildEnvironment({
+          P: buildVariable("p", 0),
+          X: buildVariable("x", 0),
+        }),
+      );
+
+      expect(reduce(state, statement, 0)).toEqual(
+        buildSingleThreadedState({
+          sigma: buildSigma(
+            buildEquivalenceClass(
+              valueNumber(3),
+              buildVariable("x", 0),
+              buildVariable("a", 0),
+            ),
+            buildEquivalenceClass(
+              valueRecord("person", { age: buildVariable("a", 0) }),
+              buildVariable("p", 0),
+            ),
+          ),
+        }),
+      );
+    });
+
+    it("executes correctly when the expression returns a value but not a variable", () => {
+      const state = buildSingleThreadedState({
+        sigma: buildSigma(
+          buildEquivalenceClass(undefined, buildVariable("x", 0)),
+        ),
+      });
+
+      const statement = buildSemanticStatement(
+        valueCreationStatement(
+          lexicalIdentifier("X"),
+          operatorExpression(
+            "+",
+            literalExpression(literalNumber(3)),
+            literalExpression(literalNumber(5)),
+          ),
+        ),
+        buildEnvironment({
+          X: buildVariable("x", 0),
+        }),
+      );
+
+      expect(reduce(state, statement, 0)).toEqual(
+        buildSingleThreadedState({
+          sigma: buildSigma(
+            buildEquivalenceClass(valueNumber(8), buildVariable("x", 0)),
+          ),
+        }),
+      );
+    });
+
+    it("blocks the current thread if the whole expression is undefined", () => {
+      const state = buildSingleThreadedState({
+        sigma: buildSigma(
+          buildEquivalenceClass(undefined, buildVariable("x", 0)),
+          buildEquivalenceClass(undefined, buildVariable("y", 0)),
+        ),
+      });
+
+      const statement = buildSemanticStatement(
+        valueCreationStatement(
+          lexicalIdentifier("X"),
+          operatorExpression(
+            "+",
+            identifierExpression(lexicalIdentifier("Y")),
+            literalExpression(literalNumber(5)),
+          ),
+        ),
+        buildEnvironment({
+          X: buildVariable("x", 0),
+          Y: buildVariable("y", 0),
+        }),
+      );
+
+      expect(reduce(state, statement, 0)).toEqual(
+        buildBlockedState(state, statement, 0, buildVariable("y", 0)),
       );
     });
   });

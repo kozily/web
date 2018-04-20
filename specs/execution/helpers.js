@@ -1,5 +1,6 @@
 import { exceptionRaiseStatement } from "../../app/oz/machine/statements";
 import {
+  threadStatus,
   buildSemanticStatement,
   buildEquivalenceClass,
   buildVariable,
@@ -12,7 +13,7 @@ export const buildSystemExceptionState = (
   activeThreadIndex,
   exception,
 ) => {
-  const aux = getLastAuxiliaryIdentifier();
+  const aux = getLastAuxiliaryIdentifier("system_exception");
   const auxIdentifier = aux.get("identifier");
   return state
     .updateIn(["threads", activeThreadIndex, "stack"], stack =>
@@ -29,5 +30,22 @@ export const buildSystemExceptionState = (
       sigma.add(
         buildEquivalenceClass(exception, buildVariable(auxIdentifier, 0)),
       ),
+    );
+};
+
+export const buildBlockedState = (
+  state,
+  statement,
+  activeThreadIndex,
+  waitCondition,
+) => {
+  return state
+    .updateIn(["threads", activeThreadIndex, "stack"], stack =>
+      stack.push(statement),
+    )
+    .updateIn(["threads", activeThreadIndex, "metadata"], metadata =>
+      metadata
+        .set("status", threadStatus.blocked)
+        .set("waitCondition", waitCondition),
     );
 };

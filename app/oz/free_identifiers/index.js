@@ -1,5 +1,6 @@
 import { statementTypes } from "../machine/statements";
-import { valueTypes } from "../machine/values";
+import { literalTypes } from "../machine/literals";
+import { expressionTypes } from "../machine/expressions";
 import skip from "./skip";
 import binding from "./binding";
 import sequence from "./sequence";
@@ -16,6 +17,9 @@ import byNeed from "./by_need";
 import number from "./number";
 import record from "./record";
 import procedure from "./procedure";
+import literalExpression from "./literal_expression";
+import identifierExpression from "./identifier_expression";
+import operatorExpression from "./operator_expression";
 
 export const collectors = {
   statement: {
@@ -34,9 +38,14 @@ export const collectors = {
     [statementTypes.byNeed]: byNeed,
   },
   literal: {
-    [valueTypes.number]: number,
-    [valueTypes.record]: record,
-    [valueTypes.procedure]: procedure,
+    [literalTypes.number]: number,
+    [literalTypes.record]: record,
+    [literalTypes.procedure]: procedure,
+  },
+  expression: {
+    [expressionTypes.literal]: literalExpression,
+    [expressionTypes.identifier]: identifierExpression,
+    [expressionTypes.operator]: operatorExpression,
   },
 };
 

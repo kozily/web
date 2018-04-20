@@ -1,5 +1,6 @@
 import { statementSyntaxTypes } from "../machine/statementSyntax";
-import { valueTypes } from "../machine/values";
+import { literalTypes } from "../machine/literals";
+import { expressionTypes } from "../machine/expressions";
 import skip from "./skip";
 import binding from "./binding";
 import sequence from "./sequence";
@@ -12,10 +13,12 @@ import exceptionContext from "./exception_context";
 import exceptionRaise from "./exception_raise";
 import thread from "./thread";
 import byNeed from "./by_need";
-import operator from "./operator";
 import number from "./number";
 import record from "./record";
 import procedure from "./procedure";
+import literalExpression from "./literal_expression";
+import identifierExpression from "./identifier_expression";
+import operatorExpression from "./operator_expression";
 
 export const compilers = {
   statement: {
@@ -29,14 +32,18 @@ export const compilers = {
     [statementSyntaxTypes.procedureApplicationSyntax]: procedureApplication,
     [statementSyntaxTypes.exceptionContextSyntax]: exceptionContext,
     [statementSyntaxTypes.exceptionRaiseSyntax]: exceptionRaise,
-    [statementSyntaxTypes.operatorSyntax]: operator,
     [statementSyntaxTypes.threadSyntax]: thread,
     [statementSyntaxTypes.byNeedSyntax]: byNeed,
   },
   literal: {
-    [valueTypes.number]: number,
-    [valueTypes.record]: record,
-    [valueTypes.procedure]: procedure,
+    [literalTypes.number]: number,
+    [literalTypes.record]: record,
+    [literalTypes.procedure]: procedure,
+  },
+  expression: {
+    [expressionTypes.literal]: literalExpression,
+    [expressionTypes.identifier]: identifierExpression,
+    [expressionTypes.operator]: operatorExpression,
   },
 };
 

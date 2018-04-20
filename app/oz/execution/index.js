@@ -14,22 +14,27 @@ import thread from "./thread";
 import byNeed from "./by_need";
 
 export const executors = {
-  [statementTypes.skip]: skip,
-  [statementTypes.sequence]: sequence,
-  [statementTypes.local]: local,
-  [statementTypes.binding]: binding,
-  [statementTypes.valueCreation]: valueCreation,
-  [statementTypes.conditional]: conditional,
-  [statementTypes.patternMatching]: patternMatching,
-  [statementTypes.procedureApplication]: procedureApplication,
-  [statementTypes.exceptionContext]: exceptionContext,
-  [statementTypes.exceptionRaise]: exceptionRaise,
-  [statementTypes.exceptionCatch]: exceptionCatch,
-  [statementTypes.thread]: thread,
-  [statementTypes.byNeed]: byNeed,
+  statement: {
+    [statementTypes.skip]: skip,
+    [statementTypes.sequence]: sequence,
+    [statementTypes.local]: local,
+    [statementTypes.binding]: binding,
+    [statementTypes.valueCreation]: valueCreation,
+    [statementTypes.conditional]: conditional,
+    [statementTypes.patternMatching]: patternMatching,
+    [statementTypes.procedureApplication]: procedureApplication,
+    [statementTypes.exceptionContext]: exceptionContext,
+    [statementTypes.exceptionRaise]: exceptionRaise,
+    [statementTypes.exceptionCatch]: exceptionCatch,
+    [statementTypes.thread]: thread,
+    [statementTypes.byNeed]: byNeed,
+  },
 };
 
 export const execute = (state, semanticStatement, activeThreadIndex) => {
-  const executor = executors[semanticStatement.getIn(["statement", "type"])];
+  const statement = semanticStatement.get("statement");
+  const node = statement.get("node");
+  const type = statement.get("type");
+  const executor = executors[node][type];
   return executor(state, semanticStatement, activeThreadIndex);
 };

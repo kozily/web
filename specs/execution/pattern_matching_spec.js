@@ -4,14 +4,13 @@ import {
   sequenceStatement,
   patternMatchingStatement,
 } from "../../app/oz/machine/statements";
+import { buildBlockedState } from "./helpers";
 import { lexicalIdentifier } from "../../app/oz/machine/lexical";
 import { literalNumber, literalRecord } from "../../app/oz/machine/literals";
 import {
-  threadStatus,
   buildSingleThreadedState,
   buildSemanticStatement,
   buildSigma,
-  buildThreadMetadata,
   buildEquivalenceClass,
   buildVariable,
   buildEnvironment,
@@ -262,17 +261,7 @@ describe("Reducing case statements", () => {
     );
 
     expect(reduce(state, statement, 0)).toEqual(
-      buildSingleThreadedState({
-        threadMetadata: buildThreadMetadata({
-          status: threadStatus.blocked,
-          waitCondition: buildVariable("x", 0),
-        }),
-        semanticStatements: [
-          statement,
-          buildSemanticStatement(skipStatement()),
-        ],
-        sigma: state.get("sigma"),
-      }),
+      buildBlockedState(state, statement, 0, buildVariable("x", 0)),
     );
   });
 });

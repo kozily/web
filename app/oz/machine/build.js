@@ -1,5 +1,7 @@
 import Immutable from "immutable";
 import { lexicalIdentifier } from "./lexical";
+import { valueRecord, valueBuiltIn } from "./values";
+import { builtIns, allBuiltInTypes } from "./built_ins.js";
 
 export const buildEnvironment = (contents = {}) => {
   return Immutable.Map(contents);
@@ -101,18 +103,72 @@ export const buildState = ({
   });
 };
 
+export const defaultEnvironment = () =>
+  buildEnvironment(
+    allBuiltInTypes.reduce((environment, builtInType) => {
+      const builtInTypeVariable = buildVariable(builtInType.toLowerCase(), 0);
+
+      return environment.set(builtInType, builtInTypeVariable);
+    }, Immutable.Map()),
+  );
+
+export const defaultSigma = () =>
+  Immutable.Set(
+    allBuiltInTypes.reduce((sigma, builtInType) => {
+      const builtInOperators = builtIns[builtInType];
+      const builtInTypeVariable = buildVariable(builtInType.toLowerCase(), 0);
+
+      const features = Object.keys(builtInOperators).reduce(
+        (acc, operatorKey) => {
+          const operatorVariable = buildVariable(
+            builtInOperators[operatorKey].name.toLowerCase(),
+            0,
+          );
+          return acc.set(operatorKey, operatorVariable);
+        },
+        Immutable.Map(),
+      );
+
+      const recordEquivalenceClass = buildEquivalenceClass(
+        valueRecord(builtInType, features),
+        builtInTypeVariable,
+      );
+
+      const operatorsEquivalenceClasses = Object.keys(builtInOperators).reduce(
+        (sigma, operatorKey) => {
+          const operatorVariable = buildVariable(
+            builtInOperators[operatorKey].name.toLowerCase(),
+            0,
+          );
+
+          const operatorValue = valueBuiltIn(operatorKey, builtInType);
+
+          return sigma.add(
+            buildEquivalenceClass(operatorValue, operatorVariable),
+          );
+        },
+        Immutable.Set(),
+      );
+
+      return sigma
+        .add(recordEquivalenceClass)
+        .union(operatorsEquivalenceClasses);
+    }, Immutable.Set()),
+  );
+
 export const buildFromKernelAST = ast => {
   return buildSingleThreadedState({
-    semanticStatements: [buildSemanticStatement(ast)],
+    semanticStatements: [buildSemanticStatement(ast, defaultEnvironment())],
+    sigma: defaultSigma(),
   });
 };
 
 var argumentIndex = 0;
 
-export const makeAuxiliaryIdentifier = () => {
-  return lexicalIdentifier(`__${argumentIndex++}__`);
+export const makeAuxiliaryIdentifier = (namespace = "") => {
+  return lexicalIdentifier(`@${namespace.toUpperCase()}_${argumentIndex++}`);
 };
 
-export const getLastAuxiliaryIdentifier = () => {
-  return lexicalIdentifier(`__${argumentIndex - 1}__`);
+export const getLastAuxiliaryIdentifier = (namespace = "") => {
+  return lexicalIdentifier(`@${namespace.toUpperCase()}_${argumentIndex - 1}`);
 };

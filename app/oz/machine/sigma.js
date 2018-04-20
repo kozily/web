@@ -1,5 +1,9 @@
 import Immutable from "immutable";
-import { buildVariable } from "./build";
+import {
+  buildVariable,
+  makeAuxiliaryIdentifier,
+  buildEquivalenceClass,
+} from "./build";
 import { unifyValue } from "../unification";
 
 export { createValue } from "../value_creation";
@@ -78,4 +82,44 @@ export const unify = (sigma, x, y) => {
       equivalenceClassY,
     );
   }
+};
+
+export const unifyVariableToValue = (sigma, variable, value) => {
+  const auxiliaryIdentifier = makeAuxiliaryIdentifier();
+  const auxiliaryVariable = makeNewVariable({
+    in: sigma,
+    for: auxiliaryIdentifier.get("identifier"),
+  });
+
+  const auxiliaryEquivalenceClass = buildEquivalenceClass(
+    value,
+    auxiliaryVariable,
+  );
+  const intermediateSigma = sigma.add(auxiliaryEquivalenceClass);
+
+  const unifiedSigma = unify(intermediateSigma, variable, auxiliaryVariable);
+  const resultingEquivalenceClass = lookupVariableInSigma(
+    unifiedSigma,
+    auxiliaryVariable,
+  );
+
+  return unifiedSigma
+    .delete(resultingEquivalenceClass)
+    .add(
+      resultingEquivalenceClass.update("variables", variables =>
+        variables.delete(auxiliaryVariable),
+      ),
+    );
+};
+
+export const unifyVariableToEvaluation = (
+  sigma,
+  variable,
+  expressionEvaluation,
+) => {
+  if (expressionEvaluation.variable) {
+    return unify(sigma, variable, expressionEvaluation.variable);
+  }
+
+  return unifyVariableToValue(sigma, variable, expressionEvaluation.value);
 };

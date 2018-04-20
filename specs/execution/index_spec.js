@@ -7,8 +7,8 @@ describe("Executing statements", () => {
     jasmine.addCustomEqualityTester(Immutable.is);
   });
 
-  it("has an executor for all types", () => {
-    const typesWithReducers = Immutable.Set(Object.keys(executors));
+  it("has an executor for all statement types", () => {
+    const typesWithReducers = Immutable.Set(Object.keys(executors.statement));
     const types = Immutable.Set(allStatementTypes);
 
     expect(typesWithReducers).toEqual(types);

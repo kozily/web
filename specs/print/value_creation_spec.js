@@ -6,6 +6,7 @@ import {
   valueCreationStatement,
 } from "../../app/oz/machine/statements";
 import { literalProcedure, literalNumber } from "../../app/oz/machine/literals";
+import { literalExpression } from "../../app/oz/machine/expressions";
 import { lexicalIdentifier } from "../../app/oz/machine/lexical";
 
 describe("Printing a value creation statement", () => {
@@ -16,7 +17,7 @@ describe("Printing a value creation statement", () => {
   it("Returns the appropriate string when using inline values", () => {
     const statement = valueCreationStatement(
       lexicalIdentifier("X"),
-      literalNumber(158),
+      literalExpression(literalNumber(158)),
     );
     const result = print(statement, 2);
 
@@ -27,9 +28,11 @@ describe("Printing a value creation statement", () => {
   it("Returns the appropriate string when using expanded values", () => {
     const statement = valueCreationStatement(
       lexicalIdentifier("X"),
-      literalProcedure(
-        [lexicalIdentifier("A"), lexicalIdentifier("B")],
-        localStatement(lexicalIdentifier("Y"), skipStatement()),
+      literalExpression(
+        literalProcedure(
+          [lexicalIdentifier("A"), lexicalIdentifier("B")],
+          localStatement(lexicalIdentifier("Y"), skipStatement()),
+        ),
       ),
     );
     const result = print(statement, 2);

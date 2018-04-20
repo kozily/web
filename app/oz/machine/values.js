@@ -4,6 +4,7 @@ export const valueTypes = {
   number: "number",
   record: "record",
   procedure: "procedure",
+  builtIn: "builtIn",
 };
 
 export const allValueTypes = Object.keys(valueTypes);
@@ -73,5 +74,14 @@ export const valueProcedure = (args = [], body, context = {}) => {
       body,
       context,
     },
+  });
+};
+
+export const valueBuiltIn = (operator, namespace) => {
+  return Immutable.fromJS({
+    node: "value",
+    type: "builtIn",
+    operator,
+    namespace,
   });
 };

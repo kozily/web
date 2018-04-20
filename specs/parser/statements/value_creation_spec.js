@@ -6,6 +6,10 @@ import {
   literalProcedure,
 } from "../../../app/oz/machine/literals";
 import {
+  operatorExpression,
+  literalExpression,
+} from "../../../app/oz/machine/expressions";
+import {
   valueCreationStatementSyntax,
   skipStatementSyntax,
 } from "../../../app/oz/machine/statementSyntax";
@@ -19,7 +23,10 @@ describe("Parsing X=VALUE statements", () => {
   describe("when parsing numbers", () => {
     it("handles condensed syntax correctly", () => {
       expect(parse("X=5")).toEqual(
-        valueCreationStatementSyntax(lexicalIdentifier("X"), literalNumber(5)),
+        valueCreationStatementSyntax(
+          lexicalIdentifier("X"),
+          literalExpression(literalNumber(5)),
+        ),
       );
     });
 
@@ -27,7 +34,7 @@ describe("Parsing X=VALUE statements", () => {
       expect(parse("Variable = 12.0")).toEqual(
         valueCreationStatementSyntax(
           lexicalIdentifier("Variable"),
-          literalNumber(12.0),
+          literalExpression(literalNumber(12.0)),
         ),
       );
     });
@@ -36,7 +43,7 @@ describe("Parsing X=VALUE statements", () => {
       expect(parse("`One Variable` = 152")).toEqual(
         valueCreationStatementSyntax(
           lexicalIdentifier("One Variable"),
-          literalNumber(152),
+          literalExpression(literalNumber(152)),
         ),
       );
     });
@@ -47,7 +54,9 @@ describe("Parsing X=VALUE statements", () => {
       expect(parse("X=person(name:N)")).toEqual(
         valueCreationStatementSyntax(
           lexicalIdentifier("X"),
-          literalRecord("person", { name: lexicalIdentifier("N") }),
+          literalExpression(
+            literalRecord("person", { name: lexicalIdentifier("N") }),
+          ),
         ),
       );
     });
@@ -56,7 +65,9 @@ describe("Parsing X=VALUE statements", () => {
       expect(parse("X = person(name:N)")).toEqual(
         valueCreationStatementSyntax(
           lexicalIdentifier("X"),
-          literalRecord("person", { name: lexicalIdentifier("N") }),
+          literalExpression(
+            literalRecord("person", { name: lexicalIdentifier("N") }),
+          ),
         ),
       );
     });
@@ -65,7 +76,9 @@ describe("Parsing X=VALUE statements", () => {
       expect(parse("`One Variable` = person(name:N)")).toEqual(
         valueCreationStatementSyntax(
           lexicalIdentifier("One Variable"),
-          literalRecord("person", { name: lexicalIdentifier("N") }),
+          literalExpression(
+            literalRecord("person", { name: lexicalIdentifier("N") }),
+          ),
         ),
       );
     });
@@ -76,9 +89,11 @@ describe("Parsing X=VALUE statements", () => {
       expect(parse("X=proc{$ X Y} skip end")).toEqual(
         valueCreationStatementSyntax(
           lexicalIdentifier("X"),
-          literalProcedure(
-            [lexicalIdentifier("X"), lexicalIdentifier("Y")],
-            skipStatementSyntax(),
+          literalExpression(
+            literalProcedure(
+              [lexicalIdentifier("X"), lexicalIdentifier("Y")],
+              skipStatementSyntax(),
+            ),
           ),
         ),
       );
@@ -88,9 +103,11 @@ describe("Parsing X=VALUE statements", () => {
       expect(parse("X = proc{$ X Y} skip end")).toEqual(
         valueCreationStatementSyntax(
           lexicalIdentifier("X"),
-          literalProcedure(
-            [lexicalIdentifier("X"), lexicalIdentifier("Y")],
-            skipStatementSyntax(),
+          literalExpression(
+            literalProcedure(
+              [lexicalIdentifier("X"), lexicalIdentifier("Y")],
+              skipStatementSyntax(),
+            ),
           ),
         ),
       );
@@ -100,12 +117,27 @@ describe("Parsing X=VALUE statements", () => {
       expect(parse("`One Variable` = proc{$ X Y} skip end")).toEqual(
         valueCreationStatementSyntax(
           lexicalIdentifier("One Variable"),
-          literalProcedure(
-            [lexicalIdentifier("X"), lexicalIdentifier("Y")],
-            skipStatementSyntax(),
+          literalExpression(
+            literalProcedure(
+              [lexicalIdentifier("X"), lexicalIdentifier("Y")],
+              skipStatementSyntax(),
+            ),
           ),
         ),
       );
     });
+  });
+
+  it("handles rhs expressions", () => {
+    expect(parse("X = 2 + 3")).toEqual(
+      valueCreationStatementSyntax(
+        lexicalIdentifier("X"),
+        operatorExpression(
+          "+",
+          literalExpression(literalNumber(2)),
+          literalExpression(literalNumber(3)),
+        ),
+      ),
+    );
   });
 });

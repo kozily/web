@@ -11,7 +11,6 @@ export const statementSyntaxTypes = {
   procedureApplicationSyntax: "procedureApplicationSyntax",
   exceptionContextSyntax: "exceptionContextSyntax",
   exceptionRaiseSyntax: "exceptionRaiseSyntax",
-  operatorSyntax: "operatorSyntax",
   threadSyntax: "threadSyntax",
   byNeedSyntax: "byNeedSyntax",
 };
@@ -119,17 +118,6 @@ export const exceptionRaiseStatementSyntax = identifier => {
     node: "statement",
     type: statementSyntaxTypes.exceptionRaiseSyntax,
     identifier,
-  });
-};
-
-export const operatorStatementSyntax = (result, lhs, rhs) => {
-  return new Immutable.fromJS({
-    node: "statement",
-    type: statementSyntaxTypes.operatorSyntax,
-    result,
-    operator: ".",
-    lhs,
-    rhs,
   });
 };
 
