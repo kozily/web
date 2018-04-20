@@ -1,3 +1,4 @@
+import Immutable from "immutable";
 import { binaryOperator, typedOperator, dividendNotZero } from "./validations";
 import { valueTypes, valueNumber } from "../machine/values";
 
@@ -7,16 +8,16 @@ export default {
     validateArgs: args =>
       binaryOperator(args) && typedOperator(valueTypes.number)(args),
     evaluate: args => {
-      const lhs = args.getIn([0, "value"]);
-      const rhs = args.getIn([1, "value"]);
-      if (!lhs) {
-        return { missingArg: 0 };
+      const missingArgument = args.find(x => !x.get("value"));
+      if (missingArgument) {
+        return Immutable.Map({
+          waitCondition: missingArgument.get("variable"),
+        });
       }
-      if (!rhs) {
-        return { missingArg: 1 };
-      }
+      const lhs = args.getIn([0, "value", "value"]);
+      const rhs = args.getIn([1, "value", "value"]);
       const value = valueNumber(lhs + rhs);
-      return { value };
+      return Immutable.Map({ value });
     },
   },
   "-": {
@@ -24,16 +25,16 @@ export default {
     validateArgs: args =>
       binaryOperator(args) && typedOperator(valueTypes.number)(args),
     evaluate: args => {
-      const lhs = args.getIn([0, "value"]);
-      const rhs = args.getIn([1, "value"]);
-      if (!lhs) {
-        return { missingArg: 0 };
+      const missingArgument = args.find(x => !x.get("value"));
+      if (missingArgument) {
+        return Immutable.Map({
+          waitCondition: missingArgument.get("variable"),
+        });
       }
-      if (!rhs) {
-        return { missingArg: 1 };
-      }
+      const lhs = args.getIn([0, "value", "value"]);
+      const rhs = args.getIn([1, "value", "value"]);
       const value = valueNumber(lhs - rhs);
-      return { value };
+      return Immutable.Map({ value });
     },
   },
   "*": {
@@ -41,16 +42,16 @@ export default {
     validateArgs: args =>
       binaryOperator(args) && typedOperator(valueTypes.number)(args),
     evaluate: args => {
-      const lhs = args.getIn([0, "value"]);
-      const rhs = args.getIn([1, "value"]);
-      if (!lhs) {
-        return { missingArg: 0 };
+      const missingArgument = args.find(x => !x.get("value"));
+      if (missingArgument) {
+        return Immutable.Map({
+          waitCondition: missingArgument.get("variable"),
+        });
       }
-      if (!rhs) {
-        return { missingArg: 1 };
-      }
+      const lhs = args.getIn([0, "value", "value"]);
+      const rhs = args.getIn([1, "value", "value"]);
       const value = valueNumber(lhs * rhs);
-      return { value };
+      return Immutable.Map({ value });
     },
   },
   div: {
@@ -60,16 +61,16 @@ export default {
       typedOperator(valueTypes.number)(args) &&
       dividendNotZero(args),
     evaluate: args => {
-      const lhs = args.getIn([0, "value"]);
-      const rhs = args.getIn([1, "value"]);
-      if (!lhs) {
-        return { missingArg: 0 };
+      const missingArgument = args.find(x => !x.get("value"));
+      if (missingArgument) {
+        return Immutable.Map({
+          waitCondition: missingArgument.get("variable"),
+        });
       }
-      if (!rhs) {
-        return { missingArg: 1 };
-      }
+      const lhs = args.getIn([0, "value", "value"]);
+      const rhs = args.getIn([1, "value", "value"]);
       const value = valueNumber(Math.floor(lhs / rhs));
-      return { value };
+      return Immutable.Map({ value });
     },
   },
   mod: {
@@ -79,16 +80,16 @@ export default {
       typedOperator(valueTypes.number)(args) &&
       dividendNotZero(args),
     evaluate: args => {
-      const lhs = args.getIn([0, "value"]);
-      const rhs = args.getIn([1, "value"]);
-      if (!lhs) {
-        return { missingArg: 0 };
+      const missingArgument = args.find(x => !x.get("value"));
+      if (missingArgument) {
+        return Immutable.Map({
+          waitCondition: missingArgument.get("variable"),
+        });
       }
-      if (!rhs) {
-        return { missingArg: 1 };
-      }
+      const lhs = args.getIn([0, "value", "value"]);
+      const rhs = args.getIn([1, "value", "value"]);
       const value = valueNumber(lhs % rhs);
-      return { value };
+      return Immutable.Map({ value });
     },
   },
 };

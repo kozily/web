@@ -3,9 +3,15 @@ export const binaryOperator = args => {
 };
 
 export const typedOperator = type => args => {
-  return args.every(arg => arg.get("type") === type);
+  return (
+    args.some(arg => arg.get("value") === undefined) ||
+    args.every(arg => arg.getIn(["value", "type"]) === type)
+  );
 };
 
 export const dividendNotZero = args => {
-  return args.getIn([1, "value"]) !== 0;
+  return (
+    args.getIn([1, "value"]) === undefined ||
+    args.getIn([1, "value", "value"]) !== 0
+  );
 };

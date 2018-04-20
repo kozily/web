@@ -2,7 +2,7 @@ import React from "react";
 import { Segment, Grid, Menu } from "semantic-ui-react";
 import CodeMenu from "./menu";
 import Editor from "./editor";
-import KernelEditor from "./kernelEditor";
+import Kernel from "./kernel";
 import Errors from "./errors";
 
 export const Code = () => {
@@ -20,7 +20,7 @@ export const Code = () => {
             <Menu.Item icon="list" header content="Kernel" />
           </Menu>
           <Segment attached>
-            <KernelEditor />
+            <Kernel />
           </Segment>
         </Grid.Column>
       </Grid.Row>

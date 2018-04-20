@@ -1,3 +1,4 @@
+import Immutable from "immutable";
 import {
   lookupVariableInSigma,
   unifyVariableToEvaluation,
@@ -44,28 +45,29 @@ export default function(state, semanticStatement, activeThreadIndex) {
 
     const resultVariable = argsVariables.last();
     const actualArgsVariables = argsVariables.pop();
-    const argsValues = actualArgsVariables.map(x =>
-      lookupVariableInSigma(sigma, x).get("value"),
+    const args = actualArgsVariables.map(x =>
+      Immutable.Map({
+        variable: x,
+        value: lookupVariableInSigma(sigma, x).get("value"),
+      }),
     );
 
-    if (argsValues.some(x => x === undefined)) {
-      const unboundArgIndex = argsValues.findIndex(x => x === undefined);
-      return blockCurrentThread(
-        state,
-        semanticStatement,
-        activeThreadIndex,
-        actualArgsVariables.get(unboundArgIndex),
-      );
-    }
-
-    if (!builtIn.validateArgs(argsValues)) {
+    if (!builtIn.validateArgs(args)) {
       return raiseSystemException(state, activeThreadIndex, errorException());
     }
 
-    const evaluationResult = builtIn.evaluate(argsValues, sigma);
     try {
+      const evaluation = builtIn.evaluate(args, sigma);
+      if (evaluation.get("waitCondition")) {
+        return blockCurrentThread(
+          state,
+          semanticStatement,
+          activeThreadIndex,
+          evaluation.get("waitCondition"),
+        );
+      }
       return state.update("sigma", sigma =>
-        unifyVariableToEvaluation(sigma, resultVariable, evaluationResult),
+        unifyVariableToEvaluation(sigma, resultVariable, evaluation),
       );
     } catch (error) {
       return raiseSystemException(state, activeThreadIndex, failureException());

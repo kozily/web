@@ -1,5 +1,6 @@
 export default (recurse, node, identation) => {
   const operator = node.get("operator");
+  const spacedOperator = operator === "." ? "." : ` ${operator} `;
 
   const lhs = node.get("lhs");
   const printedlhs = recurse(lhs, identation);
@@ -11,7 +12,7 @@ export default (recurse, node, identation) => {
   const parenrhs =
     rhs.get("type") === "operator" ? `(${printedrhs.full})` : printedrhs.full;
 
-  const result = `${parenlhs} ${operator} ${parenrhs}`;
+  const result = `${parenlhs}${spacedOperator}${parenrhs}`;
 
   return {
     abbreviated: result,

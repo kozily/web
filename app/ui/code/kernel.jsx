@@ -2,21 +2,18 @@ import React from "react";
 import CodeMirror from "codemirror";
 import "codemirror/mode/oz/oz";
 import "codemirror/lib/codemirror.css";
-import "codemirror/theme/base16-light.css";
-import "codemirror/addon/selection/active-line";
+import "codemirror/theme/elegant.css";
 import { connect } from "react-redux";
 import { print } from "../../oz/print";
 
-export class KernelEditor extends React.Component {
+export class Kernel extends React.Component {
   componentDidMount() {
     const codeMirrorOptions = {
       mode: "oz",
-      theme: "base16-light",
+      theme: "elegant",
       tabSize: 2,
       lineNumbers: true,
       lineWrapping: true,
-      autofocus: true,
-      styleActiveLine: true,
       readOnly: true,
       value: this.props.source,
     };
@@ -43,4 +40,4 @@ const mapStateToProps = state => ({
   source: print(state.getIn(["parse", "compiled"])).full,
 });
 
-export default connect(mapStateToProps)(KernelEditor);
+export default connect(mapStateToProps)(Kernel);

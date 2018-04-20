@@ -23,6 +23,7 @@ describe("State initialization", () => {
       Number: buildVariable("number", 0),
       Float: buildVariable("float", 0),
       Record: buildVariable("record", 0),
+      Value: buildVariable("value", 0),
     });
 
     expect(state.getIn(["threads", 0, "stack", 0, "environment"])).toEqual(
@@ -30,7 +31,7 @@ describe("State initialization", () => {
     );
   });
 
-  it("must generate the appropiate sigma", () => {
+  it("must generate the appropiate sigma entries for the number built-ins", () => {
     const state = buildFromKernelAST(skipStatement());
     const sigma = state.get("sigma");
 
@@ -58,6 +59,11 @@ describe("State initialization", () => {
     expect(lookupBuiltInInSigma(sigma, "nmod")).toEqual(
       valueBuiltIn("mod", "Number"),
     );
+  });
+
+  it("must generate the appropiate sigma entries for the float built-ins", () => {
+    const state = buildFromKernelAST(skipStatement());
+    const sigma = state.get("sigma");
 
     expect(lookupBuiltInInSigma(sigma, "float")).toEqual(
       valueRecord("Float", {
@@ -67,6 +73,11 @@ describe("State initialization", () => {
     expect(lookupBuiltInInSigma(sigma, "fdiv")).toEqual(
       valueBuiltIn("/", "Float"),
     );
+  });
+
+  it("must generate the appropiate sigma entries for the record built-ins", () => {
+    const state = buildFromKernelAST(skipStatement());
+    const sigma = state.get("sigma");
 
     expect(lookupBuiltInInSigma(sigma, "record")).toEqual(
       valueRecord("Record", {
@@ -75,6 +86,24 @@ describe("State initialization", () => {
     );
     expect(lookupBuiltInInSigma(sigma, "rsel")).toEqual(
       valueBuiltIn(".", "Record"),
+    );
+  });
+
+  it("must generate the appropiate sigma entries for the value built-ins", () => {
+    const state = buildFromKernelAST(skipStatement());
+    const sigma = state.get("sigma");
+
+    expect(lookupBuiltInInSigma(sigma, "value")).toEqual(
+      valueRecord("Value", {
+        "==": buildVariable("veq", 0),
+        "\\=": buildVariable("vneq", 0),
+      }),
+    );
+    expect(lookupBuiltInInSigma(sigma, "veq")).toEqual(
+      valueBuiltIn("==", "Value"),
+    );
+    expect(lookupBuiltInInSigma(sigma, "vneq")).toEqual(
+      valueBuiltIn("\\=", "Value"),
     );
   });
 });

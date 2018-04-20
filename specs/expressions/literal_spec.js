@@ -12,6 +12,6 @@ describe("Evaluating literal expressions", () => {
   it("evaluates to the created value of the literal", () => {
     const expression = literalExpression(literalNumber(10));
     const result = evaluate(expression);
-    expect(result.value).toEqual(valueNumber(10));
+    expect(result.get("value")).toEqual(valueNumber(10));
   });
 });

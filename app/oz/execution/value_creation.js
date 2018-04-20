@@ -19,12 +19,12 @@ export default function(state, semanticStatement, activeThreadIndex) {
 
   try {
     const evaluation = evaluate(expression, environment, sigma);
-    if (!evaluation.variable && !evaluation.value) {
+    if (evaluation.get("waitCondition")) {
       return blockCurrentThread(
         state,
         semanticStatement,
         activeThreadIndex,
-        evaluation.waitCondition,
+        evaluation.get("waitCondition"),
       );
     }
 

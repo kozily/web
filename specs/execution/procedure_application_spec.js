@@ -8,6 +8,7 @@ import {
   valueProcedure,
   valueNumber,
   valueBuiltIn,
+  valueRecord,
 } from "../../app/oz/machine/values";
 import {
   errorException,
@@ -324,6 +325,47 @@ describe("Reducing {X ...} statements", () => {
 
       expect(reduce(state, statement, 0)).toEqual(
         buildBlockedState(state, statement, 0, buildVariable("z", 0)),
+      );
+    });
+
+    it("blocks the current thread if the operator itself blocks", () => {
+      const state = buildSingleThreadedState({
+        semanticStatements: [buildSemanticStatement(skipStatement())],
+        sigma: buildSigma(
+          buildEquivalenceClass(
+            valueBuiltIn("==", "Value"),
+            buildVariable("x", 0),
+          ),
+          buildEquivalenceClass(
+            valueRecord("person", { age: buildVariable("a", 0) }),
+            buildVariable("y", 0),
+          ),
+          buildEquivalenceClass(
+            valueRecord("person", { age: buildVariable("a", 1) }),
+            buildVariable("z", 0),
+          ),
+          buildEquivalenceClass(undefined, buildVariable("r", 0)),
+          buildEquivalenceClass(undefined, buildVariable("a", 0)),
+          buildEquivalenceClass(undefined, buildVariable("a", 1)),
+        ),
+      });
+
+      const statement = buildSemanticStatement(
+        procedureApplicationStatement(lexicalIdentifier("X"), [
+          lexicalIdentifier("Y"),
+          lexicalIdentifier("Z"),
+          lexicalIdentifier("R"),
+        ]),
+        buildEnvironment({
+          X: buildVariable("x", 0),
+          Y: buildVariable("y", 0),
+          Z: buildVariable("z", 0),
+          R: buildVariable("r", 0),
+        }),
+      );
+
+      expect(reduce(state, statement, 0)).toEqual(
+        buildBlockedState(state, statement, 0, buildVariable("a", 0)),
       );
     });
   });

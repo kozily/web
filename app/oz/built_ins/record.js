@@ -1,28 +1,48 @@
-import { binaryOperator } from "./validations";
+import Immutable from "immutable";
+import { binaryOperator, typedOperator } from "./validations";
 import { valueTypes } from "../machine/values";
 import { lookupVariableInSigma } from "../machine/sigma";
+
+const emptyFeatures = index => args => {
+  return (
+    args.some(x => x.get("value") === undefined) ||
+    args.getIn([index, "value", "value", "features"]).isEmpty()
+  );
+};
+
+const featureExists = args => {
+  return (
+    args.some(x => x.get("value") === undefined) ||
+    !!args.getIn([
+      0,
+      "value",
+      "value",
+      "features",
+      args.getIn([1, "value", "value", "label"]),
+    ])
+  );
+};
 
 export default {
   ".": {
     name: "rsel",
     validateArgs: args =>
       binaryOperator(args) &&
-      args.getIn([0, "type"]) === valueTypes.record &&
-      args.getIn([1, "type"]) === valueTypes.record &&
-      args.getIn([1, "value", "features"]).isEmpty() &&
-      !!args.getIn([0, "value", "features", args.getIn([1, "value", "label"])]),
+      typedOperator(valueTypes.record)(args) &&
+      emptyFeatures(1)(args) &&
+      featureExists(args),
     evaluate: (args, sigma) => {
-      const record = args.getIn([0, "value"]);
-      const feature = args.getIn([1, "value", "label"]);
-      if (!record) {
-        return { missingArg: 0 };
+      const missingArgument = args.find(x => !x.get("value"));
+      if (missingArgument) {
+        return Immutable.Map({
+          waitCondition: missingArgument.get("variable"),
+        });
       }
-      if (!feature) {
-        return { missingArg: 1 };
-      }
+      const record = args.getIn([0, "value", "value"]);
+      const feature = args.getIn([1, "value", "value", "label"]);
       const variable = record.getIn(["features", feature]);
       const value = lookupVariableInSigma(sigma, variable).get("value");
-      return { value, variable };
+      return Immutable.fromJS({ value, variable });
     },
   },
 };
