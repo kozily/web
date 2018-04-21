@@ -11,7 +11,7 @@ import expressionsGrammar from "../../../app/oz/grammar/expressions.ne";
 
 const parse = parserFor(expressionsGrammar);
 
-describe("Parsing operator expressions", () => {
+describe("Parsing arithmetic operator expressions", () => {
   beforeEach(() => {
     jasmine.addCustomEqualityTester(Immutable.is);
   });
