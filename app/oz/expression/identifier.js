@@ -1,3 +1,4 @@
+import Immutable from "immutable";
 import { lookupVariableInSigma } from "../machine/sigma";
 
 export default (recurse, expression, environment, sigma) => {
@@ -6,8 +7,8 @@ export default (recurse, expression, environment, sigma) => {
   const equivalenceClass = lookupVariableInSigma(sigma, variable);
   const value = equivalenceClass.get("value");
 
-  return {
+  return Immutable.Map({
     value,
     variable,
-  };
+  });
 };

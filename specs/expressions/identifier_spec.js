@@ -24,8 +24,8 @@ describe("Evaluating identifier expressions", () => {
       buildEquivalenceClass(valueNumber(10), buildVariable("a", 0)),
     );
     const result = evaluate(expression, environment, sigma);
-    expect(result.value).toEqual(valueNumber(10));
-    expect(result.variable).toEqual(buildVariable("a", 0));
+    expect(result.get("value")).toEqual(valueNumber(10));
+    expect(result.get("variable")).toEqual(buildVariable("a", 0));
   });
 
   it("evaluates to undefined if the stored value is undefined", () => {
@@ -37,7 +37,7 @@ describe("Evaluating identifier expressions", () => {
       buildEquivalenceClass(undefined, buildVariable("a", 0)),
     );
     const result = evaluate(expression, environment, sigma);
-    expect(result.value).toEqual(undefined);
-    expect(result.variable).toEqual(buildVariable("a", 0));
+    expect(result.get("value")).toEqual(undefined);
+    expect(result.get("variable")).toEqual(buildVariable("a", 0));
   });
 });

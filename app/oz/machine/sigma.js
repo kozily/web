@@ -112,14 +112,10 @@ export const unifyVariableToValue = (sigma, variable, value) => {
     );
 };
 
-export const unifyVariableToEvaluation = (
-  sigma,
-  variable,
-  expressionEvaluation,
-) => {
-  if (expressionEvaluation.variable) {
-    return unify(sigma, variable, expressionEvaluation.variable);
+export const unifyVariableToEvaluation = (sigma, variable, evaluation) => {
+  if (evaluation.get("variable")) {
+    return unify(sigma, variable, evaluation.get("variable"));
   }
 
-  return unifyVariableToValue(sigma, variable, expressionEvaluation.value);
+  return unifyVariableToValue(sigma, variable, evaluation.get("value"));
 };

@@ -1,7 +1,7 @@
 import Immutable from "immutable";
 import { lexicalIdentifier } from "./lexical";
 import { valueRecord, valueBuiltIn } from "./values";
-import { builtIns, allBuiltInTypes } from "./built_ins.js";
+import { builtIns, allBuiltInTypes } from "../built_ins";
 
 export const buildEnvironment = (contents = {}) => {
   return Immutable.Map(contents);
@@ -109,7 +109,7 @@ export const defaultEnvironment = () =>
       const builtInTypeVariable = buildVariable(builtInType.toLowerCase(), 0);
 
       return environment.set(builtInType, builtInTypeVariable);
-    }, Immutable.Map()),
+    }, buildEnvironment()),
   );
 
 export const defaultSigma = () =>
@@ -147,7 +147,7 @@ export const defaultSigma = () =>
             buildEquivalenceClass(operatorValue, operatorVariable),
           );
         },
-        Immutable.Set(),
+        buildSigma(),
       );
 
       return sigma

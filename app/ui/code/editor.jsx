@@ -2,7 +2,7 @@ import React from "react";
 import CodeMirror from "codemirror";
 import "codemirror/mode/oz/oz";
 import "codemirror/lib/codemirror.css";
-import "codemirror/theme/base16-light.css";
+import "codemirror/theme/elegant.css";
 import "codemirror/addon/selection/active-line";
 import { connect } from "react-redux";
 import { changeSourceCode } from "../../state/parse";
@@ -11,7 +11,7 @@ export class CodeEditor extends React.Component {
   componentDidMount() {
     const codeMirrorOptions = {
       mode: "oz",
-      theme: "base16-light",
+      theme: "elegant",
       tabSize: 2,
       lineNumbers: true,
       lineWrapping: true,

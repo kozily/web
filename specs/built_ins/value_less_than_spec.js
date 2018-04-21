@@ -1,11 +1,16 @@
 import Immutable from "immutable";
 import { builtIns } from "../../app/oz/built_ins";
-import { valueNumber, valueAtom } from "../../app/oz/machine/values";
+import {
+  valueNumber,
+  valueAtom,
+  valueRecord,
+  valueBoolean,
+} from "../../app/oz/machine/values";
 import { buildVariable } from "../../app/oz/machine/build";
 
-const operator = builtIns["Number"]["div"];
+const operator = builtIns["Value"]["<"];
 
-describe("The number division built-in", () => {
+describe("The value less than built-in", () => {
   beforeEach(() => {
     jasmine.addCustomEqualityTester(Immutable.is);
   });
@@ -25,34 +30,34 @@ describe("The number division built-in", () => {
       expect(operator.validateArgs(args)).toEqual(false);
     });
 
-    it("fails when the first argument is not a number", () => {
+    it("fails when the first argument is not a number or an atom", () => {
       const args = Immutable.fromJS([
-        { value: valueAtom("person") },
-        { value: valueNumber(2) },
-      ]);
-      expect(operator.validateArgs(args)).toEqual(false);
-    });
-
-    it("fails when the second argument is not a number", () => {
-      const args = Immutable.fromJS([
-        { value: valueNumber(2) },
+        { value: valueRecord("person", { age: buildVariable("x", 0) }) },
         { value: valueAtom("person") },
       ]);
       expect(operator.validateArgs(args)).toEqual(false);
     });
 
-    it("fails when the second argument is zero", () => {
+    it("fails when the second argument is not a number or an atom", () => {
       const args = Immutable.fromJS([
-        { value: valueNumber(2) },
-        { value: valueNumber(0) },
+        { value: valueAtom("person") },
+        { value: valueRecord("person", { age: buildVariable("x", 0) }) },
       ]);
       expect(operator.validateArgs(args)).toEqual(false);
     });
 
-    it("succeeds when everything is right", () => {
+    it("succeeds when both arguments are valid numbers", () => {
       const args = Immutable.fromJS([
         { value: valueNumber(2) },
         { value: valueNumber(3) },
+      ]);
+      expect(operator.validateArgs(args)).toEqual(true);
+    });
+
+    it("succeeds when both arguments are valid atoms", () => {
+      const args = Immutable.fromJS([
+        { value: valueAtom("person") },
+        { value: valueAtom("person") },
       ]);
       expect(operator.validateArgs(args)).toEqual(true);
     });
@@ -95,13 +100,22 @@ describe("The number division built-in", () => {
       expect(evaluation.get("waitCondition")).toEqual(buildVariable("x", 0));
     });
 
-    it("returns the appropriate value when both arguments are valid", () => {
+    it("returns true when the first argument is a number less than the second argument", () => {
       const args = Immutable.fromJS([
-        { value: valueNumber(13) },
+        { value: valueNumber(2) },
         { value: valueNumber(3) },
       ]);
       const evaluation = operator.evaluate(args);
-      expect(evaluation.get("value")).toEqual(valueNumber(4));
+      expect(evaluation.get("value")).toEqual(valueBoolean(true));
+    });
+
+    it("returns true when the first argument is an atom less than the second argument", () => {
+      const args = Immutable.fromJS([
+        { value: valueAtom("person") },
+        { value: valueAtom("qerson") },
+      ]);
+      const evaluation = operator.evaluate(args);
+      expect(evaluation.get("value")).toEqual(valueBoolean(true));
     });
   });
 });

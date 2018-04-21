@@ -1,5 +1,5 @@
 import Immutable from "immutable";
-import { builtIns } from "../../app/oz/machine/built_ins";
+import { builtIns } from "../../app/oz/built_ins";
 import {
   buildVariable,
   buildEquivalenceClass,
@@ -20,49 +20,71 @@ describe("The record selection built-in", () => {
 
   describe("validation", () => {
     it("fails when less than 2 arguments are used", () => {
-      const args = Immutable.List([valueNumber(2)]);
+      const args = Immutable.fromJS([{ value: valueNumber(2) }]);
       expect(operator.validateArgs(args)).toEqual(false);
     });
 
     it("fails when more than 2 arguments are used", () => {
-      const args = Immutable.List([
-        valueNumber(2),
-        valueNumber(3),
-        valueNumber(4),
+      const args = Immutable.fromJS([
+        { value: valueNumber(2) },
+        { value: valueNumber(3) },
+        { value: valueNumber(4) },
       ]);
       expect(operator.validateArgs(args)).toEqual(false);
     });
 
     it("fails when the first argument is not a record", () => {
-      const args = Immutable.List([valueNumber, valueAtom("age")]);
+      const args = Immutable.fromJS([
+        { value: valueNumber(3) },
+        { value: valueAtom("age") },
+      ]);
       expect(operator.validateArgs(args)).toEqual(false);
     });
 
     it("fails when the second argument is not a record", () => {
-      const args = Immutable.List([
-        valueRecord("person", { age: buildVariable("x", 0) }),
-        valueNumber(3),
+      const args = Immutable.fromJS([
+        { value: valueRecord("person", { age: buildVariable("x", 0) }) },
+        { value: valueNumber(3) },
       ]);
       expect(operator.validateArgs(args)).toEqual(false);
     });
 
     it("fails when the first argument does not have features", () => {
-      const args = Immutable.List([valueRecord("person"), valueAtom("age")]);
+      const args = Immutable.fromJS([
+        { value: valueRecord("person") },
+        { value: valueAtom("age") },
+      ]);
       expect(operator.validateArgs(args)).toEqual(false);
     });
 
     it("fails when the first argument does not have the feature of the second argument", () => {
-      const args = Immutable.List([
-        valueRecord("person", { name: buildVariable("n", 0) }),
-        valueAtom("age"),
+      const args = Immutable.fromJS([
+        { value: valueRecord("person", { name: buildVariable("n", 0) }) },
+        { value: valueAtom("age") },
       ]);
       expect(operator.validateArgs(args)).toEqual(false);
     });
 
     it("succeeds when everything is right", () => {
-      const args = Immutable.List([
-        valueRecord("person", { name: buildVariable("n", 0) }),
-        valueAtom("name"),
+      const args = Immutable.fromJS([
+        { value: valueRecord("person", { name: buildVariable("n", 0) }) },
+        { value: valueAtom("name") },
+      ]);
+      expect(operator.validateArgs(args)).toEqual(true);
+    });
+
+    it("succeeds when the first argument is undefined", () => {
+      const args = Immutable.fromJS([
+        { value: undefined, variable: buildVariable("x", 0) },
+        { value: valueNumber(3) },
+      ]);
+      expect(operator.validateArgs(args)).toEqual(true);
+    });
+
+    it("succeeds when the second argument is undefined", () => {
+      const args = Immutable.fromJS([
+        { value: valueNumber(3) },
+        { value: undefined, variable: buildVariable("x", 0) },
       ]);
       expect(operator.validateArgs(args)).toEqual(true);
     });
@@ -70,25 +92,31 @@ describe("The record selection built-in", () => {
 
   describe("evaluation", () => {
     it("returns undefined when the first argument is unbound", () => {
-      const args = Immutable.List([undefined, valueNumber(3)]);
+      const args = Immutable.fromJS([
+        { value: undefined, variable: buildVariable("x", 0) },
+        { value: valueNumber(3) },
+      ]);
       const evaluation = operator.evaluate(args);
-      expect(evaluation.value).toEqual(undefined);
-      expect(evaluation.variable).toEqual(undefined);
-      expect(evaluation.missingArg).toEqual(0);
+      expect(evaluation.get("value")).toEqual(undefined);
+      expect(evaluation.get("variable")).toEqual(undefined);
+      expect(evaluation.get("waitCondition")).toEqual(buildVariable("x", 0));
     });
 
     it("returns undefined when the second argument is unbound", () => {
-      const args = Immutable.List([valueNumber(3), undefined]);
+      const args = Immutable.fromJS([
+        { value: valueNumber(3) },
+        { value: undefined, variable: buildVariable("x", 0) },
+      ]);
       const evaluation = operator.evaluate(args);
-      expect(evaluation.value).toEqual(undefined);
-      expect(evaluation.variable).toEqual(undefined);
-      expect(evaluation.missingArg).toEqual(1);
+      expect(evaluation.get("value")).toEqual(undefined);
+      expect(evaluation.get("variable")).toEqual(undefined);
+      expect(evaluation.get("waitCondition")).toEqual(buildVariable("x", 0));
     });
 
     it("returns an undefined value but proper variable when the variable is unbound", () => {
-      const args = Immutable.List([
-        valueRecord("person", { name: buildVariable("n", 0) }),
-        valueAtom("name"),
+      const args = Immutable.fromJS([
+        { value: valueRecord("person", { name: buildVariable("n", 0) }) },
+        { value: valueAtom("name") },
       ]);
       const sigma = buildSigma(
         buildEquivalenceClass(undefined, buildVariable("n", 0)),
@@ -96,14 +124,14 @@ describe("The record selection built-in", () => {
 
       const evaluation = operator.evaluate(args, sigma);
 
-      expect(evaluation.value).toEqual(undefined);
-      expect(evaluation.variable).toEqual(buildVariable("n", 0));
+      expect(evaluation.get("value")).toEqual(undefined);
+      expect(evaluation.get("variable")).toEqual(buildVariable("n", 0));
     });
 
     it("returns the value and the variable when everything is bound", () => {
-      const args = Immutable.List([
-        valueRecord("person", { name: buildVariable("n", 0) }),
-        valueAtom("name"),
+      const args = Immutable.fromJS([
+        { value: valueRecord("person", { name: buildVariable("n", 0) }) },
+        { value: valueAtom("name") },
       ]);
       const sigma = buildSigma(
         buildEquivalenceClass(valueNumber(3), buildVariable("n", 0)),
@@ -111,8 +139,8 @@ describe("The record selection built-in", () => {
 
       const evaluation = operator.evaluate(args, sigma);
 
-      expect(evaluation.value).toEqual(valueNumber(3));
-      expect(evaluation.variable).toEqual(buildVariable("n", 0));
+      expect(evaluation.get("value")).toEqual(valueNumber(3));
+      expect(evaluation.get("variable")).toEqual(buildVariable("n", 0));
     });
   });
 });

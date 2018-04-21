@@ -1,3 +1,12 @@
+const printLabel = label => {
+  const unquotedRegex = /^[a-z].*$/;
+  if (unquotedRegex.test(label)) {
+    return label;
+  }
+
+  return `'${label}'`;
+};
+
 const printValuePosition = node => {
   if (node.get("node") === "identifier") {
     return node.get("identifier");
@@ -36,7 +45,7 @@ const printTupleRecord = (label, features) => {
     .map(entry => `${printValuePosition(entry[1])}`)
     .join(" ");
 
-  return `${label}(${printedFeatures})`;
+  return `${printLabel(label)}(${printedFeatures})`;
 };
 
 const printGenericRecord = (label, features) => {
@@ -46,12 +55,12 @@ const printGenericRecord = (label, features) => {
     .map(entry => `${entry[0]}:${printValuePosition(entry[1])}`)
     .join(" ");
 
-  return `${label}(${printedFeatures})`;
+  return `${printLabel(label)}(${printedFeatures})`;
 };
 
 const printSpecificRecord = (label, features) => {
   if (features.isEmpty()) {
-    return label;
+    return printLabel(label);
   }
 
   if (label === "|") {

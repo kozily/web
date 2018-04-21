@@ -29,7 +29,7 @@ describe("Evaluating operator expressions", () => {
 
     const result = evaluate(expression);
 
-    expect(result.value).toEqual(valueNumber(8));
+    expect(result.get("value")).toEqual(valueNumber(8));
   });
 
   it("evaluates to a wait condition if any of the values are undefined", () => {
@@ -47,9 +47,9 @@ describe("Evaluating operator expressions", () => {
 
     const result = evaluate(expression, environment, sigma);
 
-    expect(result.value).toEqual(undefined);
-    expect(result.variable).toEqual(undefined);
-    expect(result.waitCondition).toEqual(buildVariable("a", 0));
+    expect(result.get("value")).toEqual(undefined);
+    expect(result.get("variable")).toEqual(undefined);
+    expect(result.get("waitCondition")).toEqual(buildVariable("a", 0));
   });
 
   it("evaluates to a wait condition if any of the values have wait conditions", () => {
@@ -71,8 +71,8 @@ describe("Evaluating operator expressions", () => {
 
     const result = evaluate(expression, environment, sigma);
 
-    expect(result.value).toEqual(undefined);
-    expect(result.variable).toEqual(undefined);
-    expect(result.waitCondition).toEqual(buildVariable("a", 0));
+    expect(result.get("value")).toEqual(undefined);
+    expect(result.get("variable")).toEqual(undefined);
+    expect(result.get("waitCondition")).toEqual(buildVariable("a", 0));
   });
 });

@@ -1,6 +1,7 @@
 import Immutable from "immutable";
-import { builtIns } from "../../app/oz/machine/built_ins";
+import { builtIns } from "../../app/oz/built_ins";
 import { valueNumber, valueAtom } from "../../app/oz/machine/values";
+import { buildVariable } from "../../app/oz/machine/build";
 
 const operator = builtIns["Number"]["mod"];
 
@@ -11,59 +12,88 @@ describe("The number modulo built-in", () => {
 
   describe("validation", () => {
     it("fails when less than 2 arguments are used", () => {
-      const args = Immutable.List([valueNumber(2)]);
+      const args = Immutable.fromJS([{ value: valueNumber(2) }]);
       expect(operator.validateArgs(args)).toEqual(false);
     });
 
     it("fails when more than 2 arguments are used", () => {
-      const args = Immutable.List([
-        valueNumber(2),
-        valueNumber(3),
-        valueNumber(4),
+      const args = Immutable.fromJS([
+        { value: valueNumber(2) },
+        { value: valueNumber(3) },
+        { value: valueNumber(4) },
       ]);
       expect(operator.validateArgs(args)).toEqual(false);
     });
 
     it("fails when the first argument is not a number", () => {
-      const args = Immutable.List([valueAtom("person"), valueNumber(2)]);
+      const args = Immutable.fromJS([
+        { value: valueAtom("person") },
+        { value: valueNumber(2) },
+      ]);
       expect(operator.validateArgs(args)).toEqual(false);
     });
 
     it("fails when the second argument is not a number", () => {
-      const args = Immutable.List([valueNumber(2), valueAtom("person")]);
-      expect(operator.validateArgs(args)).toEqual(false);
-    });
-
-    it("fails when the second argument is zero", () => {
-      const args = Immutable.List([valueNumber(2), valueNumber(0)]);
+      const args = Immutable.fromJS([
+        { value: valueNumber(2) },
+        { value: valueAtom("person") },
+      ]);
       expect(operator.validateArgs(args)).toEqual(false);
     });
 
     it("succeeds when everything is right", () => {
-      const args = Immutable.List([valueNumber(2), valueNumber(3)]);
+      const args = Immutable.fromJS([
+        { value: valueNumber(2) },
+        { value: valueNumber(3) },
+      ]);
+      expect(operator.validateArgs(args)).toEqual(true);
+    });
+
+    it("succeeds when the first argument is undefined", () => {
+      const args = Immutable.fromJS([
+        { value: undefined, variable: buildVariable("x", 0) },
+        { value: valueNumber(3) },
+      ]);
+      expect(operator.validateArgs(args)).toEqual(true);
+    });
+
+    it("succeeds when the second argument is undefined", () => {
+      const args = Immutable.fromJS([
+        { value: valueNumber(3) },
+        { value: undefined, variable: buildVariable("x", 0) },
+      ]);
       expect(operator.validateArgs(args)).toEqual(true);
     });
   });
 
   describe("evaluation", () => {
     it("returns undefined when the first argument is unbound", () => {
-      const args = Immutable.List([undefined, valueNumber(3)]);
+      const args = Immutable.fromJS([
+        { value: undefined, variable: buildVariable("x", 0) },
+        { value: valueNumber(3) },
+      ]);
       const evaluation = operator.evaluate(args);
-      expect(evaluation.value).toEqual(undefined);
-      expect(evaluation.missingArg).toEqual(0);
+      expect(evaluation.get("value")).toEqual(undefined);
+      expect(evaluation.get("waitCondition")).toEqual(buildVariable("x", 0));
     });
 
     it("returns undefined when the second argument is unbound", () => {
-      const args = Immutable.List([valueNumber(3), undefined]);
+      const args = Immutable.fromJS([
+        { value: valueNumber(3) },
+        { value: undefined, variable: buildVariable("x", 0) },
+      ]);
       const evaluation = operator.evaluate(args);
-      expect(evaluation.value).toEqual(undefined);
-      expect(evaluation.missingArg).toEqual(1);
+      expect(evaluation.get("value")).toEqual(undefined);
+      expect(evaluation.get("waitCondition")).toEqual(buildVariable("x", 0));
     });
 
     it("returns the appropriate value when both arguments are valid", () => {
-      const args = Immutable.List([valueNumber(14), valueNumber(3)]);
+      const args = Immutable.fromJS([
+        { value: valueNumber(14) },
+        { value: valueNumber(3) },
+      ]);
       const evaluation = operator.evaluate(args);
-      expect(evaluation.value).toEqual(valueNumber(2));
+      expect(evaluation.get("value")).toEqual(valueNumber(2));
     });
   });
 });
