@@ -11,7 +11,7 @@ export const RuntimeStores = props => {
   return (
     <Segment attached padded>
       <Header content="Stores" />
-      <Grid columns="equal">
+      <Grid columns="equal" stackable>
         <Grid.Column>
           <Sigma store={sigma} />
         </Grid.Column>
