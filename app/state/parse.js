@@ -1,6 +1,7 @@
 import Immutable from "immutable";
 import parser from "../oz/parser";
 import { compile } from "../oz/compilation";
+import { collectFreeIdentifiers } from "../oz/free_identifiers";
 
 export const initialState = Immutable.fromJS({
   errors: [],
@@ -20,15 +21,22 @@ export const reducer = (previousState = initialState, action) => {
     case "CHANGE_SOURCE_CODE": {
       try {
         const ast = parser(action.payload);
-        return previousState
+        const compilation = compile(ast);
+        const freeIdentifiers = collectFreeIdentifiers(compilation);
+        if (!freeIdentifiers.isEmpty()) {
+          throw new Error(
+            `Undeclared identifiers ${freeIdentifiers.join(", ")}`,
+          );
+        }
+        return initialState
           .set("errors", Immutable.List())
           .set("ast", ast)
-          .set("compiled", compile(ast));
+          .set("compiled", compilation);
       } catch (error) {
         const errors = Immutable.fromJS([
           { message: error.message, offset: error.offset },
         ]);
-        return previousState.set("errors", errors);
+        return initialState.set("errors", errors);
       }
     }
     default: {
