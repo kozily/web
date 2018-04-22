@@ -91,7 +91,7 @@ stm_value_creation -> ids_identifier _ "=" _ exp_expression {%
   }
 %}
 
-stm_conditional -> "if" __ ids_identifier __ "then" __ stm_sequence __ ("else" __ stm_sequence __):? "end" {%
+stm_conditional -> "if" __ exp_expression __ "then" __ stm_sequence __ ("else" __ stm_sequence __):? "end" {%
   function(d, position, reject) {
     return {
       node: "statement",

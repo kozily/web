@@ -5,6 +5,10 @@ import {
   bindingStatement,
   conditionalStatement,
 } from "../../app/oz/machine/statements";
+import {
+  identifierExpression,
+  operatorExpression,
+} from "../../app/oz/machine/expressions";
 import { lexicalIdentifier } from "../../app/oz/machine/lexical";
 import { literalNumber, literalRecord } from "../../app/oz/machine/literals";
 import { errorException } from "../../app/oz/machine/exceptions";
@@ -44,7 +48,7 @@ describe("Reducing if statements", () => {
 
       const statement = buildSemanticStatement(
         conditionalStatement(
-          lexicalIdentifier("X"),
+          identifierExpression(lexicalIdentifier("X")),
           skipStatement(),
           sequenceStatement(skipStatement(), skipStatement()),
         ),
@@ -77,7 +81,7 @@ describe("Reducing if statements", () => {
 
       const statement = buildSemanticStatement(
         conditionalStatement(
-          lexicalIdentifier("X"),
+          identifierExpression(lexicalIdentifier("X")),
           skipStatement(),
           sequenceStatement(skipStatement(), skipStatement()),
         ),
@@ -110,7 +114,7 @@ describe("Reducing if statements", () => {
 
       const statement = buildSemanticStatement(
         conditionalStatement(
-          lexicalIdentifier("X"),
+          identifierExpression(lexicalIdentifier("X")),
           skipStatement(),
           sequenceStatement(skipStatement(), skipStatement()),
         ),
@@ -143,12 +147,9 @@ describe("Reducing if statements", () => {
         ),
       });
 
-      /*
-      if X then Y=84 else Y=345 end
-      */
       const statement = buildSemanticStatement(
         conditionalStatement(
-          lexicalIdentifier("X"),
+          identifierExpression(lexicalIdentifier("X")),
           bindingStatement(lexicalIdentifier("Y"), literalNumber(84)),
           bindingStatement(lexicalIdentifier("Y"), literalNumber(345)),
         ),
@@ -192,12 +193,9 @@ describe("Reducing if statements", () => {
         ),
       });
 
-      /*
-      if X then Y=84 else Y=345 end
-      */
       const statement = buildSemanticStatement(
         conditionalStatement(
-          lexicalIdentifier("X"),
+          identifierExpression(lexicalIdentifier("X")),
           bindingStatement(lexicalIdentifier("Y"), literalNumber(84)),
           bindingStatement(lexicalIdentifier("Y"), literalNumber(345)),
         ),
@@ -243,12 +241,49 @@ describe("Reducing if statements", () => {
         ),
       });
 
-      /*
-      if X then Y=84 else Y=345 end
-      */
       const statement = buildSemanticStatement(
         conditionalStatement(
-          lexicalIdentifier("X"),
+          identifierExpression(lexicalIdentifier("X")),
+          bindingStatement(lexicalIdentifier("Y"), literalNumber(84)),
+          bindingStatement(lexicalIdentifier("Y"), literalNumber(345)),
+        ),
+        buildEnvironment({
+          X: buildVariable("x", 0),
+          Y: buildVariable("y", 0),
+        }),
+      );
+
+      expect(reduce(state, statement, 0)).toEqual(
+        buildBlockedState(state, statement, 0, buildVariable("x", 0)),
+      );
+    });
+  });
+
+  describe("when the expression blocks", () => {
+    it("blocks the current thread", () => {
+      const state = buildSingleThreadedState({
+        semanticStatements: [buildSemanticStatement(skipStatement())],
+        sigma: buildSigma(
+          buildEquivalenceClass(
+            undefined,
+            buildVariable("x", 0),
+            buildVariable("x", 1),
+          ),
+          buildEquivalenceClass(
+            undefined,
+            buildVariable("y", 0),
+            buildVariable("y", 1),
+          ),
+        ),
+      });
+
+      const statement = buildSemanticStatement(
+        conditionalStatement(
+          operatorExpression(
+            "+",
+            identifierExpression(lexicalIdentifier("X")),
+            identifierExpression(lexicalIdentifier("X")),
+          ),
           bindingStatement(lexicalIdentifier("Y"), literalNumber(84)),
           bindingStatement(lexicalIdentifier("Y"), literalNumber(345)),
         ),

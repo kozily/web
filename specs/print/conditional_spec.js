@@ -1,5 +1,6 @@
 import Immutable from "immutable";
 import { print } from "../../app/oz/print";
+import { identifierExpression } from "../../app/oz/machine/expressions";
 import {
   conditionalStatement,
   skipStatement,
@@ -14,7 +15,7 @@ describe("Printing a conditional statement", () => {
 
   it("Returns the appropriate string", () => {
     const statement = conditionalStatement(
-      lexicalIdentifier("Variable"),
+      identifierExpression(lexicalIdentifier("Variable")),
       skipStatement(),
       bindingStatement(lexicalIdentifier("X"), lexicalIdentifier("Y")),
     );

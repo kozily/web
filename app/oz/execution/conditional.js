@@ -1,30 +1,29 @@
-import { lookupVariableInSigma } from "../machine/sigma";
 import { buildSemanticStatement } from "../machine/build";
 import { errorException, raiseSystemException } from "../machine/exceptions";
 import { blockCurrentThread } from "../machine/threads";
+import { evaluate } from "../expression";
 
 export default function(state, semanticStatement, activeThreadIndex) {
   const sigma = state.get("sigma");
   const statement = semanticStatement.get("statement");
   const environment = semanticStatement.get("environment");
 
-  const identifier = statement.getIn(["condition", "identifier"]);
+  const condition = statement.get("condition");
   const trueStatement = statement.getIn(["trueStatement"]);
   const falseStatement = statement.getIn(["falseStatement"]);
 
-  const variable = environment.get(identifier);
-  const equivalentClass = lookupVariableInSigma(sigma, variable);
+  const evaluation = evaluate(condition, environment, sigma);
 
-  const value = equivalentClass.get("value");
-
-  if (value === undefined) {
+  if (evaluation.get("value") === undefined) {
     return blockCurrentThread(
       state,
       semanticStatement,
       activeThreadIndex,
-      variable,
+      evaluation.get("variable") || evaluation.get("waitCondition"),
     );
   }
+
+  const value = evaluation.get("value");
 
   if (value.get("type") !== "record")
     return raiseSystemException(state, activeThreadIndex, errorException());
