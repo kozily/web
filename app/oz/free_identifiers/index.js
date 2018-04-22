@@ -1,3 +1,4 @@
+import Immutable from "immutable";
 import { statementTypes } from "../machine/statements";
 import { literalTypes } from "../machine/literals";
 import { expressionTypes } from "../machine/expressions";
@@ -50,6 +51,9 @@ export const collectors = {
 };
 
 export const collectFreeIdentifiers = node => {
+  if (!node) {
+    return Immutable.Set();
+  }
   const collector = collectors[node.get("node")][node.get("type")];
   return collector(collectFreeIdentifiers, node);
 };
