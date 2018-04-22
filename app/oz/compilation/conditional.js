@@ -1,12 +1,16 @@
-import { conditionalStatement } from "../machine/statements";
+import { conditionalStatement, skipStatement } from "../machine/statements";
 
 export default (recurse, statement) => {
-  const trueStatement = recurse(statement.get("trueStatement"));
-  const falseStatement = recurse(statement.get("falseStatement"));
+  const compiledTrueStatement = recurse(statement.get("trueStatement"));
+
+  const falseStatement = statement.get("falseStatement");
+  const compiledFalseStatement = falseStatement
+    ? recurse(falseStatement)
+    : skipStatement();
 
   return conditionalStatement(
     statement.get("condition"),
-    trueStatement,
-    falseStatement,
+    compiledTrueStatement,
+    compiledFalseStatement,
   );
 };
