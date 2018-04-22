@@ -84,14 +84,14 @@ describe("Reducing X=VALUE statements", () => {
         buildSingleThreadedState({
           sigma: buildSigma(
             buildEquivalenceClass(
-              valueNumber(155),
-              buildVariable("x", 0),
-              buildVariable("x", 1),
-            ),
-            buildEquivalenceClass(
               undefined,
               buildVariable("y", 0),
               buildVariable("y", 1),
+            ),
+            buildEquivalenceClass(
+              valueNumber(155),
+              buildVariable("x", 0),
+              buildVariable("x", 1),
             ),
           ),
         }),
@@ -131,13 +131,13 @@ describe("Reducing X=VALUE statements", () => {
         buildSingleThreadedState({
           sigma: buildSigma(
             buildEquivalenceClass(
+              valueRecord("person", { age: buildVariable("a", 0) }),
+              buildVariable("p", 0),
+            ),
+            buildEquivalenceClass(
               undefined,
               buildVariable("x", 0),
               buildVariable("a", 0),
-            ),
-            buildEquivalenceClass(
-              valueRecord("person", { age: buildVariable("a", 0) }),
-              buildVariable("p", 0),
             ),
           ),
         }),
@@ -175,13 +175,13 @@ describe("Reducing X=VALUE statements", () => {
         buildSingleThreadedState({
           sigma: buildSigma(
             buildEquivalenceClass(
-              valueNumber(3),
-              buildVariable("x", 0),
-              buildVariable("a", 0),
-            ),
-            buildEquivalenceClass(
               valueRecord("person", { age: buildVariable("a", 0) }),
               buildVariable("p", 0),
+            ),
+            buildEquivalenceClass(
+              valueNumber(3),
+              buildVariable("a", 0),
+              buildVariable("x", 0),
             ),
           ),
         }),

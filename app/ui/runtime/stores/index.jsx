@@ -3,6 +3,7 @@ import { Segment, Header, Grid } from "semantic-ui-react";
 import { connect } from "react-redux";
 import Sigma from "./sigma";
 import Tau from "./tau";
+import { toggleShowSigmaSystemVariables } from "../../../state/runtime";
 
 export const RuntimeStores = props => {
   const sigma = props.machineState.get("sigma");
@@ -13,7 +14,13 @@ export const RuntimeStores = props => {
       <Header content="Stores" />
       <Grid columns="equal" stackable>
         <Grid.Column>
-          <Sigma store={sigma} />
+          <Sigma
+            store={sigma}
+            showSystemVariables={props.showSigmaSystemVariables}
+            onToggleShowSystemVariables={() =>
+              props.onToggleShowSigmaSystemVariable()
+            }
+          />
         </Grid.Column>
         <Grid.Column>
           <Tau store={tau} />
@@ -29,6 +36,15 @@ const mapStateToProps = state => ({
     "steps",
     state.getIn(["runtime", "currentStep"]),
   ]),
+  showSigmaSystemVariables: state.getIn([
+    "runtime",
+    "showSigmaSystemVariables",
+  ]),
 });
 
-export default connect(mapStateToProps)(RuntimeStores);
+const mapDispatchToProps = dispatch => ({
+  onToggleShowSigmaSystemVariable: () =>
+    dispatch(toggleShowSigmaSystemVariables()),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(RuntimeStores);

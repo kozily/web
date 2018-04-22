@@ -44,22 +44,23 @@ export const buildThread = ({
   });
 };
 
-export const buildVariable = (name, sequence) => {
+export const buildVariable = (name, sequence, { system = false } = {}) => {
   return Immutable.Map({
     name,
     sequence,
+    system,
   });
 };
 
 export const buildEquivalenceClass = (value, ...variables) => {
   return Immutable.Map({
     value,
-    variables: Immutable.Set(variables),
+    variables: Immutable.OrderedSet(variables),
   });
 };
 
 export const buildSigma = (...equivalenceClasses) => {
-  return Immutable.Set(equivalenceClasses);
+  return Immutable.OrderedSet(equivalenceClasses);
 };
 
 export const buildTrigger = (procedure, neededVariable) => {
@@ -70,7 +71,7 @@ export const buildTrigger = (procedure, neededVariable) => {
 };
 
 export const buildTau = (...triggers) => {
-  return Immutable.Set(triggers);
+  return Immutable.OrderedSet(triggers);
 };
 
 export const buildSingleThreadedState = ({
@@ -106,23 +107,28 @@ export const buildState = ({
 export const defaultEnvironment = () =>
   buildEnvironment(
     allBuiltInTypes.reduce((environment, builtInType) => {
-      const builtInTypeVariable = buildVariable(builtInType.toLowerCase(), 0);
+      const builtInTypeVariable = buildVariable(builtInType.toLowerCase(), 0, {
+        system: true,
+      });
 
       return environment.set(builtInType, builtInTypeVariable);
     }, buildEnvironment()),
   );
 
 export const defaultSigma = () =>
-  Immutable.Set(
+  Immutable.OrderedSet(
     allBuiltInTypes.reduce((sigma, builtInType) => {
       const builtInOperators = builtIns[builtInType];
-      const builtInTypeVariable = buildVariable(builtInType.toLowerCase(), 0);
+      const builtInTypeVariable = buildVariable(builtInType.toLowerCase(), 0, {
+        system: true,
+      });
 
       const features = Object.keys(builtInOperators).reduce(
         (acc, operatorKey) => {
           const operatorVariable = buildVariable(
             builtInOperators[operatorKey].name.toLowerCase(),
             0,
+            { system: true },
           );
           return acc.set(operatorKey, operatorVariable);
         },
@@ -139,6 +145,7 @@ export const defaultSigma = () =>
           const operatorVariable = buildVariable(
             builtInOperators[operatorKey].name.toLowerCase(),
             0,
+            { system: true },
           );
 
           const operatorValue = valueBuiltIn(operatorKey, builtInType);
@@ -153,7 +160,7 @@ export const defaultSigma = () =>
       return sigma
         .add(recordEquivalenceClass)
         .union(operatorsEquivalenceClasses);
-    }, Immutable.Set()),
+    }, Immutable.OrderedSet()),
   );
 
 export const buildFromKernelAST = ast => {

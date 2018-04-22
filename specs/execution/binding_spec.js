@@ -88,15 +88,15 @@ describe("Reducing X=Y statements", () => {
         sigma: buildSigma(
           buildEquivalenceClass(
             undefined,
+            buildVariable("z", 0),
+            buildVariable("z", 1),
+          ),
+          buildEquivalenceClass(
+            undefined,
             buildVariable("x", 0),
             buildVariable("x", 1),
             buildVariable("y", 0),
             buildVariable("y", 1),
-          ),
-          buildEquivalenceClass(
-            undefined,
-            buildVariable("z", 0),
-            buildVariable("z", 1),
           ),
         ),
       }),
@@ -136,15 +136,15 @@ describe("Reducing X=Y statements", () => {
         sigma: buildSigma(
           buildEquivalenceClass(
             undefined,
+            buildVariable("z", 0),
+            buildVariable("z", 1),
+          ),
+          buildEquivalenceClass(
+            undefined,
             buildVariable("x", 0),
             buildVariable("x", 1),
             buildVariable("y", 0),
             buildVariable("y", 1),
-          ),
-          buildEquivalenceClass(
-            undefined,
-            buildVariable("z", 0),
-            buildVariable("z", 1),
           ),
         ),
       }),

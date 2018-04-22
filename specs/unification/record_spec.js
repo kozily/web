@@ -33,16 +33,16 @@ describe("Unifying records", () => {
 
     const unifiedSigma = buildSigma(
       buildEquivalenceClass(
+        undefined,
+        buildVariable("y", 0),
+        buildVariable("y", 1),
+      ),
+      buildEquivalenceClass(
         valueRecord("person", { name: buildVariable("y", 0) }),
         buildVariable("x", 0),
         buildVariable("x", 1),
         buildVariable("z", 0),
         buildVariable("z", 1),
-      ),
-      buildEquivalenceClass(
-        undefined,
-        buildVariable("y", 0),
-        buildVariable("y", 1),
       ),
     );
 
@@ -73,17 +73,17 @@ describe("Unifying records", () => {
 
     const unifiedSigma = buildSigma(
       buildEquivalenceClass(
+        undefined,
+        buildVariable("y", 0),
+        buildVariable("y", 1),
+        buildVariable("w", 0),
+      ),
+      buildEquivalenceClass(
         valueRecord("person", { name: buildVariable("y", 0) }),
         buildVariable("x", 0),
         buildVariable("x", 1),
         buildVariable("z", 0),
         buildVariable("z", 1),
-      ),
-      buildEquivalenceClass(
-        undefined,
-        buildVariable("y", 0),
-        buildVariable("y", 1),
-        buildVariable("w", 0),
       ),
     );
 
@@ -120,10 +120,9 @@ describe("Unifying records", () => {
 
     const unifiedSigma = buildSigma(
       buildEquivalenceClass(
-        valueRecord("person", { address: buildVariable("y", 0) }),
-        buildVariable("x", 0),
-        buildVariable("x", 1),
-        buildVariable("z", 0),
+        undefined,
+        buildVariable("a", 0),
+        buildVariable("b", 0),
       ),
       buildEquivalenceClass(
         valueRecord("address", { street: buildVariable("a", 0) }),
@@ -131,9 +130,10 @@ describe("Unifying records", () => {
         buildVariable("p", 0),
       ),
       buildEquivalenceClass(
-        undefined,
-        buildVariable("a", 0),
-        buildVariable("b", 0),
+        valueRecord("person", { address: buildVariable("y", 0) }),
+        buildVariable("x", 0),
+        buildVariable("x", 1),
+        buildVariable("z", 0),
       ),
     );
 
