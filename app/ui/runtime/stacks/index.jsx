@@ -10,11 +10,19 @@ const threadsWithStatus = (threads, status) =>
 export const RuntimeStacks = props => {
   const threads = props.machineState
     .get("threads")
-    .map((thread, index) => thread.set("name", `Stack ${index}`));
+    .map((thread, index) =>
+      thread.set("name", `Stack ${index}`).set("index", index),
+    );
 
   return (
     <Segment attached padded>
-      <Header content="Stacks" />
+      <Header textAlign="left">
+        <Header.Content>Stacks</Header.Content>
+        <Header.Subheader>
+          Click on a stack to select which thread you want to execute on each
+          step.
+        </Header.Subheader>
+      </Header>
       <Grid divided columns="equal">
         <Grid.Column>
           <Threads

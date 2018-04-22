@@ -14,15 +14,18 @@ export const isFinalState = state => {
   return state.get("threads").every(thread => !isExecutableThread(thread));
 };
 
-export const executeSingleStep = state => {
-  const activeThreadIndices = state
+export const executeSingleStep = (state, { threadIndex = 0 } = {}) => {
+  const activeThreadEntry = state
     .get("threads")
     .map((thread, index) => ({ thread, index }))
-    .filter(entry => isExecutableThread(entry.thread))
-    .map(entry => entry.index);
-  const randomIndex = Math.floor(Math.random() * activeThreadIndices.size);
-  const activeThreadIndex = activeThreadIndices.get(randomIndex);
-  const activeThread = state.getIn(["threads", activeThreadIndex]);
+    .find(
+      entry => entry.index === threadIndex && isExecutableThread(entry.thread),
+    );
+  if (!activeThreadEntry) {
+    throw new Error("Thread index selected is not executable");
+  }
+  const activeThread = activeThreadEntry.thread;
+  const activeThreadIndex = activeThreadEntry.index;
 
   const semanticStatement = activeThread.get("stack").peek();
 
