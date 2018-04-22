@@ -1,6 +1,7 @@
 # Kozily web
 
 [![Build Status](https://travis-ci.org/kozily/web.svg?branch=master)](https://travis-ci.org/kozily/web)
+[![Waffle.io - Columns and their card count](https://badge.waffle.io/kozily/admin.svg?columns=all)](https://waffle.io/kozily/admin)
 
 Kozily client, progressive web application for developing and interaction with
 an Oz program.
