@@ -1,5 +1,5 @@
 import React from "react";
-import { threadStatus } from "../../../oz/machine/build";
+import { isExecutableThread } from "../../../oz/runtime";
 import { Menu, Header } from "semantic-ui-react";
 import SemanticStatement from "./semantic_statement";
 import WaitCondition from "./wait_condition";
@@ -58,8 +58,7 @@ const mapStateToProps = state => {
   return {
     hasNextStep: index =>
       threads.get(index) !== undefined &&
-      !threads.getIn([index, "stack"]).isEmpty() &&
-      threads.getIn([index, "metadata", "status"]) === threadStatus.ready,
+      isExecutableThread(threads.get(index)),
     hasPreviousStep: currentStep > 0,
   };
 };
