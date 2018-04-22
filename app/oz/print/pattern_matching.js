@@ -1,6 +1,6 @@
 export default (recurse, node, identation) => {
   const ident = new Array(identation + 1).join(" ");
-  const identifier = node.getIn(["identifier", "identifier"]);
+  const identifier = recurse(node.get("identifier")).abbreviated;
   const printedPattern = recurse(node.get("pattern")).abbreviated;
   const printedMatchStatement = recurse(
     node.get("trueStatement"),

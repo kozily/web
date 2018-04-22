@@ -1,5 +1,6 @@
 import Immutable from "immutable";
 import { print } from "../../app/oz/print";
+import { identifierExpression } from "../../app/oz/machine/expressions";
 import {
   patternMatchingStatement,
   bindingStatement,
@@ -14,7 +15,7 @@ describe("Printing a pattern matching statement", () => {
 
   it("Returns the appropriate string", () => {
     const statement = patternMatchingStatement(
-      lexicalIdentifier("X"),
+      identifierExpression(lexicalIdentifier("X")),
       literalRecord("person", {
         age: lexicalIdentifier("A"),
         name: lexicalIdentifier("N"),

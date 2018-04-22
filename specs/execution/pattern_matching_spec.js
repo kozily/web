@@ -1,5 +1,9 @@
 import Immutable from "immutable";
 import {
+  identifierExpression,
+  operatorExpression,
+} from "../../app/oz/machine/expressions";
+import {
   skipStatement,
   sequenceStatement,
   patternMatchingStatement,
@@ -40,7 +44,7 @@ describe("Reducing case statements", () => {
 
     const statement = buildSemanticStatement(
       patternMatchingStatement(
-        lexicalIdentifier("X"),
+        identifierExpression(lexicalIdentifier("X")),
         literalRecord("person", {
           name: lexicalIdentifier("Name"),
           age: lexicalIdentifier("Age"),
@@ -81,7 +85,7 @@ describe("Reducing case statements", () => {
 
     const statement = buildSemanticStatement(
       patternMatchingStatement(
-        lexicalIdentifier("X"),
+        identifierExpression(lexicalIdentifier("X")),
         literalRecord("person"),
         sequenceStatement(skipStatement(), skipStatement()),
         skipStatement(),
@@ -125,7 +129,7 @@ describe("Reducing case statements", () => {
 
     const statement = buildSemanticStatement(
       patternMatchingStatement(
-        lexicalIdentifier("X"),
+        identifierExpression(lexicalIdentifier("X")),
         literalRecord("person", {
           names: lexicalIdentifier("Name"),
           age: lexicalIdentifier("Age"),
@@ -172,7 +176,7 @@ describe("Reducing case statements", () => {
 
     const statement = buildSemanticStatement(
       patternMatchingStatement(
-        lexicalIdentifier("X"),
+        identifierExpression(lexicalIdentifier("X")),
         literalRecord("person", {
           name: lexicalIdentifier("Name"),
           age: lexicalIdentifier("Age"),
@@ -211,7 +215,7 @@ describe("Reducing case statements", () => {
 
     const statement = buildSemanticStatement(
       patternMatchingStatement(
-        lexicalIdentifier("X"),
+        identifierExpression(lexicalIdentifier("X")),
         literalRecord("person", {
           name: lexicalIdentifier("Name"),
           age: lexicalIdentifier("Age"),
@@ -240,28 +244,61 @@ describe("Reducing case statements", () => {
     );
   });
 
-  it("when the case identifier is unbound", () => {
-    const state = buildSingleThreadedState({
-      semanticStatements: [buildSemanticStatement(skipStatement())],
-      sigma: buildSigma(
-        buildEquivalenceClass(undefined, buildVariable("x", 0)),
-      ),
+  describe("when the case identifier is unbound", () => {
+    it("blocks the current thread", () => {
+      const state = buildSingleThreadedState({
+        semanticStatements: [buildSemanticStatement(skipStatement())],
+        sigma: buildSigma(
+          buildEquivalenceClass(undefined, buildVariable("x", 0)),
+        ),
+      });
+
+      const statement = buildSemanticStatement(
+        patternMatchingStatement(
+          identifierExpression(lexicalIdentifier("X")),
+          literalRecord("person"),
+          sequenceStatement(skipStatement(), skipStatement()),
+          skipStatement(),
+        ),
+        buildEnvironment({
+          X: buildVariable("x", 0),
+        }),
+      );
+
+      expect(reduce(state, statement, 0)).toEqual(
+        buildBlockedState(state, statement, 0, buildVariable("x", 0)),
+      );
     });
+  });
 
-    const statement = buildSemanticStatement(
-      patternMatchingStatement(
-        lexicalIdentifier("X"),
-        literalRecord("person"),
-        sequenceStatement(skipStatement(), skipStatement()),
-        skipStatement(),
-      ),
-      buildEnvironment({
-        X: buildVariable("x", 0),
-      }),
-    );
+  describe("when the expression blocks", () => {
+    it("blocks the current thread", () => {
+      const state = buildSingleThreadedState({
+        semanticStatements: [buildSemanticStatement(skipStatement())],
+        sigma: buildSigma(
+          buildEquivalenceClass(undefined, buildVariable("x", 0)),
+        ),
+      });
 
-    expect(reduce(state, statement, 0)).toEqual(
-      buildBlockedState(state, statement, 0, buildVariable("x", 0)),
-    );
+      const statement = buildSemanticStatement(
+        patternMatchingStatement(
+          operatorExpression(
+            "+",
+            identifierExpression(lexicalIdentifier("X")),
+            identifierExpression(lexicalIdentifier("X")),
+          ),
+          literalRecord("person"),
+          sequenceStatement(skipStatement(), skipStatement()),
+          skipStatement(),
+        ),
+        buildEnvironment({
+          X: buildVariable("x", 0),
+        }),
+      );
+
+      expect(reduce(state, statement, 0)).toEqual(
+        buildBlockedState(state, statement, 0, buildVariable("x", 0)),
+      );
+    });
   });
 });
