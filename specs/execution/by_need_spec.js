@@ -30,15 +30,15 @@ describe("Reducing by need statements", () => {
       semanticStatements: [buildSemanticStatement(skipStatement())],
       sigma: buildSigma(
         buildEquivalenceClass(undefined, buildVariable("x", 0)),
-        buildEquivalenceClass(undefined, buildVariable("y", 0)),
+        buildEquivalenceClass(undefined, buildVariable("w", 0)),
       ),
     });
 
     const statement = buildSemanticStatement(
-      byNeedStatement(lexicalIdentifier("X"), lexicalIdentifier("Y")),
+      byNeedStatement(lexicalIdentifier("X"), lexicalIdentifier("W")),
       buildEnvironment({
         X: buildVariable("x", 0),
-        Y: buildVariable("y", 0),
+        W: buildVariable("w", 0),
       }),
     );
 
@@ -47,7 +47,12 @@ describe("Reducing by need statements", () => {
         semanticStatements: [buildSemanticStatement(skipStatement())],
         sigma: state.get("sigma"),
         tau: buildTau(
-          buildTrigger(buildVariable("x", 0), buildVariable("y", 0)),
+          buildTrigger(
+            buildVariable("x", 0),
+            "TriggerProcedure",
+            buildVariable("w", 0),
+            "W",
+          ),
         ),
       }),
     );
@@ -58,15 +63,15 @@ describe("Reducing by need statements", () => {
       semanticStatements: [buildSemanticStatement(skipStatement())],
       sigma: buildSigma(
         buildEquivalenceClass(undefined, buildVariable("x", 0)),
-        buildEquivalenceClass(valueNumber(5), buildVariable("y", 0)),
+        buildEquivalenceClass(valueNumber(5), buildVariable("w", 0)),
       ),
     });
 
     const statement = buildSemanticStatement(
-      byNeedStatement(lexicalIdentifier("X"), lexicalIdentifier("Y")),
+      byNeedStatement(lexicalIdentifier("X"), lexicalIdentifier("W")),
       buildEnvironment({
         X: buildVariable("x", 0),
-        Y: buildVariable("y", 0),
+        W: buildVariable("w", 0),
       }),
     );
 
@@ -80,10 +85,14 @@ describe("Reducing by need statements", () => {
           buildThread({
             semanticStatements: [
               buildSemanticStatement(
-                procedureApplicationStatement(lexicalIdentifier("X"), [
-                  lexicalIdentifier("Y"),
-                ]),
-                statement.get("environment"),
+                procedureApplicationStatement(
+                  lexicalIdentifier("TriggerProcedure"),
+                  [lexicalIdentifier("W")],
+                ),
+                buildEnvironment({
+                  TriggerProcedure: buildVariable("x", 0),
+                  W: buildVariable("w", 0),
+                }),
               ),
             ],
           }),

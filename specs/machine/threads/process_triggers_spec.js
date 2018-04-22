@@ -49,7 +49,14 @@ describe("threads#processTriggers", () => {
           buildVariable("p", 0),
         ),
       ),
-      tau: buildTau(buildTrigger(buildVariable("p", 0), buildVariable("x", 0))),
+      tau: buildTau(
+        buildTrigger(
+          buildVariable("p", 0),
+          "TriggerProcedure",
+          buildVariable("x", 0),
+          "X",
+        ),
+      ),
     });
 
     expect(processTriggers(state)).toEqual(state);
@@ -68,7 +75,14 @@ describe("threads#processTriggers", () => {
           buildVariable("p", 0),
         ),
       ),
-      tau: buildTau(buildTrigger(buildVariable("p", 0), buildVariable("x", 0))),
+      tau: buildTau(
+        buildTrigger(
+          buildVariable("p", 0),
+          "TriggerProcedure",
+          buildVariable("x", 0),
+          "X",
+        ),
+      ),
     });
 
     expect(processTriggers(state)).toEqual(
@@ -80,12 +94,13 @@ describe("threads#processTriggers", () => {
           buildThread({
             semanticStatements: [
               buildSemanticStatement(
-                procedureApplicationStatement(lexicalIdentifier("X"), [
-                  lexicalIdentifier("Y"),
-                ]),
+                procedureApplicationStatement(
+                  lexicalIdentifier("TriggerProcedure"),
+                  [lexicalIdentifier("X")],
+                ),
                 buildEnvironment({
-                  X: buildVariable("p", 0),
-                  Y: buildVariable("x", 0),
+                  TriggerProcedure: buildVariable("p", 0),
+                  X: buildVariable("x", 0),
                 }),
               ),
             ],
@@ -113,7 +128,14 @@ describe("threads#processTriggers", () => {
           buildVariable("p", 0),
         ),
       ),
-      tau: buildTau(buildTrigger(buildVariable("p", 0), buildVariable("x", 0))),
+      tau: buildTau(
+        buildTrigger(
+          buildVariable("p", 0),
+          "TriggerProcedure",
+          buildVariable("x", 0),
+          "X",
+        ),
+      ),
     });
 
     expect(processTriggers(state)).toEqual(
@@ -129,12 +151,13 @@ describe("threads#processTriggers", () => {
           buildThread({
             semanticStatements: [
               buildSemanticStatement(
-                procedureApplicationStatement(lexicalIdentifier("X"), [
-                  lexicalIdentifier("Y"),
-                ]),
+                procedureApplicationStatement(
+                  lexicalIdentifier("TriggerProcedure"),
+                  [lexicalIdentifier("X")],
+                ),
                 buildEnvironment({
-                  X: buildVariable("p", 0),
-                  Y: buildVariable("x", 0),
+                  TriggerProcedure: buildVariable("p", 0),
+                  X: buildVariable("x", 0),
                 }),
               ),
             ],

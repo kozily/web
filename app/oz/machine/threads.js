@@ -50,12 +50,15 @@ export const processWaitConditions = state => {
 };
 
 export const activateTrigger = (state, trigger) => {
-  const statement = procedureApplicationStatement(lexicalIdentifier("X"), [
-    lexicalIdentifier("Y"),
-  ]);
+  const procedureIdentifier = trigger.get("procedureIdentifier");
+  const neededVariableIdentifier = trigger.get("neededVariableIdentifier");
+  const statement = procedureApplicationStatement(
+    lexicalIdentifier(procedureIdentifier),
+    [lexicalIdentifier(neededVariableIdentifier)],
+  );
   const environment = buildEnvironment({
-    X: trigger.get("procedure"),
-    Y: trigger.get("neededVariable"),
+    [procedureIdentifier]: trigger.get("procedure"),
+    [neededVariableIdentifier]: trigger.get("neededVariable"),
   });
 
   const newThread = buildThread({
