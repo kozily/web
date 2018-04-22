@@ -8,7 +8,7 @@ export const RuntimeStacksThreads = props => {
       <Header size="tiny" textAlign="center">
         {props.title}
       </Header>
-      <Transition.Group animation="fade up" as={Grid} columns="2">
+      <Transition.Group animation="fade up" as={Grid} columns="2" stackable>
         {props.threads.map(thread => (
           <Grid.Column key={thread.get("name")}>
             <Thread thread={thread} />

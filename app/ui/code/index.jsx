@@ -7,7 +7,7 @@ import Errors from "./errors";
 
 export const Code = () => {
   return (
-    <Grid>
+    <Grid stackable>
       <Grid.Row>
         <Grid.Column width={8}>
           <CodeMenu />
