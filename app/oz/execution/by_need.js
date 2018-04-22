@@ -1,8 +1,10 @@
 import { lookupVariableInSigma } from "../machine/sigma";
+import { lexicalIdentifier } from "../machine/lexical";
 import {
   buildThread,
   buildSemanticStatement,
   buildTrigger,
+  buildEnvironment,
 } from "../machine/build";
 import { procedureApplicationStatement } from "../machine/statements";
 
@@ -23,15 +25,31 @@ export default function(state, semanticStatement) {
   );
 
   if (neededEquivalenceClass.get("value")) {
-    const newStatement = procedureApplicationStatement(procedure, [needed]);
+    const newStatement = procedureApplicationStatement(
+      lexicalIdentifier("TriggerProcedure"),
+      [needed],
+    );
     const newThread = buildThread({
-      semanticStatements: [buildSemanticStatement(newStatement, environment)],
+      semanticStatements: [
+        buildSemanticStatement(
+          newStatement,
+          buildEnvironment({
+            TriggerProcedure: procedureVariable,
+            [neededIdentifier]: neededVariable,
+          }),
+        ),
+      ],
     });
 
     return state.update("threads", threads => threads.push(newThread));
   }
 
-  const newTrigger = buildTrigger(procedureVariable, neededVariable);
+  const newTrigger = buildTrigger(
+    procedureVariable,
+    "TriggerProcedure",
+    neededVariable,
+    neededIdentifier,
+  );
 
   return state.update("tau", tau => tau.add(newTrigger));
 }

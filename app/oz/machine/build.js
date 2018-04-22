@@ -63,10 +63,17 @@ export const buildSigma = (...equivalenceClasses) => {
   return Immutable.OrderedSet(equivalenceClasses);
 };
 
-export const buildTrigger = (procedure, neededVariable) => {
+export const buildTrigger = (
+  procedure,
+  procedureIdentifier,
+  neededVariable,
+  neededVariableIdentifier,
+) => {
   return Immutable.fromJS({
     procedure,
+    procedureIdentifier,
     neededVariable,
+    neededVariableIdentifier,
   });
 };
 
