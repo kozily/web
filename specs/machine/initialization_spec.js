@@ -9,7 +9,9 @@ import { lookupVariableInSigma } from "../../app/oz/machine/sigma";
 import { valueRecord, valueBuiltIn } from "../../app/oz/machine/values";
 
 const lookupBuiltInInSigma = (sigma, builtIn) =>
-  lookupVariableInSigma(sigma, buildVariable(builtIn, 0)).get("value");
+  lookupVariableInSigma(sigma, buildVariable(builtIn, 0, { system: true })).get(
+    "value",
+  );
 
 describe("State initialization", () => {
   beforeEach(() => {
@@ -20,10 +22,10 @@ describe("State initialization", () => {
     const state = buildFromKernelAST(skipStatement());
 
     const environment = buildEnvironment({
-      Number: buildVariable("number", 0),
-      Float: buildVariable("float", 0),
-      Record: buildVariable("record", 0),
-      Value: buildVariable("value", 0),
+      Number: buildVariable("number", 0, { system: true }),
+      Float: buildVariable("float", 0, { system: true }),
+      Record: buildVariable("record", 0, { system: true }),
+      Value: buildVariable("value", 0, { system: true }),
     });
 
     expect(state.getIn(["threads", 0, "stack", 0, "environment"])).toEqual(
@@ -37,11 +39,11 @@ describe("State initialization", () => {
 
     expect(lookupBuiltInInSigma(sigma, "number")).toEqual(
       valueRecord("Number", {
-        "+": buildVariable("nsum", 0),
-        "-": buildVariable("nsub", 0),
-        "*": buildVariable("nmul", 0),
-        div: buildVariable("ndiv", 0),
-        mod: buildVariable("nmod", 0),
+        "+": buildVariable("nsum", 0, { system: true }),
+        "-": buildVariable("nsub", 0, { system: true }),
+        "*": buildVariable("nmul", 0, { system: true }),
+        div: buildVariable("ndiv", 0, { system: true }),
+        mod: buildVariable("nmod", 0, { system: true }),
       }),
     );
     expect(lookupBuiltInInSigma(sigma, "nsum")).toEqual(
@@ -67,7 +69,7 @@ describe("State initialization", () => {
 
     expect(lookupBuiltInInSigma(sigma, "float")).toEqual(
       valueRecord("Float", {
-        "/": buildVariable("fdiv", 0),
+        "/": buildVariable("fdiv", 0, { system: true }),
       }),
     );
     expect(lookupBuiltInInSigma(sigma, "fdiv")).toEqual(
@@ -81,7 +83,7 @@ describe("State initialization", () => {
 
     expect(lookupBuiltInInSigma(sigma, "record")).toEqual(
       valueRecord("Record", {
-        ".": buildVariable("rsel", 0),
+        ".": buildVariable("rsel", 0, { system: true }),
       }),
     );
     expect(lookupBuiltInInSigma(sigma, "rsel")).toEqual(
@@ -95,12 +97,12 @@ describe("State initialization", () => {
 
     expect(lookupBuiltInInSigma(sigma, "value")).toEqual(
       valueRecord("Value", {
-        "==": buildVariable("veq", 0),
-        "\\=": buildVariable("vneq", 0),
-        "<": buildVariable("vlt", 0),
-        "<=": buildVariable("vle", 0),
-        ">": buildVariable("vgt", 0),
-        ">=": buildVariable("vge", 0),
+        "==": buildVariable("veq", 0, { system: true }),
+        "\\=": buildVariable("vneq", 0, { system: true }),
+        "<": buildVariable("vlt", 0, { system: true }),
+        "<=": buildVariable("vle", 0, { system: true }),
+        ">": buildVariable("vgt", 0, { system: true }),
+        ">=": buildVariable("vge", 0, { system: true }),
       }),
     );
     expect(lookupBuiltInInSigma(sigma, "veq")).toEqual(

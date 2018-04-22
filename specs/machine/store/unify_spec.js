@@ -64,8 +64,8 @@ describe("Unifying values in the sigma", () => {
       const unifiedSigma = buildSigma(
         buildEquivalenceClass(
           valueNumber(100),
-          buildVariable("x", 0),
           buildVariable("y", 0),
+          buildVariable("x", 0),
         ),
       );
 

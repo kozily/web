@@ -1,4 +1,3 @@
-import Immutable from "immutable";
 import {
   buildVariable,
   makeAuxiliaryIdentifier,
@@ -33,7 +32,13 @@ export const isEquivalenceClassBound = equivalenceClass => {
 
 export const lookupVariableInSigma = (sigma, variable) => {
   return sigma.find(ec =>
-    ec.get("variables").some(x => Immutable.is(x, variable)),
+    ec
+      .get("variables")
+      .some(
+        x =>
+          x.get("name") === variable.get("name") &&
+          x.get("sequence") === variable.get("sequence"),
+      ),
   );
 };
 
@@ -41,7 +46,7 @@ export const mergeEquivalenceClasses = (sigma, target, source) => {
   const sourceVariables = source.get("variables");
 
   const mergedEquivalenceClass = target.update("variables", variables =>
-    variables.union(sourceVariables),
+    variables.concat(sourceVariables),
   );
 
   return sigma
