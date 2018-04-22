@@ -1,6 +1,12 @@
 import Immutable from "immutable";
 
 import { lexicalIdentifier } from "../../../app/oz/machine/lexical";
+import { literalNumber } from "../../../app/oz/machine/literals";
+import {
+  operatorExpression,
+  literalExpression,
+  identifierExpression,
+} from "../../../app/oz/machine/expressions";
 import {
   sequenceStatementSyntax,
   skipStatementSyntax,
@@ -16,7 +22,7 @@ describe("Parsing conditional statements", () => {
   it("parses simple if ... then ... else ... end statements", () => {
     expect(parse("if X then skip skip else skip end")).toEqual(
       conditionalStatementSyntax(
-        lexicalIdentifier("X"),
+        identifierExpression(lexicalIdentifier("X")),
         sequenceStatementSyntax(skipStatementSyntax(), skipStatementSyntax()),
         skipStatementSyntax(),
       ),
@@ -25,7 +31,24 @@ describe("Parsing conditional statements", () => {
 
   it("parses simple if ... then ... end statements", () => {
     expect(parse("if X then skip end")).toEqual(
-      conditionalStatementSyntax(lexicalIdentifier("X"), skipStatementSyntax()),
+      conditionalStatementSyntax(
+        identifierExpression(lexicalIdentifier("X")),
+        skipStatementSyntax(),
+      ),
+    );
+  });
+
+  it("handles condition expressions", () => {
+    expect(parse("if 5 < 4 then skip else skip skip end")).toEqual(
+      conditionalStatementSyntax(
+        operatorExpression(
+          "<",
+          literalExpression(literalNumber(5)),
+          literalExpression(literalNumber(4)),
+        ),
+        skipStatementSyntax(),
+        sequenceStatementSyntax(skipStatementSyntax(), skipStatementSyntax()),
+      ),
     );
   });
 });

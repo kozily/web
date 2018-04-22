@@ -57,8 +57,8 @@ export const RuntimeStoresSigma = props => {
         <Menu.Menu position="right">
           <Dropdown item icon="ellipsis vertical">
             <Dropdown.Menu>
+              <Dropdown.Header icon="settings" content="Settings" />
               <Dropdown.Item
-                icon="cubes"
                 content={showHideMessage}
                 onClick={props.onToggleShowSystemVariables}
               />

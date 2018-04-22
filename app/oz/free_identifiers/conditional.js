@@ -1,9 +1,5 @@
-import Immutable from "immutable";
-
 export default (recurse, statement) => {
-  const conditionIdentifiers = Immutable.Set([
-    statement.getIn(["condition", "identifier"]),
-  ]);
+  const conditionIdentifiers = recurse(statement.get("condition"));
   const trueStatementIdentifiers = recurse(statement.get("trueStatement"));
   const falseStatementIdentifiers = recurse(statement.get("falseStatement"));
 

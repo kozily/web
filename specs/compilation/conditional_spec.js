@@ -1,5 +1,6 @@
 import Immutable from "immutable";
 import { compile } from "../../app/oz/compilation";
+import { identifierExpression } from "../../app/oz/machine/expressions";
 import {
   conditionalStatementSyntax,
   skipStatementSyntax,
@@ -19,14 +20,14 @@ describe("Compiling conditional statements", () => {
 
   it("compiles appropriately", () => {
     const statement = conditionalStatementSyntax(
-      lexicalIdentifier("X"),
+      identifierExpression(lexicalIdentifier("X")),
       skipStatementSyntax(),
       skipStatementSyntax(),
     );
 
     expect(compile(statement)).toEqual(
       conditionalStatement(
-        lexicalIdentifier("X"),
+        identifierExpression(lexicalIdentifier("X")),
         skipStatement(),
         skipStatement(),
       ),
@@ -35,13 +36,13 @@ describe("Compiling conditional statements", () => {
 
   it("compiles appropriately conditionals without else", () => {
     const statement = conditionalStatementSyntax(
-      lexicalIdentifier("X"),
+      identifierExpression(lexicalIdentifier("X")),
       bindingStatementSyntax(lexicalIdentifier("A"), lexicalIdentifier("B")),
     );
 
     expect(compile(statement)).toEqual(
       conditionalStatement(
-        lexicalIdentifier("X"),
+        identifierExpression(lexicalIdentifier("X")),
         bindingStatement(lexicalIdentifier("A"), lexicalIdentifier("B")),
         skipStatement(),
       ),

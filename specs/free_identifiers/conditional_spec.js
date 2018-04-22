@@ -1,5 +1,6 @@
 import Immutable from "immutable";
 import { collectFreeIdentifiers } from "../../app/oz/free_identifiers";
+import { identifierExpression } from "../../app/oz/machine/expressions";
 import {
   conditionalStatement,
   bindingStatement,
@@ -13,7 +14,7 @@ describe("Collecting free identifiers in a conditional statement", () => {
 
   it("collects all identifiers from the condition and all substatements", () => {
     const statement = conditionalStatement(
-      lexicalIdentifier("Z"),
+      identifierExpression(lexicalIdentifier("Z")),
       bindingStatement(lexicalIdentifier("A"), lexicalIdentifier("B")),
       bindingStatement(lexicalIdentifier("X"), lexicalIdentifier("Y")),
     );
