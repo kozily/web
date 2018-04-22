@@ -13,25 +13,19 @@ describe("Parsing conditional statements", () => {
     jasmine.addCustomEqualityTester(Immutable.is);
   });
 
-  describe("when condition is a variable", () => {
-    it("when is composed by two statement in the true statement", () => {
-      expect(parse("if X then skip skip else skip end")).toEqual(
-        conditionalStatementSyntax(
-          lexicalIdentifier("X"),
-          sequenceStatementSyntax(skipStatementSyntax(), skipStatementSyntax()),
-          skipStatementSyntax(),
-        ),
-      );
-    });
+  it("parses simple if ... then ... else ... end statements", () => {
+    expect(parse("if X then skip skip else skip end")).toEqual(
+      conditionalStatementSyntax(
+        lexicalIdentifier("X"),
+        sequenceStatementSyntax(skipStatementSyntax(), skipStatementSyntax()),
+        skipStatementSyntax(),
+      ),
+    );
+  });
 
-    it("when is composed by two statements in the false statement", () => {
-      expect(parse("if X then skip else skip skip end")).toEqual(
-        conditionalStatementSyntax(
-          lexicalIdentifier("X"),
-          skipStatementSyntax(),
-          sequenceStatementSyntax(skipStatementSyntax(), skipStatementSyntax()),
-        ),
-      );
-    });
+  it("parses simple if ... then ... end statements", () => {
+    expect(parse("if X then skip end")).toEqual(
+      conditionalStatementSyntax(lexicalIdentifier("X"), skipStatementSyntax()),
+    );
   });
 });
