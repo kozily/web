@@ -9,6 +9,7 @@ import {
   patternMatchingStatementSyntax,
   sequenceStatementSyntax,
   skipStatementSyntax,
+  bindingStatementSyntax,
 } from "../../../app/oz/machine/statementSyntax";
 import parse from "../../../app/oz/parser";
 
@@ -23,11 +24,18 @@ describe("Parsing case statements", () => {
     ).toEqual(
       patternMatchingStatementSyntax(
         identifierExpression(lexicalIdentifier("X")),
-        literalRecord("person", {
-          name: lexicalIdentifier("Name"),
-          age: lexicalIdentifier("Age"),
-        }),
-        sequenceStatementSyntax(skipStatementSyntax(), skipStatementSyntax()),
+        [
+          {
+            pattern: literalRecord("person", {
+              name: lexicalIdentifier("Name"),
+              age: lexicalIdentifier("Age"),
+            }),
+            statement: sequenceStatementSyntax(
+              skipStatementSyntax(),
+              skipStatementSyntax(),
+            ),
+          },
+        ],
         skipStatementSyntax(),
       ),
     );
@@ -37,9 +45,66 @@ describe("Parsing case statements", () => {
     expect(parse("case X of person then skip skip else skip end")).toEqual(
       patternMatchingStatementSyntax(
         identifierExpression(lexicalIdentifier("X")),
-        literalRecord("person"),
-        sequenceStatementSyntax(skipStatementSyntax(), skipStatementSyntax()),
+        [
+          {
+            pattern: literalRecord("person"),
+            statement: sequenceStatementSyntax(
+              skipStatementSyntax(),
+              skipStatementSyntax(),
+            ),
+          },
+        ],
         skipStatementSyntax(),
+      ),
+    );
+  });
+
+  it("handles multiple pattern cases", () => {
+    expect(
+      parse(
+        "case X of person then A = B [] animal then B = C [] mineral then C = D else skip end",
+      ),
+    ).toEqual(
+      patternMatchingStatementSyntax(
+        identifierExpression(lexicalIdentifier("X")),
+        [
+          {
+            pattern: literalRecord("person"),
+            statement: bindingStatementSyntax(
+              lexicalIdentifier("A"),
+              lexicalIdentifier("B"),
+            ),
+          },
+          {
+            pattern: literalRecord("animal"),
+            statement: bindingStatementSyntax(
+              lexicalIdentifier("B"),
+              lexicalIdentifier("C"),
+            ),
+          },
+          {
+            pattern: literalRecord("mineral"),
+            statement: bindingStatementSyntax(
+              lexicalIdentifier("C"),
+              lexicalIdentifier("D"),
+            ),
+          },
+        ],
+        skipStatementSyntax(),
+      ),
+    );
+  });
+
+  it("handles no else clause", () => {
+    expect(parse("case X of person then skip end")).toEqual(
+      patternMatchingStatementSyntax(
+        identifierExpression(lexicalIdentifier("X")),
+        [
+          {
+            pattern: literalRecord("person"),
+            statement: skipStatementSyntax(),
+          },
+        ],
       ),
     );
   });
@@ -52,8 +117,15 @@ describe("Parsing case statements", () => {
           identifierExpression(lexicalIdentifier("A")),
           identifierExpression(lexicalIdentifier("B")),
         ),
-        literalRecord("person"),
-        sequenceStatementSyntax(skipStatementSyntax(), skipStatementSyntax()),
+        [
+          {
+            pattern: literalRecord("person"),
+            statement: sequenceStatementSyntax(
+              skipStatementSyntax(),
+              skipStatementSyntax(),
+            ),
+          },
+        ],
         skipStatementSyntax(),
       ),
     );

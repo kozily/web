@@ -76,16 +76,14 @@ export const conditionalStatementSyntax = (
 
 export const patternMatchingStatementSyntax = (
   identifier,
-  pattern,
-  trueStatement,
+  clauses,
   falseStatement = undefined,
 ) => {
-  return new Immutable.Map({
+  return new Immutable.fromJS({
     node: "statement",
     type: statementSyntaxTypes.patternMatchingSyntax,
     identifier,
-    pattern,
-    trueStatement,
+    clauses,
     falseStatement,
   });
 };

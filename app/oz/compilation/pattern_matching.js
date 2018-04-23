@@ -1,14 +1,18 @@
-import { patternMatchingStatement } from "../machine/statements";
+import { patternMatchingStatement, skipStatement } from "../machine/statements";
 
 export default (recurse, statement) => {
-  const pattern = statement.get("pattern");
-  const trueStatement = recurse(statement.get("trueStatement"));
-  const falseStatement = recurse(statement.get("falseStatement"));
+  const identifier = statement.get("identifier");
+  const falseStatement = statement.get("falseStatement");
+  const finalFalseStatement = falseStatement
+    ? recurse(statement.get("falseStatement"))
+    : skipStatement();
 
-  return patternMatchingStatement(
-    statement.get("identifier"),
-    pattern,
-    trueStatement,
-    falseStatement,
-  );
+  return statement.get("clauses").reduceRight((result, clause) => {
+    return patternMatchingStatement(
+      identifier,
+      clause.get("pattern"),
+      recurse(clause.get("statement")),
+      result,
+    );
+  }, finalFalseStatement);
 };
