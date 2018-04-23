@@ -43,7 +43,7 @@ export const valueListItem = (head, tail) => {
 };
 
 export const valueList = (items = []) => {
-  return items.reduce(
+  return items.reduceRight(
     (result, item) => valueListItem(item, result),
     valueRecord("nil"),
   );
