@@ -1,5 +1,5 @@
 import React from "react";
-import { Popup, Menu, Header } from "semantic-ui-react";
+import { Popup, Segment, Header } from "semantic-ui-react";
 import { print } from "../../../oz/print";
 import Code from "../code";
 import Environment from "./environment";
@@ -10,9 +10,9 @@ export const RuntimeStacksSemanticStatement = props => {
   const environment = props.semanticStatement.get("environment");
 
   const item = (
-    <Menu.Item active={props.active}>
+    <Segment attached>
       <Code>{printedStatement.abbreviated}</Code>
-    </Menu.Item>
+    </Segment>
   );
 
   return (
