@@ -48,30 +48,41 @@ export const reducer = (previousState = initialState, action) => {
       const ast = parser(previousState.get("source"));
       const kernel = compile(ast);
       const runtime = buildFromKernelAST(kernel);
-      const step = executeSingleStep(runtime);
       return previousState
-        .set("steps", Immutable.List([step]))
+        .set("steps", Immutable.List.of(runtime))
         .set("currentStep", 0);
     }
     case "RUNTIME_NEXT": {
       const threadIndex = action.payload;
       const currentStep = previousState.get("currentStep");
       const runtime = previousState.getIn(["steps", currentStep]);
-      const step = executeSingleStep(runtime, { threadIndex });
-      return previousState
-        .update("steps", steps => steps.push(step))
-        .set("currentStep", currentStep + 1);
+      try {
+        const step = executeSingleStep(runtime, { threadIndex });
+        return previousState
+          .update("steps", steps => steps.push(step))
+          .set("currentStep", currentStep + 1);
+      } catch (error) {
+        return previousState.set(
+          "error",
+          Immutable.Map({
+            message: "Unhandled OZ exception",
+            error: error.innerOzException,
+          }),
+        );
+      }
     }
     case "RUNTIME_PREVIOUS": {
       const currentStep = previousState.get("currentStep");
       const previousStep = currentStep > 0 ? currentStep - 1 : currentStep;
       return previousState
         .update("steps", steps => steps.pop())
+        .delete("error")
         .set("currentStep", previousStep);
     }
     case "RUNTIME_FIRST": {
       return previousState
         .update("steps", steps => Immutable.List([steps.get(0)]))
+        .delete("error")
         .set("currentStep", 0);
     }
     case "CHANGE_SOURCE_CODE": {
