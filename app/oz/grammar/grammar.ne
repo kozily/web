@@ -103,15 +103,22 @@ stm_conditional -> "if" __ exp_expression __ "then" __ stm_sequence __ ("else" _
   }
 %}
 
-stm_pattern_matching -> "case" __ exp_expression __ "of" __ lit_record_like __ "then" __ stm_sequence __ "else" __ stm_sequence __ "end" {%
+stm_pattern_matching -> "case" __ exp_expression __ "of" __ lit_record_like __ "then" __ stm_sequence __ ("[]" __ lit_record_like __ "then" __ stm_sequence __ ):* ("else" __ stm_sequence __):? "end" {%
   function(d, position, reject) {
+    const clauses = d[12].reduce(function(result, clause) {
+      result.push({
+        pattern: clause[2],
+        statement: clause[6],
+      });
+      return result;
+    }, [{pattern: d[6], statement: d[10]}]);
+
     return {
       node: "statement",
       type: "patternMatchingSyntax",
       identifier: d[2],
-      pattern: d[6],
-      trueStatement: d[10],
-      falseStatement: d[14],
+      clauses: clauses,
+      falseStatement: d[13] ? d[13][2] : undefined,
     }
   }
 %}
