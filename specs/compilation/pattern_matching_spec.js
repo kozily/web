@@ -1,5 +1,6 @@
 import Immutable from "immutable";
 import { compile } from "../../app/oz/compilation";
+import { identifierExpression } from "../../app/oz/machine/expressions";
 import {
   patternMatchingStatementSyntax,
   skipStatementSyntax,
@@ -18,7 +19,7 @@ describe("Compiling patternMatching statements", () => {
 
   it("compiles appropriately", () => {
     const statement = patternMatchingStatementSyntax(
-      lexicalIdentifier("X"),
+      identifierExpression(lexicalIdentifier("X")),
       literalRecord("person"),
       skipStatementSyntax(),
       skipStatementSyntax(),
@@ -26,7 +27,7 @@ describe("Compiling patternMatching statements", () => {
 
     expect(compile(statement)).toEqual(
       patternMatchingStatement(
-        lexicalIdentifier("X"),
+        identifierExpression(lexicalIdentifier("X")),
         literalRecord("person"),
         skipStatement(),
         skipStatement(),

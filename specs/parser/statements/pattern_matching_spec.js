@@ -1,5 +1,9 @@
 import Immutable from "immutable";
 import { lexicalIdentifier } from "../../../app/oz/machine/lexical";
+import {
+  identifierExpression,
+  operatorExpression,
+} from "../../../app/oz/machine/expressions";
 import { literalRecord } from "../../../app/oz/machine/literals";
 import {
   patternMatchingStatementSyntax,
@@ -18,7 +22,7 @@ describe("Parsing case statements", () => {
       parse("case X of person(name:Name age:Age) then skip skip else skip end"),
     ).toEqual(
       patternMatchingStatementSyntax(
-        lexicalIdentifier("X"),
+        identifierExpression(lexicalIdentifier("X")),
         literalRecord("person", {
           name: lexicalIdentifier("Name"),
           age: lexicalIdentifier("Age"),
@@ -32,7 +36,22 @@ describe("Parsing case statements", () => {
   it("handles record with label and no features", () => {
     expect(parse("case X of person then skip skip else skip end")).toEqual(
       patternMatchingStatementSyntax(
-        lexicalIdentifier("X"),
+        identifierExpression(lexicalIdentifier("X")),
+        literalRecord("person"),
+        sequenceStatementSyntax(skipStatementSyntax(), skipStatementSyntax()),
+        skipStatementSyntax(),
+      ),
+    );
+  });
+
+  it("handles expressions", () => {
+    expect(parse("case A + B of person then skip skip else skip end")).toEqual(
+      patternMatchingStatementSyntax(
+        operatorExpression(
+          "+",
+          identifierExpression(lexicalIdentifier("A")),
+          identifierExpression(lexicalIdentifier("B")),
+        ),
         literalRecord("person"),
         sequenceStatementSyntax(skipStatementSyntax(), skipStatementSyntax()),
         skipStatementSyntax(),

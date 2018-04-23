@@ -20,6 +20,6 @@ export default function(state, semanticStatement, activeThreadIndex) {
   );
 
   return state.updateIn(["threads", activeThreadIndex, "stack"], stack =>
-    stack.concat(semanticStatements),
+    stack.pushAll(semanticStatements),
   );
 }

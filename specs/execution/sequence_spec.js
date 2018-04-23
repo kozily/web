@@ -2,6 +2,7 @@ import Immutable from "immutable";
 import {
   sequenceStatement,
   bindingStatement,
+  skipStatement,
 } from "../../app/oz/machine/statements";
 import {
   buildSingleThreadedState,
@@ -18,7 +19,9 @@ describe("Reducing sequence statements", () => {
   });
 
   it("reduces correctly", () => {
-    const state = buildSingleThreadedState({});
+    const state = buildSingleThreadedState({
+      semanticStatements: [buildSemanticStatement(skipStatement())],
+    });
 
     const sharedEnvironment = buildEnvironment({
       X: buildVariable("x", 0),
@@ -43,13 +46,16 @@ describe("Reducing sequence statements", () => {
             bindingStatement(lexicalIdentifier("C"), lexicalIdentifier("D")),
             sharedEnvironment,
           ),
+          buildSemanticStatement(skipStatement()),
         ],
       }),
     );
   });
 
   it("reduces sequences of sequence correctly", () => {
-    const state = buildSingleThreadedState({});
+    const state = buildSingleThreadedState({
+      semanticStatements: [buildSemanticStatement(skipStatement())],
+    });
 
     const sharedEnvironment = buildEnvironment({
       X: buildVariable("x", 0),
@@ -88,6 +94,7 @@ describe("Reducing sequence statements", () => {
             bindingStatement(lexicalIdentifier("D"), lexicalIdentifier("E")),
             sharedEnvironment,
           ),
+          buildSemanticStatement(skipStatement()),
         ],
       }),
     );

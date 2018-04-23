@@ -1,6 +1,10 @@
 import Immutable from "immutable";
 import { collectFreeIdentifiers } from "../../app/oz/free_identifiers";
 import {
+  identifierExpression,
+  operatorExpression,
+} from "../../app/oz/machine/expressions";
+import {
   patternMatchingStatement,
   bindingStatement,
 } from "../../app/oz/machine/statements";
@@ -14,7 +18,11 @@ describe("Collecting free identifiers in a pattern matching statement", () => {
 
   it("collects the appropriate identifiers", () => {
     const statement = patternMatchingStatement(
-      lexicalIdentifier("X"),
+      operatorExpression(
+        "==",
+        identifierExpression(lexicalIdentifier("P")),
+        identifierExpression(lexicalIdentifier("Q")),
+      ),
       literalRecord("person", {
         age: lexicalIdentifier("A"),
         name: lexicalIdentifier("N"),
@@ -24,7 +32,7 @@ describe("Collecting free identifiers in a pattern matching statement", () => {
     );
 
     expect(collectFreeIdentifiers(statement)).toEqual(
-      Immutable.Set(["X", "Y", "Z", "N"]),
+      Immutable.Set(["P", "Q", "Y", "Z", "N"]),
     );
   });
 });

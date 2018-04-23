@@ -103,7 +103,7 @@ stm_conditional -> "if" __ exp_expression __ "then" __ stm_sequence __ ("else" _
   }
 %}
 
-stm_pattern_matching -> "case" __ ids_identifier __ "of" __ lit_record_like __ "then" __ stm_sequence __ "else" __ stm_sequence __ "end" {%
+stm_pattern_matching -> "case" __ exp_expression __ "of" __ lit_record_like __ "then" __ stm_sequence __ "else" __ stm_sequence __ "end" {%
   function(d, position, reject) {
     return {
       node: "statement",
