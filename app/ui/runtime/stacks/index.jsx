@@ -16,13 +16,7 @@ export const RuntimeStacks = props => {
 
   return (
     <Segment attached padded>
-      <Header textAlign="left">
-        <Header.Content>Stacks</Header.Content>
-        <Header.Subheader>
-          Click on a stack to select which thread you want to execute on each
-          step.
-        </Header.Subheader>
-      </Header>
+      <Header textAlign="left" content="Stacks" />
       <Grid divided columns="equal">
         <Grid.Column>
           <Threads
