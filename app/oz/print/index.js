@@ -15,9 +15,12 @@ import exceptionRaise from "./exception_raise";
 import exceptionCatch from "./exception_catch";
 import thread from "./thread";
 import byNeed from "./by_need";
-import number from "./number";
-import record from "./record";
-import procedure from "./procedure";
+import numberLiteral from "./literals/number";
+import recordLiteral from "./literals/record";
+import procedureLiteral from "./literals/procedure";
+import numberValue from "./values/number";
+import recordValue from "./values/record";
+import procedureValue from "./values/procedure";
 import builtIn from "./built_in";
 import literalExpression from "./literal_expression";
 import identifierExpression from "./identifier_expression";
@@ -40,14 +43,14 @@ export const printers = {
     [statementTypes.byNeed]: byNeed,
   },
   literal: {
-    [literalTypes.number]: number,
-    [literalTypes.record]: record,
-    [literalTypes.procedure]: procedure,
+    [literalTypes.number]: numberLiteral,
+    [literalTypes.record]: recordLiteral,
+    [literalTypes.procedure]: procedureLiteral,
   },
   value: {
-    [valueTypes.number]: number,
-    [valueTypes.record]: record,
-    [valueTypes.procedure]: procedure,
+    [valueTypes.number]: numberValue,
+    [valueTypes.record]: recordValue,
+    [valueTypes.procedure]: procedureValue,
     [valueTypes.builtIn]: builtIn,
   },
   expression: {
