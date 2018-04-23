@@ -3,17 +3,16 @@ import { Message } from "semantic-ui-react";
 import { connect } from "react-redux";
 
 export const CodeError = props => {
-  const errorMessages = props.error.map(e => e.get("message"));
   return (
     <Message
       as="pre"
-      hidden={props.error.isEmpty()}
+      hidden={props.error === undefined}
       attached="bottom"
       size="tiny"
       error
       icon="warning sign"
       header="Syntax error"
-      list={errorMessages.toJS()}
+      content={props.error !== undefined ? props.error.get("message") : false}
     />
   );
 };

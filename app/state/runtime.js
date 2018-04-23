@@ -48,20 +48,9 @@ export const reducer = (previousState = initialState, action) => {
       const ast = parser(previousState.get("source"));
       const kernel = compile(ast);
       const runtime = buildFromKernelAST(kernel);
-      try {
-        const step = executeSingleStep(runtime);
-        return previousState
-          .set("steps", Immutable.List([step]))
-          .set("currentStep", 0);
-      } catch (error) {
-        return previousState.set(
-          "error",
-          Immutable.Map({
-            message: "Unhandled OZ exception",
-            error: error.innerOzException,
-          }),
-        );
-      }
+      return previousState
+        .set("steps", Immutable.List.of(runtime))
+        .set("currentStep", 0);
     }
     case "RUNTIME_NEXT": {
       const threadIndex = action.payload;
