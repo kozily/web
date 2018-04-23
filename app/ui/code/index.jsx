@@ -3,7 +3,7 @@ import { Segment, Grid, Menu } from "semantic-ui-react";
 import CodeMenu from "./menu";
 import Editor from "./editor";
 import Kernel from "./kernel";
-import Errors from "./errors";
+import CodeError from "./error";
 
 export const Code = () => {
   return (
@@ -26,7 +26,7 @@ export const Code = () => {
       </Grid.Row>
       <Grid.Row>
         <Grid.Column width={16}>
-          <Errors />
+          <CodeError />
         </Grid.Column>
       </Grid.Row>
     </Grid>

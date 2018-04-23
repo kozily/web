@@ -4,7 +4,7 @@ import { compile } from "../oz/compilation";
 import { collectFreeIdentifiers } from "../oz/free_identifiers";
 
 export const initialState = Immutable.fromJS({
-  errors: [],
+  error: [],
   ast: null,
 });
 
@@ -29,14 +29,14 @@ export const reducer = (previousState = initialState, action) => {
           );
         }
         return initialState
-          .set("errors", Immutable.List())
+          .set("error", Immutable.List())
           .set("ast", ast)
           .set("compiled", compilation);
       } catch (error) {
-        const errors = Immutable.fromJS([
+        const errorModel = Immutable.fromJS([
           { message: error.message, offset: error.offset },
         ]);
-        return initialState.set("errors", errors);
+        return initialState.set("error", errorModel);
       }
     }
     default: {
