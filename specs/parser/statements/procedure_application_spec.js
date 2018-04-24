@@ -1,4 +1,5 @@
 import Immutable from "immutable";
+import { identifierExpression } from "../../../app/oz/machine/expressions";
 import { lexicalIdentifier } from "../../../app/oz/machine/lexical";
 import { procedureApplicationStatementSyntax } from "../../../app/oz/machine/statementSyntax";
 import parse from "../../../app/oz/parser";
@@ -11,13 +12,17 @@ describe("Parsing {X ...} statements", () => {
   describe("when no arguments are provided", () => {
     it("handles condensed syntax correctly", () => {
       expect(parse("{SomeProcedure}")).toEqual(
-        procedureApplicationStatementSyntax(lexicalIdentifier("SomeProcedure")),
+        procedureApplicationStatementSyntax(
+          identifierExpression(lexicalIdentifier("SomeProcedure")),
+        ),
       );
     });
 
     it("handles whitespaced syntax correctly", () => {
       expect(parse("{\n   SomeProcedure\t\t  \n}")).toEqual(
-        procedureApplicationStatementSyntax(lexicalIdentifier("SomeProcedure")),
+        procedureApplicationStatementSyntax(
+          identifierExpression(lexicalIdentifier("SomeProcedure")),
+        ),
       );
     });
   });
@@ -26,10 +31,10 @@ describe("Parsing {X ...} statements", () => {
     it("handles condensed syntax correctly", () => {
       expect(parse("{SomeProcedure FirstArgument SecondArgument}")).toEqual(
         procedureApplicationStatementSyntax(
-          lexicalIdentifier("SomeProcedure"),
+          identifierExpression(lexicalIdentifier("SomeProcedure")),
           [
-            lexicalIdentifier("FirstArgument"),
-            lexicalIdentifier("SecondArgument"),
+            identifierExpression(lexicalIdentifier("FirstArgument")),
+            identifierExpression(lexicalIdentifier("SecondArgument")),
           ],
         ),
       );
@@ -42,10 +47,10 @@ describe("Parsing {X ...} statements", () => {
         ),
       ).toEqual(
         procedureApplicationStatementSyntax(
-          lexicalIdentifier("SomeProcedure"),
+          identifierExpression(lexicalIdentifier("SomeProcedure")),
           [
-            lexicalIdentifier("FirstArgument"),
-            lexicalIdentifier("SecondArgument"),
+            identifierExpression(lexicalIdentifier("FirstArgument")),
+            identifierExpression(lexicalIdentifier("SecondArgument")),
           ],
         ),
       );

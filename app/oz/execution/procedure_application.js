@@ -1,9 +1,10 @@
 import Immutable from "immutable";
+import { unifyEvaluations, makeNewVariable } from "../machine/sigma";
 import {
-  lookupVariableInSigma,
-  unifyVariableToEvaluation,
-} from "../machine/sigma";
-import { buildSemanticStatement } from "../machine/build";
+  buildSemanticStatement,
+  buildEquivalenceClass,
+  makeAuxiliaryIdentifier,
+} from "../machine/build";
 import {
   failureException,
   errorException,
@@ -11,92 +12,175 @@ import {
 } from "../machine/exceptions";
 import { builtIns } from "../built_ins";
 import { blockCurrentThread } from "../machine/threads";
+import { evaluate } from "../expression";
 
-export default function(state, semanticStatement, activeThreadIndex) {
-  const sigma = state.get("sigma");
+const executeBuiltInValue = (
+  procedureValue,
+  state,
+  semanticStatement,
+  activeThreadIndex,
+) => {
   const statement = semanticStatement.get("statement");
+  const sigma = state.get("sigma");
   const environment = semanticStatement.get("environment");
 
-  const procedureIdentifier = statement.getIn(["procedure", "identifier"]);
-  const procedureVariable = environment.get(procedureIdentifier);
-  const procedureValue = lookupVariableInSigma(sigma, procedureVariable).get(
-    "value",
-  );
+  const builtInNamespace = procedureValue.get("namespace");
+  const builtInOperator = procedureValue.get("operator");
+  const builtIn = builtIns[builtInNamespace][builtInOperator];
 
-  if (procedureValue === undefined) {
+  const args = statement.get("args");
+  if (args.isEmpty()) {
+    return raiseSystemException(state, activeThreadIndex, errorException());
+  }
+
+  const resultArg = args.last();
+  const resultEvaluation = evaluate(resultArg, environment, sigma);
+
+  if (resultEvaluation.get("waitCondition")) {
     return blockCurrentThread(
       state,
       semanticStatement,
       activeThreadIndex,
-      procedureVariable,
+      resultEvaluation.get("waitCondition"),
     );
   }
 
-  if (procedureValue.get("type") === "builtIn") {
-    const builtInNamespace = procedureValue.get("namespace");
-    const builtInOperator = procedureValue.get("operator");
-    const builtIn = builtIns[builtInNamespace][builtInOperator];
+  const actualArgs = args.pop().map(x => evaluate(x, environment, sigma));
 
-    const argsIdentifiers = statement.get("args").map(x => x.get("identifier"));
-    const argsVariables = argsIdentifiers.map(x => environment.get(x));
-    if (argsVariables.isEmpty()) {
-      return raiseSystemException(state, activeThreadIndex, errorException());
-    }
+  if (!builtIn.validateArgs(actualArgs)) {
+    return raiseSystemException(state, activeThreadIndex, errorException());
+  }
 
-    const resultVariable = argsVariables.last();
-    const actualArgsVariables = argsVariables.pop();
-    const args = actualArgsVariables.map(x =>
-      Immutable.Map({
-        variable: x,
-        value: lookupVariableInSigma(sigma, x).get("value"),
-      }),
-    );
-
-    if (!builtIn.validateArgs(args)) {
-      return raiseSystemException(state, activeThreadIndex, errorException());
-    }
-
-    try {
-      const evaluation = builtIn.evaluate(args, sigma);
-      if (evaluation.get("waitCondition")) {
-        return blockCurrentThread(
-          state,
-          semanticStatement,
-          activeThreadIndex,
-          evaluation.get("waitCondition"),
-        );
-      }
-      return state.update("sigma", sigma =>
-        unifyVariableToEvaluation(sigma, resultVariable, evaluation),
+  try {
+    const builtInEvaluation = builtIn.evaluate(actualArgs, sigma);
+    if (builtInEvaluation.get("waitCondition")) {
+      return blockCurrentThread(
+        state,
+        semanticStatement,
+        activeThreadIndex,
+        builtInEvaluation.get("waitCondition"),
       );
-    } catch (error) {
-      return raiseSystemException(state, activeThreadIndex, failureException());
     }
+    return state.update("sigma", sigma =>
+      unifyEvaluations(sigma, resultEvaluation, builtInEvaluation),
+    );
+  } catch (error) {
+    return raiseSystemException(state, activeThreadIndex, failureException());
+  }
+};
+
+const executeProcedureValue = (
+  procedureValue,
+  state,
+  semanticStatement,
+  activeThreadIndex,
+) => {
+  const statement = semanticStatement.get("statement");
+  const sigma = state.get("sigma");
+  const environment = semanticStatement.get("environment");
+
+  const callArguments = statement
+    .get("args")
+    .map(x => evaluate(x, environment, sigma));
+
+  const declaredArguments = procedureValue
+    .getIn(["value", "args"])
+    .map(x => x.get("identifier"));
+
+  if (declaredArguments.count() !== callArguments.count())
+    return raiseSystemException(state, activeThreadIndex, errorException());
+
+  const blockingArgument = callArguments.find(x => x.get("waitCondition"));
+  if (blockingArgument) {
+    return blockCurrentThread(
+      state,
+      semanticStatement,
+      activeThreadIndex,
+      blockingArgument.get("waitCondition"),
+    );
+  }
+
+  const { augmentedSigma, callArgumentVariables } = callArguments.reduce(
+    ({ augmentedSigma, callArgumentVariables }, evaluation) => {
+      if (evaluation.get("variable")) {
+        return {
+          augmentedSigma,
+          callArgumentVariables: callArgumentVariables.push(
+            evaluation.get("variable"),
+          ),
+        };
+      }
+
+      const auxIdentifier = makeAuxiliaryIdentifier("ARG");
+      const auxVariable = makeNewVariable({
+        in: augmentedSigma,
+        for: auxIdentifier.get("identifier"),
+      });
+      const auxEquivalenceClass = buildEquivalenceClass(
+        evaluation.get("value"),
+        auxVariable,
+      );
+
+      return {
+        augmentedSigma: augmentedSigma.add(auxEquivalenceClass),
+        callArgumentVariables: callArgumentVariables.push(auxVariable),
+      };
+    },
+    { augmentedSigma: sigma, callArgumentVariables: Immutable.List() },
+  );
+
+  const contextualEnvironment = procedureValue.getIn(["value", "context"]);
+  const newEnvironment = callArgumentVariables
+    .zip(declaredArguments)
+    .reduce((accumulator, pair) => {
+      return accumulator.set(pair[1], pair[0]);
+    }, contextualEnvironment);
+
+  const procedureBody = procedureValue.getIn(["value", "body"]);
+
+  const newStatement = buildSemanticStatement(procedureBody, newEnvironment);
+
+  return state
+    .updateIn(["threads", activeThreadIndex, "stack"], stack =>
+      stack.push(newStatement),
+    )
+    .set("sigma", augmentedSigma);
+};
+
+export default function(state, semanticStatement, activeThreadIndex) {
+  const statement = semanticStatement.get("statement");
+  const procedure = statement.get("procedure");
+
+  const sigma = state.get("sigma");
+  const environment = semanticStatement.get("environment");
+  const evaluation = evaluate(procedure, environment, sigma);
+
+  if (evaluation.get("value") === undefined) {
+    return blockCurrentThread(
+      state,
+      semanticStatement,
+      activeThreadIndex,
+      evaluation.get("variable") || evaluation.get("waitCondition"),
+    );
+  }
+
+  const procedureValue = evaluation.get("value");
+
+  if (procedureValue.get("type") === "builtIn") {
+    return executeBuiltInValue(
+      procedureValue,
+      state,
+      semanticStatement,
+      activeThreadIndex,
+    );
   }
 
   if (procedureValue.get("type") === "procedure") {
-    const callArguments = statement.get("args").map(x => x.get("identifier"));
-
-    const declaredArguments = procedureValue
-      .getIn(["value", "args"])
-      .map(x => x.get("identifier"));
-
-    if (declaredArguments.count() !== callArguments.count())
-      return raiseSystemException(state, activeThreadIndex, errorException());
-
-    const contextualEnvironment = procedureValue.getIn(["value", "context"]);
-    const newEnvironment = callArguments
-      .zip(declaredArguments)
-      .reduce((accumulator, pair) => {
-        return accumulator.set(pair[1], environment.get(pair[0]));
-      }, contextualEnvironment);
-
-    const procedureBody = procedureValue.getIn(["value", "body"]);
-
-    const newStatement = buildSemanticStatement(procedureBody, newEnvironment);
-
-    return state.updateIn(["threads", activeThreadIndex, "stack"], stack =>
-      stack.push(newStatement),
+    return executeProcedureValue(
+      procedureValue,
+      state,
+      semanticStatement,
+      activeThreadIndex,
     );
   }
 

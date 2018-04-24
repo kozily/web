@@ -2,6 +2,9 @@ import Immutable from "immutable";
 import parser from "../oz/parser";
 import { compile } from "../oz/compilation";
 import { collectFreeIdentifiers } from "../oz/free_identifiers";
+import { defaultEnvironment } from "../oz/machine/build";
+
+const defaultIdentifiers = Immutable.Set(defaultEnvironment().keySeq());
 
 export const initialState = Immutable.fromJS({
   error: undefined,
@@ -22,7 +25,9 @@ export const reducer = (previousState = initialState, action) => {
       try {
         const ast = parser(action.payload);
         const compilation = compile(ast);
-        const freeIdentifiers = collectFreeIdentifiers(compilation);
+        const freeIdentifiers = collectFreeIdentifiers(compilation).subtract(
+          defaultIdentifiers,
+        );
         if (!freeIdentifiers.isEmpty()) {
           throw new Error(
             `Undeclared identifiers ${freeIdentifiers.join(", ")}`,

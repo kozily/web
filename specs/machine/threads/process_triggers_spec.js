@@ -5,6 +5,7 @@ import {
   procedureApplicationStatement,
 } from "../../../app/oz/machine/statements";
 import { lexicalIdentifier } from "../../../app/oz/machine/lexical";
+import { identifierExpression } from "../../../app/oz/machine/expressions";
 import { literalNumber } from "../../../app/oz/machine/literals";
 import { valueProcedure, valueNumber } from "../../../app/oz/machine/values";
 import {
@@ -95,8 +96,8 @@ describe("threads#processTriggers", () => {
             semanticStatements: [
               buildSemanticStatement(
                 procedureApplicationStatement(
-                  lexicalIdentifier("TriggerProcedure"),
-                  [lexicalIdentifier("X")],
+                  identifierExpression(lexicalIdentifier("TriggerProcedure")),
+                  [identifierExpression(lexicalIdentifier("X"))],
                 ),
                 buildEnvironment({
                   TriggerProcedure: buildVariable("p", 0),
@@ -152,8 +153,8 @@ describe("threads#processTriggers", () => {
             semanticStatements: [
               buildSemanticStatement(
                 procedureApplicationStatement(
-                  lexicalIdentifier("TriggerProcedure"),
-                  [lexicalIdentifier("X")],
+                  identifierExpression(lexicalIdentifier("TriggerProcedure")),
+                  [identifierExpression(lexicalIdentifier("X"))],
                 ),
                 buildEnvironment({
                   TriggerProcedure: buildVariable("p", 0),

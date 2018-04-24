@@ -123,10 +123,10 @@ stm_pattern_matching -> "case" __ exp_expression __ "of" __ lit_record_like __ "
   }
 %}
 
-stm_procedure_application -> "{" _ ids_identifier lit_procedure_args:? _ "}" {%
+stm_procedure_application -> "{" _ exp_expression stm_procedure_application_args:? _ "}" {%
   function(d, position, reject) {
     var procedure = d[2];
-    if (STM_SPECIAL_PROCEDURES.indexOf(procedure.identifier) !== -1) {
+    if (procedure.type === "identifier" && STM_SPECIAL_PROCEDURES.indexOf(procedure.identifier.identifier) !== -1) {
       return reject;
     } else {
       return {
@@ -138,6 +138,14 @@ stm_procedure_application -> "{" _ ids_identifier lit_procedure_args:? _ "}" {%
     }
   }
 %}
+
+stm_procedure_application_args ->
+    __ exp_expression {% function(d) { return [d[1]] } %}
+  | stm_procedure_application_args __ exp_expression {%
+    function(d) {
+      return d[0].concat(d[2])
+    }
+  %}
 
 stm_try -> "try" __ stm_sequence __ "catch" __ ids_identifier __ "then" __ stm_sequence __ "end" {%
   function(d) {
