@@ -180,9 +180,9 @@ export const buildFromKernelAST = ast => {
 var argumentIndex = 0;
 
 export const makeAuxiliaryIdentifier = (namespace = "") => {
-  return lexicalIdentifier(`@${namespace.toUpperCase()}_${argumentIndex++}`);
+  return lexicalIdentifier(`@${namespace}${argumentIndex++}`);
 };
 
 export const getLastAuxiliaryIdentifier = (namespace = "") => {
-  return lexicalIdentifier(`@${namespace.toUpperCase()}_${argumentIndex - 1}`);
+  return lexicalIdentifier(`@${namespace}${argumentIndex - 1}`);
 };

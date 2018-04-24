@@ -1,10 +1,6 @@
 import Immutable from "immutable";
-import { unifyEvaluations, makeNewVariable } from "../machine/sigma";
-import {
-  buildSemanticStatement,
-  buildEquivalenceClass,
-  makeAuxiliaryIdentifier,
-} from "../machine/build";
+import { unifyEvaluations, evaluationToVariable } from "../machine/sigma";
+import { buildSemanticStatement } from "../machine/build";
 import {
   failureException,
   errorException,
@@ -102,28 +98,13 @@ const executeProcedureValue = (
 
   const { augmentedSigma, callArgumentVariables } = callArguments.reduce(
     ({ augmentedSigma, callArgumentVariables }, evaluation) => {
-      if (evaluation.get("variable")) {
-        return {
-          augmentedSigma,
-          callArgumentVariables: callArgumentVariables.push(
-            evaluation.get("variable"),
-          ),
-        };
-      }
-
-      const auxIdentifier = makeAuxiliaryIdentifier("ARG");
-      const auxVariable = makeNewVariable({
-        in: augmentedSigma,
-        for: auxIdentifier.get("identifier"),
-      });
-      const auxEquivalenceClass = buildEquivalenceClass(
-        evaluation.get("value"),
-        auxVariable,
-      );
-
+      const {
+        sigma: newAugmentedSigma,
+        variable: callArgumentVariable,
+      } = evaluationToVariable(evaluation, augmentedSigma, "argument");
       return {
-        augmentedSigma: augmentedSigma.add(auxEquivalenceClass),
-        callArgumentVariables: callArgumentVariables.push(auxVariable),
+        augmentedSigma: newAugmentedSigma,
+        callArgumentVariables: callArgumentVariables.push(callArgumentVariable),
       };
     },
     { augmentedSigma: sigma, callArgumentVariables: Immutable.List() },

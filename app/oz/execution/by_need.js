@@ -1,4 +1,4 @@
-import { lookupVariableInSigma } from "../machine/sigma";
+import { lookupVariableInSigma, evaluationToVariable } from "../machine/sigma";
 import { identifierExpression } from "../machine/expressions";
 import { lexicalIdentifier } from "../machine/lexical";
 import {
@@ -8,20 +8,36 @@ import {
   buildEnvironment,
 } from "../machine/build";
 import { procedureApplicationStatement } from "../machine/statements";
+import { blockCurrentThread } from "../machine/threads";
+import { evaluate } from "../expression";
 
-export default function(state, semanticStatement) {
+export default function(state, semanticStatement, activeThreadIndex) {
+  const sigma = state.get("sigma");
   const statement = semanticStatement.get("statement");
   const environment = semanticStatement.get("environment");
 
   const procedure = statement.get("procedure");
-  const procedureIdentifier = procedure.get("identifier");
-  const procedureVariable = environment.get(procedureIdentifier);
+  const evaluation = evaluate(procedure, environment, sigma);
+
+  if (evaluation.get("waitCondition")) {
+    return blockCurrentThread(
+      state,
+      semanticStatement,
+      activeThreadIndex,
+      evaluation.get("waitCondition"),
+    );
+  }
+
+  const {
+    sigma: augmentedSigma,
+    variable: procedureVariable,
+  } = evaluationToVariable(evaluation, sigma, "triggerProcedure");
 
   const needed = statement.get("neededIdentifier");
   const neededIdentifier = needed.get("identifier");
   const neededVariable = environment.get(neededIdentifier);
   const neededEquivalenceClass = lookupVariableInSigma(
-    state.get("sigma"),
+    augmentedSigma,
     neededVariable,
   );
 
@@ -42,7 +58,9 @@ export default function(state, semanticStatement) {
       ],
     });
 
-    return state.update("threads", threads => threads.push(newThread));
+    return state
+      .update("threads", threads => threads.push(newThread))
+      .set("sigma", augmentedSigma);
   }
 
   const newTrigger = buildTrigger(
@@ -52,5 +70,7 @@ export default function(state, semanticStatement) {
     neededIdentifier,
   );
 
-  return state.update("tau", tau => tau.add(newTrigger));
+  return state
+    .update("tau", tau => tau.add(newTrigger))
+    .set("sigma", augmentedSigma);
 }

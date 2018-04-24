@@ -4,7 +4,6 @@ import {
   byNeedStatement,
   procedureApplicationStatement,
 } from "../../app/oz/machine/statements";
-import { identifierExpression } from "../../app/oz/machine/expressions";
 import { lexicalIdentifier } from "../../app/oz/machine/lexical";
 import {
   identifierExpression,

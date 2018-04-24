@@ -1,5 +1,7 @@
-import { statementTypes } from "../machine/statements";
+import { byNeedStatement } from "../machine/statements";
 
 export default (recurse, node) => {
-  return node.set("type", statementTypes.byNeed);
+  const procedure = recurse(node.get("procedure"));
+  const neededIdentifier = node.get("neededIdentifier");
+  return byNeedStatement(procedure, neededIdentifier);
 };
