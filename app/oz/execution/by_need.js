@@ -1,4 +1,5 @@
 import { lookupVariableInSigma } from "../machine/sigma";
+import { identifierExpression } from "../machine/expressions";
 import { lexicalIdentifier } from "../machine/lexical";
 import {
   buildThread,
@@ -26,8 +27,8 @@ export default function(state, semanticStatement) {
 
   if (neededEquivalenceClass.get("value")) {
     const newStatement = procedureApplicationStatement(
-      lexicalIdentifier("TriggerProcedure"),
-      [needed],
+      identifierExpression(lexicalIdentifier("TriggerProcedure")),
+      [identifierExpression(needed)],
     );
     const newThread = buildThread({
       semanticStatements: [

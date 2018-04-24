@@ -4,6 +4,7 @@ import {
   byNeedStatement,
   procedureApplicationStatement,
 } from "../../app/oz/machine/statements";
+import { identifierExpression } from "../../app/oz/machine/expressions";
 import { lexicalIdentifier } from "../../app/oz/machine/lexical";
 import { valueNumber } from "../../app/oz/machine/values";
 import {
@@ -86,8 +87,8 @@ describe("Reducing by need statements", () => {
             semanticStatements: [
               buildSemanticStatement(
                 procedureApplicationStatement(
-                  lexicalIdentifier("TriggerProcedure"),
-                  [lexicalIdentifier("W")],
+                  identifierExpression(lexicalIdentifier("TriggerProcedure")),
+                  [identifierExpression(lexicalIdentifier("W"))],
                 ),
                 buildEnvironment({
                   TriggerProcedure: buildVariable("x", 0),

@@ -1,13 +1,11 @@
 import Immutable from "immutable";
 
 export default (recurse, statement) => {
-  const procedureIdentifier = Immutable.Set([
-    statement.getIn(["procedure", "identifier"]),
-  ]);
+  const procedureIdentifiers = recurse(statement.get("procedure"));
 
-  const argumentIdentifiers = Immutable.Set(
-    statement.get("args").map(x => x.get("identifier")),
-  );
+  const argumentIdentifiers = statement
+    .get("args")
+    .reduce((result, item) => result.union(recurse(item)), Immutable.Set());
 
-  return procedureIdentifier.union(argumentIdentifiers);
+  return procedureIdentifiers.union(argumentIdentifiers);
 };

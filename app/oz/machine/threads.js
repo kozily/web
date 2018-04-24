@@ -7,6 +7,7 @@ import {
 } from "./build";
 import { lookupVariableInSigma } from "./sigma";
 import { procedureApplicationStatement } from "./statements";
+import { identifierExpression } from "./expressions";
 import { lexicalIdentifier } from "./lexical";
 
 export const blockCurrentThread = (
@@ -53,8 +54,8 @@ export const activateTrigger = (state, trigger) => {
   const procedureIdentifier = trigger.get("procedureIdentifier");
   const neededVariableIdentifier = trigger.get("neededVariableIdentifier");
   const statement = procedureApplicationStatement(
-    lexicalIdentifier(procedureIdentifier),
-    [lexicalIdentifier(neededVariableIdentifier)],
+    identifierExpression(lexicalIdentifier(procedureIdentifier)),
+    [identifierExpression(lexicalIdentifier(neededVariableIdentifier))],
   );
   const environment = buildEnvironment({
     [procedureIdentifier]: trigger.get("procedure"),

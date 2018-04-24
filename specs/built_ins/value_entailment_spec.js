@@ -116,5 +116,21 @@ describe("The entailment/disentailment check built-ins", () => {
       ]);
       expectUndefinedEvaluationResult(args, buildVariable("x", 0));
     });
+
+    it("cascades wait conditions when the first argument is a wait condition", () => {
+      const args = Immutable.fromJS([
+        { value: undefined, waitCondition: buildVariable("x", 0) },
+        { value: valueAtom("person") },
+      ]);
+      expectUndefinedEvaluationResult(args, buildVariable("x", 0));
+    });
+
+    it("cascades wait conditions when the second argument is a wait condition", () => {
+      const args = Immutable.fromJS([
+        { value: valueAtom("person") },
+        { value: undefined, waitCondition: buildVariable("x", 0) },
+      ]);
+      expectUndefinedEvaluationResult(args, buildVariable("x", 0));
+    });
   });
 });

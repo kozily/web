@@ -1,9 +1,9 @@
 export default (recurse, node, identation) => {
   const ident = new Array(identation + 1).join(" ");
-  const procedureIdentifier = node.getIn(["procedure", "identifier"]);
+  const procedureIdentifier = recurse(node.get("procedure")).abbreviated;
   const args = node
     .get("args")
-    .map(x => x.get("identifier"))
+    .map(x => recurse(x).abbreviated)
     .join(" ");
   const result = `${ident}{${procedureIdentifier} ${args}}`;
   return {

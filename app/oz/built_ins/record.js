@@ -35,7 +35,9 @@ export default {
       const missingArgument = args.find(x => !x.get("value"));
       if (missingArgument) {
         return Immutable.Map({
-          waitCondition: missingArgument.get("variable"),
+          waitCondition:
+            missingArgument.get("waitCondition") ||
+            missingArgument.get("variable"),
         });
       }
       const record = args.getIn([0, "value", "value"]);

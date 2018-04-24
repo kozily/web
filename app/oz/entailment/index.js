@@ -15,7 +15,10 @@ export const checkers = {
 export const entail = (args, sigma) => {
   const missingArgument = args.find(x => !x.get("value"));
   if (missingArgument) {
-    return Immutable.Map({ waitCondition: missingArgument.get("variable") });
+    return Immutable.Map({
+      waitCondition:
+        missingArgument.get("waitCondition") || missingArgument.get("variable"),
+    });
   }
   if (args.getIn([0, "value", "type"]) !== args.getIn([1, "value", "type"])) {
     return Immutable.Map({ value: false });

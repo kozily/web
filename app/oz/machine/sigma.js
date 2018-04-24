@@ -117,10 +117,60 @@ export const unifyVariableToValue = (sigma, variable, value) => {
     );
 };
 
+export const unifyValues = (sigma, x, y) => {
+  const xAuxiliaryIdentifier = makeAuxiliaryIdentifier();
+  const xAuxiliaryVariable = makeNewVariable({
+    in: sigma,
+    for: xAuxiliaryIdentifier.get("identifier"),
+  });
+  const xAuxiliaryEquivalenceClass = buildEquivalenceClass(
+    x,
+    xAuxiliaryVariable,
+  );
+
+  const yAuxiliaryIdentifier = makeAuxiliaryIdentifier();
+  const yAuxiliaryVariable = makeNewVariable({
+    in: sigma,
+    for: yAuxiliaryIdentifier.get("identifier"),
+  });
+  const yAuxiliaryEquivalenceClass = buildEquivalenceClass(
+    y,
+    yAuxiliaryVariable,
+  );
+
+  const intermediateSigma = sigma
+    .add(xAuxiliaryEquivalenceClass)
+    .add(yAuxiliaryEquivalenceClass);
+
+  const unifiedSigma = unify(
+    intermediateSigma,
+    xAuxiliaryVariable,
+    yAuxiliaryVariable,
+  );
+
+  return unifiedSigma;
+};
+
 export const unifyVariableToEvaluation = (sigma, variable, evaluation) => {
   if (evaluation.get("variable")) {
     return unify(sigma, variable, evaluation.get("variable"));
   }
 
   return unifyVariableToValue(sigma, variable, evaluation.get("value"));
+};
+
+export const unifyEvaluations = (sigma, x, y) => {
+  if (x.get("variable") && y.get("variable")) {
+    return unify(sigma, x.get("variable"), y.get("variable"));
+  }
+
+  if (x.get("variable")) {
+    return unifyVariableToValue(sigma, x.get("variable"), y.get("value"));
+  }
+
+  if (y.get("variable")) {
+    return unifyVariableToValue(sigma, y.get("variable"), x.get("value"));
+  }
+
+  return unifyValues(sigma, x.get("value"), y.get("value"));
 };

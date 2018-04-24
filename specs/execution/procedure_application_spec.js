@@ -3,7 +3,13 @@ import {
   skipStatement,
   procedureApplicationStatement,
 } from "../../app/oz/machine/statements";
+import {
+  identifierExpression,
+  operatorExpression,
+  literalExpression,
+} from "../../app/oz/machine/expressions";
 import { lexicalIdentifier } from "../../app/oz/machine/lexical";
+import { literalAtom } from "../../app/oz/machine/literals";
 import {
   valueProcedure,
   valueNumber,
@@ -22,6 +28,7 @@ import {
   buildEquivalenceClass,
   buildVariable,
   buildEnvironment,
+  getLastAuxiliaryIdentifier,
 } from "../../app/oz/machine/build";
 import reduce from "../../app/oz/execution/procedure_application";
 
@@ -48,10 +55,13 @@ describe("Reducing {X ...} statements", () => {
       });
 
       const statement = buildSemanticStatement(
-        procedureApplicationStatement(lexicalIdentifier("P"), [
-          lexicalIdentifier("X"),
-          lexicalIdentifier("Y"),
-        ]),
+        procedureApplicationStatement(
+          identifierExpression(lexicalIdentifier("P")),
+          [
+            identifierExpression(lexicalIdentifier("X")),
+            identifierExpression(lexicalIdentifier("Y")),
+          ],
+        ),
         buildEnvironment({
           P: buildVariable("p", 0),
           X: buildVariable("x", 0),
@@ -100,10 +110,13 @@ describe("Reducing {X ...} statements", () => {
       });
 
       const statement = buildSemanticStatement(
-        procedureApplicationStatement(lexicalIdentifier("X"), [
-          lexicalIdentifier("Y"),
-          lexicalIdentifier("Z"),
-        ]),
+        procedureApplicationStatement(
+          identifierExpression(lexicalIdentifier("X")),
+          [
+            identifierExpression(lexicalIdentifier("Y")),
+            identifierExpression(lexicalIdentifier("Z")),
+          ],
+        ),
         buildEnvironment({
           X: buildVariable("x", 0),
           Y: buildVariable("y", 0),
@@ -129,6 +142,78 @@ describe("Reducing {X ...} statements", () => {
       );
     });
 
+    it("executes simple functional procedures with expressions as arguments correctly", () => {
+      const state = buildSingleThreadedState({
+        semanticStatements: [buildSemanticStatement(skipStatement())],
+        sigma: buildSigma(
+          buildEquivalenceClass(
+            valueProcedure(
+              [lexicalIdentifier("I"), lexicalIdentifier("O")],
+              skipStatement(),
+            ),
+            buildVariable("p", 0),
+          ),
+          buildEquivalenceClass(valueNumber(10), buildVariable("x", 0)),
+          buildEquivalenceClass(undefined, buildVariable("y", 0)),
+        ),
+      });
+
+      const statement = buildSemanticStatement(
+        procedureApplicationStatement(
+          identifierExpression(lexicalIdentifier("P")),
+          [
+            operatorExpression(
+              "+",
+              identifierExpression(lexicalIdentifier("X")),
+              identifierExpression(lexicalIdentifier("X")),
+            ),
+            identifierExpression(lexicalIdentifier("Y")),
+          ],
+        ),
+        buildEnvironment({
+          P: buildVariable("p", 0),
+          X: buildVariable("x", 0),
+          Y: buildVariable("y", 0),
+        }),
+      );
+
+      expect(reduce(state, statement, 0)).toEqual(
+        buildSingleThreadedState({
+          semanticStatements: [
+            buildSemanticStatement(
+              skipStatement(),
+              buildEnvironment({
+                I: buildVariable(
+                  getLastAuxiliaryIdentifier("ARG").get("identifier"),
+                  0,
+                ),
+                O: buildVariable("y", 0),
+              }),
+            ),
+            buildSemanticStatement(skipStatement()),
+          ],
+          sigma: buildSigma(
+            buildEquivalenceClass(
+              valueProcedure(
+                [lexicalIdentifier("I"), lexicalIdentifier("O")],
+                skipStatement(),
+              ),
+              buildVariable("p", 0),
+            ),
+            buildEquivalenceClass(valueNumber(10), buildVariable("x", 0)),
+            buildEquivalenceClass(undefined, buildVariable("y", 0)),
+            buildEquivalenceClass(
+              valueNumber(20),
+              buildVariable(
+                getLastAuxiliaryIdentifier("ARG").get("identifier"),
+                0,
+              ),
+            ),
+          ),
+        }),
+      );
+    });
+
     it("fails if a procedure is called with the wrong number of arguments", () => {
       const state = buildSingleThreadedState({
         semanticStatements: [buildSemanticStatement(skipStatement())],
@@ -146,9 +231,10 @@ describe("Reducing {X ...} statements", () => {
       });
 
       const statement = buildSemanticStatement(
-        procedureApplicationStatement(lexicalIdentifier("X"), [
-          lexicalIdentifier("Y"),
-        ]),
+        procedureApplicationStatement(
+          identifierExpression(lexicalIdentifier("X")),
+          [identifierExpression(lexicalIdentifier("Y"))],
+        ),
         buildEnvironment({
           X: buildVariable("x", 0),
           Y: buildVariable("y", 0),
@@ -177,11 +263,14 @@ describe("Reducing {X ...} statements", () => {
       });
 
       const statement = buildSemanticStatement(
-        procedureApplicationStatement(lexicalIdentifier("X"), [
-          lexicalIdentifier("Y"),
-          lexicalIdentifier("Z"),
-          lexicalIdentifier("R"),
-        ]),
+        procedureApplicationStatement(
+          identifierExpression(lexicalIdentifier("X")),
+          [
+            identifierExpression(lexicalIdentifier("Y")),
+            identifierExpression(lexicalIdentifier("Z")),
+            identifierExpression(lexicalIdentifier("R")),
+          ],
+        ),
         buildEnvironment({
           X: buildVariable("x", 0),
           Y: buildVariable("y", 0),
@@ -206,6 +295,57 @@ describe("Reducing {X ...} statements", () => {
       );
     });
 
+    it("binds the appropriate value and executes argument expressions correctly", () => {
+      const state = buildSingleThreadedState({
+        semanticStatements: [buildSemanticStatement(skipStatement())],
+        sigma: buildSigma(
+          buildEquivalenceClass(
+            valueBuiltIn("+", "Number"),
+            buildVariable("x", 0),
+          ),
+          buildEquivalenceClass(valueNumber(5), buildVariable("y", 0)),
+          buildEquivalenceClass(valueNumber(10), buildVariable("z", 0)),
+          buildEquivalenceClass(undefined, buildVariable("r", 0)),
+        ),
+      });
+
+      const statement = buildSemanticStatement(
+        procedureApplicationStatement(
+          identifierExpression(lexicalIdentifier("X")),
+          [
+            operatorExpression(
+              "+",
+              identifierExpression(lexicalIdentifier("Y")),
+              identifierExpression(lexicalIdentifier("Z")),
+            ),
+            identifierExpression(lexicalIdentifier("Z")),
+            identifierExpression(lexicalIdentifier("R")),
+          ],
+        ),
+        buildEnvironment({
+          X: buildVariable("x", 0),
+          Y: buildVariable("y", 0),
+          Z: buildVariable("z", 0),
+          R: buildVariable("r", 0),
+        }),
+      );
+
+      expect(reduce(state, statement, 0)).toEqual(
+        buildSingleThreadedState({
+          semanticStatements: [buildSemanticStatement(skipStatement())],
+          sigma: buildSigma(
+            buildEquivalenceClass(
+              valueBuiltIn("+", "Number"),
+              buildVariable("x", 0),
+            ),
+            buildEquivalenceClass(valueNumber(5), buildVariable("y", 0)),
+            buildEquivalenceClass(valueNumber(10), buildVariable("z", 0)),
+            buildEquivalenceClass(valueNumber(25), buildVariable("r", 0)),
+          ),
+        }),
+      );
+    });
+
     it("fails if the amount of arguments is empty", () => {
       const state = buildSingleThreadedState({
         semanticStatements: [buildSemanticStatement(skipStatement())],
@@ -218,7 +358,9 @@ describe("Reducing {X ...} statements", () => {
       });
 
       const statement = buildSemanticStatement(
-        procedureApplicationStatement(lexicalIdentifier("X")),
+        procedureApplicationStatement(
+          identifierExpression(lexicalIdentifier("X")),
+        ),
         buildEnvironment({
           X: buildVariable("x", 0),
         }),
@@ -244,11 +386,14 @@ describe("Reducing {X ...} statements", () => {
       });
 
       const statement = buildSemanticStatement(
-        procedureApplicationStatement(lexicalIdentifier("X"), [
-          lexicalIdentifier("Y"),
-          lexicalIdentifier("Z"),
-          lexicalIdentifier("R"),
-        ]),
+        procedureApplicationStatement(
+          identifierExpression(lexicalIdentifier("X")),
+          [
+            identifierExpression(lexicalIdentifier("Y")),
+            identifierExpression(lexicalIdentifier("Z")),
+            identifierExpression(lexicalIdentifier("R")),
+          ],
+        ),
         buildEnvironment({
           X: buildVariable("x", 0),
           Y: buildVariable("y", 0),
@@ -277,11 +422,14 @@ describe("Reducing {X ...} statements", () => {
       });
 
       const statement = buildSemanticStatement(
-        procedureApplicationStatement(lexicalIdentifier("X"), [
-          lexicalIdentifier("Y"),
-          lexicalIdentifier("Z"),
-          lexicalIdentifier("R"),
-        ]),
+        procedureApplicationStatement(
+          identifierExpression(lexicalIdentifier("X")),
+          [
+            identifierExpression(lexicalIdentifier("Y")),
+            identifierExpression(lexicalIdentifier("Z")),
+            identifierExpression(lexicalIdentifier("R")),
+          ],
+        ),
         buildEnvironment({
           X: buildVariable("x", 0),
           Y: buildVariable("y", 0),
@@ -310,11 +458,14 @@ describe("Reducing {X ...} statements", () => {
       });
 
       const statement = buildSemanticStatement(
-        procedureApplicationStatement(lexicalIdentifier("X"), [
-          lexicalIdentifier("Y"),
-          lexicalIdentifier("Z"),
-          lexicalIdentifier("R"),
-        ]),
+        procedureApplicationStatement(
+          identifierExpression(lexicalIdentifier("X")),
+          [
+            identifierExpression(lexicalIdentifier("Y")),
+            identifierExpression(lexicalIdentifier("Z")),
+            identifierExpression(lexicalIdentifier("R")),
+          ],
+        ),
         buildEnvironment({
           X: buildVariable("x", 0),
           Y: buildVariable("y", 0),
@@ -351,11 +502,14 @@ describe("Reducing {X ...} statements", () => {
       });
 
       const statement = buildSemanticStatement(
-        procedureApplicationStatement(lexicalIdentifier("X"), [
-          lexicalIdentifier("Y"),
-          lexicalIdentifier("Z"),
-          lexicalIdentifier("R"),
-        ]),
+        procedureApplicationStatement(
+          identifierExpression(lexicalIdentifier("X")),
+          [
+            identifierExpression(lexicalIdentifier("Y")),
+            identifierExpression(lexicalIdentifier("Z")),
+            identifierExpression(lexicalIdentifier("R")),
+          ],
+        ),
         buildEnvironment({
           X: buildVariable("x", 0),
           Y: buildVariable("y", 0),
@@ -381,10 +535,13 @@ describe("Reducing {X ...} statements", () => {
     });
 
     const statement = buildSemanticStatement(
-      procedureApplicationStatement(lexicalIdentifier("P"), [
-        lexicalIdentifier("X"),
-        lexicalIdentifier("Y"),
-      ]),
+      procedureApplicationStatement(
+        identifierExpression(lexicalIdentifier("P")),
+        [
+          identifierExpression(lexicalIdentifier("X")),
+          identifierExpression(lexicalIdentifier("Y")),
+        ],
+      ),
       buildEnvironment({
         P: buildVariable("p", 0),
         X: buildVariable("x", 0),
@@ -397,6 +554,80 @@ describe("Reducing {X ...} statements", () => {
     );
   });
 
+  it("blocks the thread if the procedure expression blocks", () => {
+    const state = buildSingleThreadedState({
+      semanticStatements: [buildSemanticStatement(skipStatement())],
+      sigma: buildSigma(
+        buildEquivalenceClass(undefined, buildVariable("p", 0)),
+        buildEquivalenceClass(valueNumber(10), buildVariable("x", 0)),
+        buildEquivalenceClass(undefined, buildVariable("y", 0)),
+      ),
+    });
+
+    const statement = buildSemanticStatement(
+      procedureApplicationStatement(
+        operatorExpression(
+          ".",
+          identifierExpression(lexicalIdentifier("P")),
+          literalExpression(literalAtom("field")),
+        ),
+        [
+          identifierExpression(lexicalIdentifier("X")),
+          identifierExpression(lexicalIdentifier("Y")),
+        ],
+      ),
+      buildEnvironment({
+        P: buildVariable("p", 0),
+        X: buildVariable("x", 0),
+        Y: buildVariable("y", 0),
+      }),
+    );
+
+    expect(reduce(state, statement, 0)).toEqual(
+      buildBlockedState(state, statement, 0, buildVariable("p", 0)),
+    );
+  });
+
+  it("blocks the thread if some argument expression blocks", () => {
+    const state = buildSingleThreadedState({
+      semanticStatements: [buildSemanticStatement(skipStatement())],
+      sigma: buildSigma(
+        buildEquivalenceClass(
+          valueBuiltIn("+", "Number"),
+          buildVariable("p", 0),
+        ),
+        buildEquivalenceClass(undefined, buildVariable("x", 0)),
+        buildEquivalenceClass(undefined, buildVariable("y", 0)),
+        buildEquivalenceClass(undefined, buildVariable("z", 0)),
+      ),
+    });
+
+    const statement = buildSemanticStatement(
+      procedureApplicationStatement(
+        identifierExpression(lexicalIdentifier("P")),
+        [
+          operatorExpression(
+            "+",
+            identifierExpression(lexicalIdentifier("X")),
+            identifierExpression(lexicalIdentifier("X")),
+          ),
+          identifierExpression(lexicalIdentifier("Y")),
+          identifierExpression(lexicalIdentifier("Z")),
+        ],
+      ),
+      buildEnvironment({
+        P: buildVariable("p", 0),
+        X: buildVariable("x", 0),
+        Y: buildVariable("y", 0),
+        Z: buildVariable("z", 0),
+      }),
+    );
+
+    expect(reduce(state, statement, 0)).toEqual(
+      buildBlockedState(state, statement, 0, buildVariable("x", 0)),
+    );
+  });
+
   it("fails if a non-callable value is called", () => {
     const state = buildSingleThreadedState({
       semanticStatements: [buildSemanticStatement(skipStatement())],
@@ -406,7 +637,9 @@ describe("Reducing {X ...} statements", () => {
     });
 
     const statement = buildSemanticStatement(
-      procedureApplicationStatement(lexicalIdentifier("P")),
+      procedureApplicationStatement(
+        identifierExpression(lexicalIdentifier("P")),
+      ),
       buildEnvironment({
         P: buildVariable("p", 0),
       }),
