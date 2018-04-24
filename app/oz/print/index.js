@@ -61,7 +61,7 @@ export const printers = {
 };
 
 export const print = (node, identation = 0) => {
-  if (!node) return { full: "", abbreviated: "" };
+  if (!node) return { full: "Unbound", abbreviated: "Unbound" };
   const printer = printers[node.get("node")][node.get("type")];
   return printer(print, node, identation);
 };

@@ -1,5 +1,6 @@
-import { statementTypes } from "../machine/statements";
+import { exceptionRaiseStatement } from "../machine/statements";
 
 export default (recurse, node) => {
-  return node.set("type", statementTypes.exceptionRaise);
+  const identifier = recurse(node.get("identifier"));
+  return exceptionRaiseStatement(identifier);
 };

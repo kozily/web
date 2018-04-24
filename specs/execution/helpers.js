@@ -1,4 +1,5 @@
 import { exceptionRaiseStatement } from "../../app/oz/machine/statements";
+import { identifierExpression } from "../../app/oz/machine/expressions";
 import {
   threadStatus,
   buildSemanticStatement,
@@ -13,22 +14,28 @@ export const buildSystemExceptionState = (
   activeThreadIndex,
   exception,
 ) => {
-  const aux = getLastAuxiliaryIdentifier("SystemException");
-  const auxIdentifier = aux.get("identifier");
+  const exceptionIdentifier = getLastAuxiliaryIdentifier("SystemException");
+  const exceptionIdentifierName = exceptionIdentifier.get("identifier");
   return state
     .updateIn(["threads", activeThreadIndex, "stack"], stack =>
       stack.push(
         buildSemanticStatement(
-          exceptionRaiseStatement(aux),
+          exceptionRaiseStatement(identifierExpression(exceptionIdentifier)),
           buildEnvironment({
-            [auxIdentifier]: buildVariable(auxIdentifier, 0),
+            [exceptionIdentifierName]: buildVariable(
+              exceptionIdentifierName,
+              0,
+            ),
           }),
         ),
       ),
     )
     .update("sigma", sigma =>
       sigma.add(
-        buildEquivalenceClass(exception, buildVariable(auxIdentifier, 0)),
+        buildEquivalenceClass(
+          exception,
+          buildVariable(exceptionIdentifierName, 0),
+        ),
       ),
     );
 };

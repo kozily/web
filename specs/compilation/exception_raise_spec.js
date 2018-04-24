@@ -3,6 +3,7 @@ import { compile } from "../../app/oz/compilation";
 import { exceptionRaiseStatementSyntax } from "../../app/oz/machine/statementSyntax";
 import { exceptionRaiseStatement } from "../../app/oz/machine/statements";
 import { lexicalIdentifier } from "../../app/oz/machine/lexical";
+import { identifierExpression } from "../../app/oz/machine/expressions";
 
 describe("Compiling exception raise statements", () => {
   beforeEach(() => {
@@ -10,10 +11,12 @@ describe("Compiling exception raise statements", () => {
   });
 
   it("compiles appropriately", () => {
-    const statement = exceptionRaiseStatementSyntax(lexicalIdentifier("X"));
+    const statement = exceptionRaiseStatementSyntax(
+      identifierExpression(lexicalIdentifier("X")),
+    );
 
     expect(compile(statement)).toEqual(
-      exceptionRaiseStatement(lexicalIdentifier("X")),
+      exceptionRaiseStatement(identifierExpression(lexicalIdentifier("X"))),
     );
   });
 });

@@ -6,20 +6,6 @@ import { print } from "../../../oz/print";
 
 export const RuntimeStoreRow = props => {
   const value = props.equivalenceClass.get("value");
-
-  if (!value) {
-    return (
-      <Table.Row>
-        <Table.Cell>
-          <EquivalenceClass {...props} />
-        </Table.Cell>
-        <Table.Cell>
-          <Code>Unbound</Code>
-        </Table.Cell>
-      </Table.Row>
-    );
-  }
-
   const printedValue = print(value);
 
   return (

@@ -1,13 +1,42 @@
 import { buildSemanticStatement } from "../machine/build";
 import { UncaughtOzExceptionError } from "../machine/exceptions";
-import { lookupVariableInSigma } from "../machine/sigma";
+import { evaluationToVariable } from "../machine/sigma";
+import { blockCurrentThread } from "../machine/threads";
+import { evaluate } from "../expression";
 
 export default function(state, semanticStatement, activeThreadIndex) {
+  const sigma = state.get("sigma");
   const statement = semanticStatement.get("statement");
   const environment = semanticStatement.get("environment");
 
-  const exceptionIdentifier = statement.getIn(["identifier", "identifier"]);
-  const exceptionVariable = environment.get(exceptionIdentifier);
+  const exceptionEvaluation = evaluate(
+    statement.get("identifier"),
+    environment,
+    sigma,
+  );
+
+  if (exceptionEvaluation.get("waitCondition")) {
+    return blockCurrentThread(
+      state,
+      semanticStatement,
+      activeThreadIndex,
+      exceptionEvaluation.get("waitCondition"),
+    );
+  }
+
+  const {
+    sigma: augmentedSigma,
+    variable: exceptionVariable,
+  } = evaluationToVariable(exceptionEvaluation, sigma, "exception");
+
+  if (exceptionEvaluation.get("waitCondition")) {
+    return blockCurrentThread(
+      state,
+      semanticStatement,
+      activeThreadIndex,
+      exceptionEvaluation.get("waitCondition"),
+    );
+  }
 
   const poppedState = state.updateIn(
     ["threads", activeThreadIndex, "stack"],
@@ -19,12 +48,7 @@ export default function(state, semanticStatement, activeThreadIndex) {
   );
 
   if (poppedState.getIn(["threads", activeThreadIndex, "stack"]).isEmpty()) {
-    const sigma = state.get("sigma");
-    const exceptionEquivalenceClass = lookupVariableInSigma(
-      sigma,
-      exceptionVariable,
-    );
-    const innerOzException = exceptionEquivalenceClass.get("value");
+    const innerOzException = exceptionEvaluation.get("value");
     throw new UncaughtOzExceptionError(innerOzException);
   }
 
@@ -49,7 +73,9 @@ export default function(state, semanticStatement, activeThreadIndex) {
     handlingEnvironment,
   );
 
-  return poppedState.updateIn(["threads", activeThreadIndex, "stack"], stack =>
-    stack.pop().push(handlingSemanticStatement),
-  );
+  return poppedState
+    .updateIn(["threads", activeThreadIndex, "stack"], stack =>
+      stack.pop().push(handlingSemanticStatement),
+    )
+    .set("sigma", augmentedSigma);
 }

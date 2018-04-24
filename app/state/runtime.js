@@ -9,6 +9,7 @@ export const initialState = Immutable.fromJS({
   steps: [buildState()],
   currentStep: 0,
   showSigmaSystemVariables: false,
+  error: null,
 });
 
 export const run = () => {
@@ -50,7 +51,8 @@ export const reducer = (previousState = initialState, action) => {
       const runtime = buildFromKernelAST(kernel);
       return previousState
         .set("steps", Immutable.List.of(runtime))
-        .set("currentStep", 0);
+        .set("currentStep", 0)
+        .set("error", null);
     }
     case "RUNTIME_NEXT": {
       const threadIndex = action.payload;
@@ -60,7 +62,8 @@ export const reducer = (previousState = initialState, action) => {
         const step = executeSingleStep(runtime, { threadIndex });
         return previousState
           .update("steps", steps => steps.push(step))
-          .set("currentStep", currentStep + 1);
+          .set("currentStep", currentStep + 1)
+          .set("error", null);
       } catch (error) {
         return previousState.set(
           "error",
@@ -76,14 +79,14 @@ export const reducer = (previousState = initialState, action) => {
       const previousStep = currentStep > 0 ? currentStep - 1 : currentStep;
       return previousState
         .update("steps", steps => steps.pop())
-        .delete("error")
-        .set("currentStep", previousStep);
+        .set("currentStep", previousStep)
+        .set("error", null);
     }
     case "RUNTIME_FIRST": {
       return previousState
         .update("steps", steps => Immutable.List([steps.get(0)]))
-        .delete("error")
-        .set("currentStep", 0);
+        .set("currentStep", 0)
+        .set("error", null);
     }
     case "CHANGE_SOURCE_CODE": {
       return previousState.set("source", action.payload);

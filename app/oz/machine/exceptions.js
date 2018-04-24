@@ -7,6 +7,7 @@ import {
 } from "../machine/build";
 import { exceptionRaiseStatement } from "../machine/statements";
 import { makeAuxiliaryIdentifier } from "../machine/build";
+import { identifierExpression } from "../machine/expressions";
 
 export class UncaughtOzExceptionError extends Error {
   constructor(innerOzException) {
@@ -25,21 +26,23 @@ export const errorException = () => {
 };
 
 export const raiseSystemException = (state, activeThreadIndex, exception) => {
-  const aux = makeAuxiliaryIdentifier("SystemException");
-  const auxIdentifier = aux.get("identifier");
+  const exceptionIdentifier = makeAuxiliaryIdentifier("SystemException");
+  const exceptionIdentifierName = exceptionIdentifier.get("identifier");
   const exceptionVariable = makeNewVariable({
     in: state.get("sigma"),
-    for: auxIdentifier,
+    for: exceptionIdentifierName,
   });
   const newEquivalenceClass = buildEquivalenceClass(
     exception,
     exceptionVariable,
   );
 
-  const newRaiseStatement = exceptionRaiseStatement(aux);
+  const newRaiseStatement = exceptionRaiseStatement(
+    identifierExpression(exceptionIdentifier),
+  );
 
   const newEnvironment = buildEnvironment({
-    [auxIdentifier]: exceptionVariable,
+    [exceptionIdentifierName]: exceptionVariable,
   });
 
   return state
