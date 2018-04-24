@@ -184,7 +184,7 @@ describe("Reducing {X ...} statements", () => {
               skipStatement(),
               buildEnvironment({
                 I: buildVariable(
-                  getLastAuxiliaryIdentifier("ARG").get("identifier"),
+                  getLastAuxiliaryIdentifier("argument").get("identifier"),
                   0,
                 ),
                 O: buildVariable("y", 0),
@@ -205,7 +205,7 @@ describe("Reducing {X ...} statements", () => {
             buildEquivalenceClass(
               valueNumber(20),
               buildVariable(
-                getLastAuxiliaryIdentifier("ARG").get("identifier"),
+                getLastAuxiliaryIdentifier("argument").get("identifier"),
                 0,
               ),
             ),

@@ -1,8 +1,4 @@
-import Immutable from "immutable";
-
 export default (recurse, statement) => {
-  return Immutable.Set([
-    statement.getIn(["procedure", "identifier"]),
-    statement.getIn(["neededIdentifier", "identifier"]),
-  ]);
+  const neededIdentifier = statement.getIn(["neededIdentifier", "identifier"]);
+  return recurse(statement.get("procedure")).add(neededIdentifier);
 };

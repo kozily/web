@@ -1,6 +1,7 @@
 import Immutable from "immutable";
 import { byNeedStatementSyntax } from "../../../app/oz/machine/statementSyntax";
 import { lexicalIdentifier } from "../../../app/oz/machine/lexical";
+import { identifierExpression } from "../../../app/oz/machine/expressions";
 import parse from "../../../app/oz/parser";
 
 describe("Parsing by need statements", () => {
@@ -10,7 +11,10 @@ describe("Parsing by need statements", () => {
 
   it("handles it correctly", () => {
     expect(parse("{ByNeed X Y}")).toEqual(
-      byNeedStatementSyntax(lexicalIdentifier("X"), lexicalIdentifier("Y")),
+      byNeedStatementSyntax(
+        identifierExpression(lexicalIdentifier("X")),
+        lexicalIdentifier("Y"),
+      ),
     );
   });
 });

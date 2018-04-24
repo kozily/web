@@ -42,6 +42,25 @@ export const lookupVariableInSigma = (sigma, variable) => {
   );
 };
 
+export const valueToVariable = (value, sigma, namespace = "") => {
+  const auxIdentifier = makeAuxiliaryIdentifier(namespace);
+  const auxVariable = makeNewVariable({
+    in: sigma,
+    for: auxIdentifier.get("identifier"),
+  });
+  const auxEquivalenceClass = buildEquivalenceClass(value, auxVariable);
+
+  return { sigma: sigma.add(auxEquivalenceClass), variable: auxVariable };
+};
+
+export const evaluationToVariable = (evaluation, sigma, namespace = "") => {
+  if (evaluation.get("variable")) {
+    return { sigma, variable: evaluation.get("variable") };
+  }
+
+  return valueToVariable(evaluation.get("value"), sigma, namespace);
+};
+
 export const mergeEquivalenceClasses = (sigma, target, source) => {
   const sourceVariables = source.get("variables");
 
@@ -90,19 +109,11 @@ export const unify = (sigma, x, y) => {
 };
 
 export const unifyVariableToValue = (sigma, variable, value) => {
-  const auxiliaryIdentifier = makeAuxiliaryIdentifier();
-  const auxiliaryVariable = makeNewVariable({
-    in: sigma,
-    for: auxiliaryIdentifier.get("identifier"),
-  });
-
-  const auxiliaryEquivalenceClass = buildEquivalenceClass(
-    value,
-    auxiliaryVariable,
-  );
-  const intermediateSigma = sigma.add(auxiliaryEquivalenceClass);
-
-  const unifiedSigma = unify(intermediateSigma, variable, auxiliaryVariable);
+  const {
+    sigma: augmentedSigma,
+    variable: auxiliaryVariable,
+  } = valueToVariable(value, sigma);
+  const unifiedSigma = unify(augmentedSigma, variable, auxiliaryVariable);
   const resultingEquivalenceClass = lookupVariableInSigma(
     unifiedSigma,
     auxiliaryVariable,
@@ -118,35 +129,16 @@ export const unifyVariableToValue = (sigma, variable, value) => {
 };
 
 export const unifyValues = (sigma, x, y) => {
-  const xAuxiliaryIdentifier = makeAuxiliaryIdentifier();
-  const xAuxiliaryVariable = makeNewVariable({
-    in: sigma,
-    for: xAuxiliaryIdentifier.get("identifier"),
-  });
-  const xAuxiliaryEquivalenceClass = buildEquivalenceClass(
+  const { sigma: xAugmentedSigma, variable: xVariable } = valueToVariable(
     x,
-    xAuxiliaryVariable,
+    sigma,
   );
-
-  const yAuxiliaryIdentifier = makeAuxiliaryIdentifier();
-  const yAuxiliaryVariable = makeNewVariable({
-    in: sigma,
-    for: yAuxiliaryIdentifier.get("identifier"),
-  });
-  const yAuxiliaryEquivalenceClass = buildEquivalenceClass(
+  const { sigma: yAugmentedSigma, variable: yVariable } = valueToVariable(
     y,
-    yAuxiliaryVariable,
+    xAugmentedSigma,
   );
 
-  const intermediateSigma = sigma
-    .add(xAuxiliaryEquivalenceClass)
-    .add(yAuxiliaryEquivalenceClass);
-
-  const unifiedSigma = unify(
-    intermediateSigma,
-    xAuxiliaryVariable,
-    yAuxiliaryVariable,
-  );
+  const unifiedSigma = unify(yAugmentedSigma, xVariable, yVariable);
 
   return unifiedSigma;
 };

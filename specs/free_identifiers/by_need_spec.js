@@ -2,6 +2,7 @@ import Immutable from "immutable";
 import { collectFreeIdentifiers } from "../../app/oz/free_identifiers";
 import { byNeedStatement } from "../../app/oz/machine/statements";
 import { lexicalIdentifier } from "../../app/oz/machine/lexical";
+import { identifierExpression } from "../../app/oz/machine/expressions";
 
 describe("Collecting free identifiers in a by need statement", () => {
   beforeEach(() => {
@@ -10,7 +11,7 @@ describe("Collecting free identifiers in a by need statement", () => {
 
   it("collects both procedure and needed identifier identifiers", () => {
     const statement = byNeedStatement(
-      lexicalIdentifier("X"),
+      identifierExpression(lexicalIdentifier("X")),
       lexicalIdentifier("Y"),
     );
     expect(collectFreeIdentifiers(statement)).toEqual(

@@ -4,9 +4,15 @@ import {
   byNeedStatement,
   procedureApplicationStatement,
 } from "../../app/oz/machine/statements";
-import { identifierExpression } from "../../app/oz/machine/expressions";
 import { lexicalIdentifier } from "../../app/oz/machine/lexical";
+import {
+  identifierExpression,
+  operatorExpression,
+  literalExpression,
+} from "../../app/oz/machine/expressions";
+import { literalAtom } from "../../app/oz/machine/literals";
 import { valueNumber } from "../../app/oz/machine/values";
+import { buildBlockedState } from "./helpers";
 import {
   buildState,
   buildSingleThreadedState,
@@ -26,7 +32,7 @@ describe("Reducing by need statements", () => {
     jasmine.addCustomEqualityTester(Immutable.is);
   });
 
-  it("when Y is unbound", () => {
+  it("creates a trigger when Y is unbound", () => {
     const state = buildSingleThreadedState({
       semanticStatements: [buildSemanticStatement(skipStatement())],
       sigma: buildSigma(
@@ -36,7 +42,10 @@ describe("Reducing by need statements", () => {
     });
 
     const statement = buildSemanticStatement(
-      byNeedStatement(lexicalIdentifier("X"), lexicalIdentifier("W")),
+      byNeedStatement(
+        identifierExpression(lexicalIdentifier("X")),
+        lexicalIdentifier("W"),
+      ),
       buildEnvironment({
         X: buildVariable("x", 0),
         W: buildVariable("w", 0),
@@ -59,7 +68,7 @@ describe("Reducing by need statements", () => {
     );
   });
 
-  it("when Y is bound", () => {
+  it("activates a trigger when Y is bound", () => {
     const state = buildSingleThreadedState({
       semanticStatements: [buildSemanticStatement(skipStatement())],
       sigma: buildSigma(
@@ -69,7 +78,10 @@ describe("Reducing by need statements", () => {
     });
 
     const statement = buildSemanticStatement(
-      byNeedStatement(lexicalIdentifier("X"), lexicalIdentifier("W")),
+      byNeedStatement(
+        identifierExpression(lexicalIdentifier("X")),
+        lexicalIdentifier("W"),
+      ),
       buildEnvironment({
         X: buildVariable("x", 0),
         W: buildVariable("w", 0),
@@ -101,6 +113,35 @@ describe("Reducing by need statements", () => {
         sigma: state.get("sigma"),
         tau: state.get("tau"),
       }),
+    );
+  });
+
+  it("blocks the current thread when the procedure expression blocks", () => {
+    const state = buildSingleThreadedState({
+      semanticStatements: [buildSemanticStatement(skipStatement())],
+      sigma: buildSigma(
+        buildEquivalenceClass(undefined, buildVariable("x", 0)),
+        buildEquivalenceClass(valueNumber(5), buildVariable("w", 0)),
+      ),
+    });
+
+    const statement = buildSemanticStatement(
+      byNeedStatement(
+        operatorExpression(
+          ".",
+          identifierExpression(lexicalIdentifier("X")),
+          literalExpression(literalAtom("trigger")),
+        ),
+        lexicalIdentifier("W"),
+      ),
+      buildEnvironment({
+        X: buildVariable("x", 0),
+        W: buildVariable("w", 0),
+      }),
+    );
+
+    expect(reduce(state, statement, 0)).toEqual(
+      buildBlockedState(state, statement, 0, buildVariable("x", 0)),
     );
   });
 });

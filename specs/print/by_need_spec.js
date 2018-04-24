@@ -2,6 +2,7 @@ import Immutable from "immutable";
 import { print } from "../../app/oz/print";
 import { byNeedStatement } from "../../app/oz/machine/statements";
 import { lexicalIdentifier } from "../../app/oz/machine/lexical";
+import { identifierExpression } from "../../app/oz/machine/expressions";
 
 describe("Printing a by need statement", () => {
   beforeEach(() => {
@@ -10,7 +11,7 @@ describe("Printing a by need statement", () => {
 
   it("Returns the appropriate string", () => {
     const statement = byNeedStatement(
-      lexicalIdentifier("OneVariable"),
+      identifierExpression(lexicalIdentifier("OneVariable")),
       lexicalIdentifier("OtherVariable"),
     );
     const result = print(statement, 2);

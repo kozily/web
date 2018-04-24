@@ -179,7 +179,7 @@ stm_thread -> "thread" __ stm_sequence __ "end" {%
   }
 %}
 
-stm_by_need -> "{" _ "ByNeed" __ ids_identifier __ ids_identifier _ "}" {%
+stm_by_need -> "{" _ "ByNeed" __ exp_expression __ ids_identifier _ "}" {%
   function(d, position, reject) {
     return {
       node: "statement",
