@@ -19,6 +19,7 @@ import {
   buildVariable,
   buildEnvironment,
 } from "../../app/oz/machine/build";
+import { getLastEnvironmentIndex } from "../../app/oz/machine/environment";
 import reduce from "../../app/oz/execution/pattern_matching";
 
 describe("Reducing case statements", () => {
@@ -57,6 +58,7 @@ describe("Reducing case statements", () => {
       }),
     );
 
+    const lastIndex = getLastEnvironmentIndex();
     expect(reduce(state, statement, 0)).toEqual(
       buildSingleThreadedState({
         semanticStatements: [
@@ -67,8 +69,13 @@ describe("Reducing case statements", () => {
               Name: buildVariable("n", 0),
               Age: buildVariable("a", 0),
             }),
+            {
+              environmentIndex: lastIndex + 1,
+            },
           ),
-          buildSemanticStatement(skipStatement()),
+          buildSemanticStatement(skipStatement(), buildEnvironment(), {
+            environmentIndex: lastIndex,
+          }),
         ],
         sigma: state.get("sigma"),
       }),
@@ -95,6 +102,7 @@ describe("Reducing case statements", () => {
       }),
     );
 
+    const lastIndex = getLastEnvironmentIndex();
     expect(reduce(state, statement, 0)).toEqual(
       buildSingleThreadedState({
         semanticStatements: [
@@ -103,8 +111,11 @@ describe("Reducing case statements", () => {
             buildEnvironment({
               X: buildVariable("x", 0),
             }),
+            { environmentIndex: lastIndex + 1 },
           ),
-          buildSemanticStatement(skipStatement()),
+          buildSemanticStatement(skipStatement(), buildEnvironment(), {
+            environmentIndex: lastIndex,
+          }),
         ],
         sigma: state.get("sigma"),
       }),
@@ -300,5 +311,67 @@ describe("Reducing case statements", () => {
         buildBlockedState(state, statement, 0, buildVariable("x", 0)),
       );
     });
+  });
+
+  it("when pattern matches incrementing the environment index", () => {
+    const lastIndex = getLastEnvironmentIndex();
+    const state = buildSingleThreadedState({
+      semanticStatements: [
+        buildSemanticStatement(skipStatement(), buildEnvironment(), {
+          environmentIndex: lastIndex,
+        }),
+      ],
+      sigma: buildSigma(
+        buildEquivalenceClass(
+          literalRecord("person", {
+            name: buildVariable("n", 0),
+            age: buildVariable("a", 0),
+          }),
+          buildVariable("x", 0),
+        ),
+        buildEquivalenceClass(undefined, buildVariable("n", 0)),
+        buildEquivalenceClass(undefined, buildVariable("a", 0)),
+      ),
+    });
+
+    const statement = buildSemanticStatement(
+      patternMatchingStatement(
+        identifierExpression(lexicalIdentifier("X")),
+        literalRecord("person", {
+          name: lexicalIdentifier("Name"),
+          age: lexicalIdentifier("Age"),
+        }),
+        sequenceStatement(skipStatement(), skipStatement()),
+        skipStatement(),
+      ),
+      buildEnvironment({
+        X: buildVariable("x", 0),
+      }),
+      {
+        environmentIndex: lastIndex,
+      },
+    );
+
+    expect(reduce(state, statement, 0)).toEqual(
+      buildSingleThreadedState({
+        semanticStatements: [
+          buildSemanticStatement(
+            sequenceStatement(skipStatement(), skipStatement()),
+            buildEnvironment({
+              X: buildVariable("x", 0),
+              Name: buildVariable("n", 0),
+              Age: buildVariable("a", 0),
+            }),
+            {
+              environmentIndex: lastIndex + 1,
+            },
+          ),
+          buildSemanticStatement(skipStatement(), buildEnvironment(), {
+            environmentIndex: lastIndex,
+          }),
+        ],
+        sigma: state.get("sigma"),
+      }),
+    );
   });
 });

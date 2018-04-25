@@ -22,6 +22,7 @@ import {
   buildSemanticStatement,
   buildEnvironment,
 } from "../../../app/oz/machine/build";
+import { getLastEnvironmentIndex } from "../../../app/oz/machine/environment";
 import { processTriggers } from "../../../app/oz/machine/threads";
 
 describe("threads#processTriggers", () => {
@@ -86,11 +87,16 @@ describe("threads#processTriggers", () => {
       ),
     });
 
+    const lastIndex = getLastEnvironmentIndex();
     expect(processTriggers(state)).toEqual(
       buildState({
         threads: [
           buildThread({
-            semanticStatements: [buildSemanticStatement(skipStatement())],
+            semanticStatements: [
+              buildSemanticStatement(skipStatement(), buildEnvironment(), {
+                environmentIndex: lastIndex,
+              }),
+            ],
           }),
           buildThread({
             semanticStatements: [
@@ -103,6 +109,7 @@ describe("threads#processTriggers", () => {
                   TriggerProcedure: buildVariable("p", 0),
                   X: buildVariable("x", 0),
                 }),
+                { environmentIndex: lastIndex + 1 },
               ),
             ],
           }),
@@ -139,11 +146,16 @@ describe("threads#processTriggers", () => {
       ),
     });
 
+    const lastIndex = getLastEnvironmentIndex();
     expect(processTriggers(state)).toEqual(
       buildState({
         threads: [
           buildThread({
-            semanticStatements: [buildSemanticStatement(skipStatement())],
+            semanticStatements: [
+              buildSemanticStatement(skipStatement(), buildEnvironment(), {
+                environmentIndex: lastIndex,
+              }),
+            ],
             metadata: buildThreadMetadata({
               status: threadStatus.blocked,
               waitCondition: buildVariable("x", 0),
@@ -160,6 +172,7 @@ describe("threads#processTriggers", () => {
                   TriggerProcedure: buildVariable("p", 0),
                   X: buildVariable("x", 0),
                 }),
+                { environmentIndex: lastIndex + 1 },
               ),
             ],
           }),

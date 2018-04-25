@@ -10,8 +10,10 @@ import {
   buildEquivalenceClass,
   buildVariable,
   buildEnvironment,
+  buildSingleThreadedState,
 } from "../../app/oz/machine/build";
 import reduce from "../../app/oz/execution/local";
+import { getLastEnvironmentIndex } from "../../app/oz/machine/environment";
 
 describe("Reducing local X in ... end statements", () => {
   beforeEach(() => {
@@ -86,6 +88,47 @@ describe("Reducing local X in ... end statements", () => {
           buildEquivalenceClass(literalNumber(20), buildVariable("x", 0)),
           buildEquivalenceClass(literalNumber(30), buildVariable("x", 1)),
           buildEquivalenceClass(undefined, buildVariable("x", 2)),
+        ),
+      }),
+    );
+  });
+
+  it("reduces incrementing the environment index", () => {
+    const lastIndex = getLastEnvironmentIndex();
+    const state = buildSingleThreadedState({
+      semanticStatements: [
+        buildSemanticStatement(skipStatement(), buildEnvironment(), {
+          environmentIndex: lastIndex,
+        }),
+      ],
+    });
+
+    const statement = buildSemanticStatement(
+      localStatement(lexicalIdentifier("X"), skipStatement()),
+      buildEnvironment(),
+      { environmentIndex: lastIndex },
+    );
+
+    expect(reduce(state, statement, 0)).toEqual(
+      buildState({
+        threads: [
+          buildThread({
+            semanticStatements: [
+              buildSemanticStatement(
+                skipStatement(),
+                buildEnvironment({
+                  X: buildVariable("x", 0),
+                }),
+                { environmentIndex: lastIndex + 1 },
+              ),
+              buildSemanticStatement(skipStatement(), buildEnvironment(), {
+                environmentIndex: lastIndex,
+              }),
+            ],
+          }),
+        ],
+        sigma: buildSigma(
+          buildEquivalenceClass(undefined, buildVariable("x", 0)),
         ),
       }),
     );

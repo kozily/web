@@ -3,6 +3,7 @@ import parser from "../oz/parser";
 import { compile } from "../oz/compilation";
 import { buildState, buildFromKernelAST } from "../oz/machine/build";
 import { executeSingleStep } from "../oz/runtime";
+import { resetEnvironmentIndex } from "../oz/machine/environment";
 
 export const initialState = Immutable.fromJS({
   source: "",
@@ -48,6 +49,7 @@ export const reducer = (previousState = initialState, action) => {
     case "RUNTIME_RUN": {
       const ast = parser(previousState.get("source"));
       const kernel = compile(ast);
+      resetEnvironmentIndex();
       const runtime = buildFromKernelAST(kernel);
       return previousState
         .set("steps", Immutable.List.of(runtime))
@@ -77,12 +79,16 @@ export const reducer = (previousState = initialState, action) => {
     case "RUNTIME_PREVIOUS": {
       const currentStep = previousState.get("currentStep");
       const previousStep = currentStep > 0 ? currentStep - 1 : currentStep;
+      if (currentStep === 1) {
+        resetEnvironmentIndex();
+      }
       return previousState
         .update("steps", steps => steps.pop())
         .set("currentStep", previousStep)
         .set("error", null);
     }
     case "RUNTIME_FIRST": {
+      resetEnvironmentIndex();
       return previousState
         .update("steps", steps => Immutable.List([steps.get(0)]))
         .set("currentStep", 0)

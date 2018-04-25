@@ -8,10 +8,15 @@ export const RuntimeStacksSemanticStatement = props => {
   const statement = props.semanticStatement.get("statement");
   const printedStatement = print(statement);
   const environment = props.semanticStatement.get("environment");
+  const environmentName = "E".concat(
+    props.semanticStatement.getIn(["metadata", "environmentIndex"]),
+  );
 
   const item = (
     <Segment attached>
-      <Code>{printedStatement.abbreviated}</Code>
+      <Code>
+        {printedStatement.abbreviated}, {environmentName}
+      </Code>
     </Segment>
   );
 
