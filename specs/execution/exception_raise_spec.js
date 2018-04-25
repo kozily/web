@@ -104,7 +104,7 @@ describe("Reducing raise statements", () => {
     });
 
     const statement = buildSemanticStatement(
-      exceptionRaiseStatement(lexicalIdentifier("X")),
+      exceptionRaiseStatement(identifierExpression(lexicalIdentifier("X"))),
       buildEnvironment({
         X: buildVariable("x", 0),
       }),
