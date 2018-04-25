@@ -159,7 +159,7 @@ stm_try -> "try" __ stm_sequence __ "catch" __ ids_identifier __ "then" __ stm_s
   }
 %}
 
-stm_raise -> "raise" __ ids_identifier __ "end" {%
+stm_raise -> "raise" __ exp_expression __ "end" {%
   function(d) {
     return {
       node: "statement",

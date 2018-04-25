@@ -7,6 +7,10 @@ import {
 } from "../../app/oz/machine/statements";
 import { lexicalIdentifier } from "../../app/oz/machine/lexical";
 import {
+  identifierExpression,
+  operatorExpression,
+} from "../../app/oz/machine/expressions";
+import {
   buildSingleThreadedState,
   buildSemanticStatement,
   buildSigma,
@@ -16,6 +20,7 @@ import {
 } from "../../app/oz/machine/build";
 import reduce from "../../app/oz/execution/exception_raise";
 import { failureException } from "../../app/oz/machine/exceptions";
+import { buildBlockedState } from "./helpers";
 
 describe("Reducing raise statements", () => {
   beforeEach(() => {
@@ -45,7 +50,7 @@ describe("Reducing raise statements", () => {
     });
 
     const statement = buildSemanticStatement(
-      exceptionRaiseStatement(lexicalIdentifier("X")),
+      exceptionRaiseStatement(identifierExpression(lexicalIdentifier("X"))),
       buildEnvironment({
         X: buildVariable("x", 0),
       }),
@@ -83,7 +88,7 @@ describe("Reducing raise statements", () => {
     });
 
     const statement = buildSemanticStatement(
-      exceptionRaiseStatement(lexicalIdentifier("X")),
+      exceptionRaiseStatement(identifierExpression(lexicalIdentifier("X"))),
       buildEnvironment({
         X: buildVariable("x", 0),
       }),
@@ -95,5 +100,35 @@ describe("Reducing raise statements", () => {
         Immutable.is(error.innerOzException, failureException("Message"))
       );
     });
+  });
+
+  it("blocks when the exception expression blocks", () => {
+    const state = buildSingleThreadedState({
+      semanticStatements: [
+        buildSemanticStatement(skipStatement()),
+        buildSemanticStatement(skipStatement()),
+        buildSemanticStatement(skipStatement()),
+      ],
+      sigma: buildSigma(
+        buildEquivalenceClass(undefined, buildVariable("x", 0)),
+      ),
+    });
+
+    const statement = buildSemanticStatement(
+      exceptionRaiseStatement(
+        operatorExpression(
+          "+",
+          identifierExpression(lexicalIdentifier("X")),
+          identifierExpression(lexicalIdentifier("X")),
+        ),
+      ),
+      buildEnvironment({
+        X: buildVariable("x", 0),
+      }),
+    );
+
+    expect(reduce(state, statement, 0)).toEqual(
+      buildBlockedState(state, statement, 0, buildVariable("x", 0)),
+    );
   });
 });

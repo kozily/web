@@ -8,14 +8,14 @@ export const RuntimeErrors = props => {
     <Segment attached padded>
       <Message
         as="pre"
-        hidden={props.error === undefined}
+        hidden={!props.error}
         attached="bottom"
         size="tiny"
         icon="warning sign"
-        header="Runtime error"
+        header="Uncaught exception when running the last statement"
         content={
-          props.error !== undefined
-            ? print(props.error.get("error")).full
+          props.error
+            ? `Exception value: ${print(props.error.get("error")).full}`
             : false
         }
         error

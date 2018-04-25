@@ -1,6 +1,6 @@
 export default (recurse, node, identation) => {
   const ident = new Array(identation + 1).join(" ");
-  const identifier = node.getIn(["identifier", "identifier"]);
+  const identifier = recurse(node.get("identifier")).abbreviated;
 
   return {
     abbreviated: `${ident}raise ${identifier} end`,
