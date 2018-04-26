@@ -1,6 +1,6 @@
 import Immutable from "immutable";
 import { lexicalIdentifier } from "../../../app/oz/machine/lexical";
-import { literalRecord } from "../../../app/oz/machine/literals";
+import { literalRecord, literalNumber } from "../../../app/oz/machine/literals";
 import { parserFor } from "../../../app/oz/parser";
 import literalGrammar from "../../../app/oz/grammar/literals.ne";
 
@@ -58,6 +58,18 @@ describe("Parsing record literals", () => {
       literalRecord("andthen", {
         a: lexicalIdentifier("X"),
         b: lexicalIdentifier("Y"),
+      }),
+    );
+  });
+
+  it("handles nested literals", () => {
+    expect(parse("label(age:30 name:N address:address(number:1200))")).toEqual(
+      literalRecord("label", {
+        age: literalNumber(30),
+        name: lexicalIdentifier("N"),
+        address: literalRecord("address", {
+          number: literalNumber(1200),
+        }),
       }),
     );
   });

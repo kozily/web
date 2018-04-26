@@ -29,7 +29,7 @@ describe("Creating record values in the sigma", () => {
     );
   });
 
-  it("creates a sigma nested record value", () => {
+  it("creates a nested record value", () => {
     const environment = buildEnvironment({
       X: buildVariable("x", 0),
       Y: buildVariable("y", 0),

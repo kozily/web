@@ -359,9 +359,15 @@ lit_record_feature_list ->
     lit_record_feature_list __ lit_record_feature {% function(d) { return d[0].concat(d[2]); } %}
   | lit_record_feature
 
-lit_record_feature -> lit_atom_syntax ":" ids_identifier {%
+lit_record_feature -> lit_atom_syntax ":" lit_record_value {%
   function(d, position, reject) {
     return {name: d[0], value: d[2]};
+  }
+%}
+
+lit_record_value -> (ids_identifier|lit_value) {%
+  function(d) {
+    return d[0][0];
   }
 %}
 
@@ -490,12 +496,18 @@ lit_empty_list -> "[" _ "]" {%
 %}
 
 lit_list_items ->
-    ids_identifier
-  | lit_list_items __ ids_identifier {%
+    lit_list_item
+  | lit_list_items __ lit_list_item {%
       function(d) {
         return d[0].concat(d[2]);
       }
     %}
+
+lit_list_item -> (ids_identifier | lit_value) {%
+  function(d) {
+    return d[0][0];
+  }
+%}
 
 ##############################################################################
 # Strings

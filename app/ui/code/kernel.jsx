@@ -8,6 +8,7 @@ import { print } from "../../oz/print";
 
 export class Kernel extends React.Component {
   componentDidMount() {
+    const value = this.props.compilation ? this.props.source : "";
     const codeMirrorOptions = {
       mode: "oz",
       theme: "elegant",
@@ -15,14 +16,15 @@ export class Kernel extends React.Component {
       lineNumbers: true,
       lineWrapping: true,
       readOnly: true,
-      value: this.props.source,
+      value,
     };
     this.editor = new CodeMirror(this.editorElement, codeMirrorOptions);
     setTimeout(() => this.editor.refresh(), 1000);
   }
 
   componentWillReceiveProps(nextProps) {
-    this.editor.setValue(nextProps.source);
+    const value = nextProps.compilation ? nextProps.source : "";
+    this.editor.setValue(value);
   }
 
   render() {
@@ -37,6 +39,7 @@ export class Kernel extends React.Component {
 }
 
 const mapStateToProps = state => ({
+  compilation: state.getIn(["parse", "compiled"]),
   source: print(state.getIn(["parse", "compiled"])).full,
 });
 
