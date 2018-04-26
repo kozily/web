@@ -4,7 +4,7 @@ import { blockCurrentThread } from "../machine/threads";
 import { evaluate } from "../expression";
 import {
   getLastEnvironmentIndex,
-  makeEnvironmentIndex,
+  makeNewEnvironmentIndex,
 } from "../machine/environment";
 
 export default function(state, semanticStatement, activeThreadIndex) {
@@ -44,7 +44,7 @@ export default function(state, semanticStatement, activeThreadIndex) {
         patternFeatures.keySeq().toSet(),
       )
     ) {
-      const newIndex = makeEnvironmentIndex();
+      const newIndex = makeNewEnvironmentIndex();
       const newEnvironment = patternFeatures.reduce(
         (result, identifier, feature) => {
           return result.set(

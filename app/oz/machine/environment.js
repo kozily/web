@@ -4,7 +4,7 @@ export const resetEnvironmentIndex = () => {
   environmentIndex = 0;
 };
 
-export const makeEnvironmentIndex = () => {
+export const makeNewEnvironmentIndex = () => {
   return ++environmentIndex;
 };
 

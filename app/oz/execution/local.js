@@ -3,7 +3,7 @@ import {
   buildSemanticStatement,
 } from "../machine/build";
 import { makeNewVariable } from "../machine/sigma";
-import { makeEnvironmentIndex } from "../machine/environment";
+import { makeNewEnvironmentIndex } from "../machine/environment";
 
 export default function(state, semanticStatement, activeThreadIndex) {
   const identifier = semanticStatement.getIn([
@@ -21,7 +21,7 @@ export default function(state, semanticStatement, activeThreadIndex) {
   const newEnvironment = semanticStatement
     .get("environment")
     .set(identifier, newVariable);
-  const newIndex = makeEnvironmentIndex();
+  const newIndex = makeNewEnvironmentIndex();
   const newSemanticStatement = buildSemanticStatement(
     childStatement,
     newEnvironment,

@@ -9,7 +9,7 @@ import {
 import { builtIns } from "../built_ins";
 import { blockCurrentThread } from "../machine/threads";
 import { evaluate } from "../expression";
-import { makeEnvironmentIndex } from "../machine/environment";
+import { makeNewEnvironmentIndex } from "../machine/environment";
 
 const executeBuiltInValue = (
   procedureValue,
@@ -120,7 +120,7 @@ const executeProcedureValue = (
 
   const procedureBody = procedureValue.getIn(["value", "body"]);
 
-  const newIndex = makeEnvironmentIndex();
+  const newIndex = makeNewEnvironmentIndex();
   const newStatement = buildSemanticStatement(procedureBody, newEnvironment, {
     environmentIndex: newIndex,
   });
