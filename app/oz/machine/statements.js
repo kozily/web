@@ -14,6 +14,7 @@ export const statementTypes = {
   exceptionCatch: "exceptionCatch",
   thread: "thread",
   byNeed: "byNeed",
+  cellCreation: "cellCreation",
 };
 
 export const allStatementTypes = Object.keys(statementTypes);
@@ -35,7 +36,7 @@ export const skipStatement = () => {
 };
 
 export const localStatement = (identifier, statement) => {
-  return new Immutable.Map({
+  return Immutable.Map({
     node: "statement",
     type: statementTypes.local,
     identifier,
@@ -44,7 +45,7 @@ export const localStatement = (identifier, statement) => {
 };
 
 export const bindingStatement = (lhs, rhs) => {
-  return new Immutable.Map({
+  return Immutable.Map({
     node: "statement",
     type: statementTypes.binding,
     lhs,
@@ -53,7 +54,7 @@ export const bindingStatement = (lhs, rhs) => {
 };
 
 export const valueCreationStatement = (lhs, rhs) => {
-  return new Immutable.Map({
+  return Immutable.Map({
     node: "statement",
     type: statementTypes.valueCreation,
     lhs,
@@ -66,7 +67,7 @@ export const conditionalStatement = (
   trueStatement,
   falseStatement = undefined,
 ) => {
-  return new Immutable.Map({
+  return Immutable.Map({
     node: "statement",
     type: statementTypes.conditional,
     condition,
@@ -81,7 +82,7 @@ export const patternMatchingStatement = (
   trueStatement,
   falseStatement = undefined,
 ) => {
-  return new Immutable.Map({
+  return Immutable.Map({
     node: "statement",
     type: statementTypes.patternMatching,
     identifier,
@@ -92,7 +93,7 @@ export const patternMatchingStatement = (
 };
 
 export const procedureApplicationStatement = (procedure, args = []) => {
-  return new Immutable.fromJS({
+  return Immutable.fromJS({
     node: "statement",
     type: statementTypes.procedureApplication,
     procedure,
@@ -105,7 +106,7 @@ export const exceptionContextStatement = (
   exceptionIdentifier,
   exceptionStatement,
 ) => {
-  return new Immutable.fromJS({
+  return Immutable.fromJS({
     node: "statement",
     type: statementTypes.exceptionContext,
     triedStatement,
@@ -115,7 +116,7 @@ export const exceptionContextStatement = (
 };
 
 export const exceptionRaiseStatement = identifier => {
-  return new Immutable.fromJS({
+  return Immutable.fromJS({
     node: "statement",
     type: statementTypes.exceptionRaise,
     identifier,
@@ -126,7 +127,7 @@ export const exceptionCatchStatement = (
   exceptionIdentifier,
   exceptionStatement,
 ) => {
-  return new Immutable.fromJS({
+  return Immutable.fromJS({
     node: "statement",
     type: statementTypes.exceptionCatch,
     exceptionIdentifier,
@@ -135,7 +136,7 @@ export const exceptionCatchStatement = (
 };
 
 export const threadStatement = body => {
-  return new Immutable.fromJS({
+  return Immutable.fromJS({
     node: "statement",
     type: statementTypes.thread,
     body,
@@ -148,5 +149,14 @@ export const byNeedStatement = (procedure, neededIdentifier) => {
     type: statementTypes.byNeed,
     procedure,
     neededIdentifier,
+  });
+};
+
+export const cellCreationStatement = (value, cell) => {
+  return Immutable.fromJS({
+    node: "statement",
+    type: statementTypes.cellCreation,
+    value,
+    cell,
   });
 };

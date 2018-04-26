@@ -15,6 +15,7 @@ import exceptionRaise from "./exception_raise";
 import exceptionCatch from "./exception_catch";
 import thread from "./thread";
 import byNeed from "./by_need";
+import cellCreation from "./cell_creation";
 import number from "./number";
 import record from "./record";
 import procedure from "./procedure";
@@ -37,6 +38,7 @@ export const collectors = {
     [statementTypes.exceptionCatch]: exceptionCatch,
     [statementTypes.thread]: thread,
     [statementTypes.byNeed]: byNeed,
+    [statementTypes.cellCreation]: cellCreation,
   },
   literal: {
     [literalTypes.number]: number,

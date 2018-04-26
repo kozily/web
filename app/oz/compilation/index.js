@@ -11,6 +11,7 @@ import patternMatching from "./pattern_matching";
 import procedureApplication from "./procedure_application";
 import exceptionContext from "./exception_context";
 import exceptionRaise from "./exception_raise";
+import cellCreation from "./cell_creation";
 import thread from "./thread";
 import byNeed from "./by_need";
 import number from "./number";
@@ -34,6 +35,7 @@ export const compilers = {
     [statementSyntaxTypes.exceptionRaiseSyntax]: exceptionRaise,
     [statementSyntaxTypes.threadSyntax]: thread,
     [statementSyntaxTypes.byNeedSyntax]: byNeed,
+    [statementSyntaxTypes.cellCreationSyntax]: cellCreation,
   },
   literal: {
     [literalTypes.number]: number,

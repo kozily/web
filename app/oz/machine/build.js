@@ -85,10 +85,22 @@ export const buildTau = (...triggers) => {
   return Immutable.OrderedSet(triggers);
 };
 
+export const buildMutableMapping = (mutableVariable, immutableVariable) => {
+  return Immutable.fromJS({
+    mutableVariable,
+    immutableVariable,
+  });
+};
+
+export const buildMu = (...entries) => {
+  return Immutable.OrderedSet(entries);
+};
+
 export const buildSingleThreadedState = ({
   semanticStatements = [],
   sigma = buildSigma(),
   tau = buildTau(),
+  mu = buildMu(),
   threadMetadata = buildThreadMetadata(),
 } = {}) => {
   return buildState({
@@ -100,6 +112,7 @@ export const buildSingleThreadedState = ({
     ],
     sigma,
     tau,
+    mu,
   });
 };
 
@@ -107,11 +120,13 @@ export const buildState = ({
   threads = [],
   sigma = buildSigma(),
   tau = buildTau(),
+  mu = buildMu(),
 } = {}) => {
   return Immutable.Map({
     threads: Immutable.List(threads),
     sigma,
     tau,
+    mu,
   });
 };
 
