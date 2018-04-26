@@ -6,7 +6,7 @@ import {
   errorException,
   raiseSystemException,
 } from "../machine/exceptions";
-import { builtIns } from "../built_ins";
+import { namespacedBuiltIns, noNamespacedBuiltIns } from "../built_ins";
 import { blockCurrentThread } from "../machine/threads";
 import { evaluate } from "../expression";
 import { makeNewEnvironmentIndex } from "../machine/environment";
@@ -23,7 +23,10 @@ const executeBuiltInValue = (
 
   const builtInNamespace = procedureValue.get("namespace");
   const builtInOperator = procedureValue.get("operator");
-  const builtIn = builtIns[builtInNamespace][builtInOperator];
+  const builtIn =
+    builtInNamespace === undefined
+      ? noNamespacedBuiltIns[builtInOperator]
+      : namespacedBuiltIns[builtInNamespace][builtInOperator];
 
   const args = statement.get("args");
   if (args.isEmpty()) {

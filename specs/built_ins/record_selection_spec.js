@@ -1,5 +1,5 @@
 import Immutable from "immutable";
-import { builtIns } from "../../app/oz/built_ins";
+import { namespacedBuiltIns } from "../../app/oz/built_ins";
 import {
   buildVariable,
   buildEquivalenceClass,
@@ -11,7 +11,7 @@ import {
   valueRecord,
 } from "../../app/oz/machine/values";
 
-const operator = builtIns["Record"]["."];
+const operator = namespacedBuiltIns["Record"]["."];
 
 describe("The record selection built-in", () => {
   beforeEach(() => {

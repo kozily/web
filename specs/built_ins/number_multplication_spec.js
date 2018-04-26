@@ -1,9 +1,9 @@
 import Immutable from "immutable";
-import { builtIns } from "../../app/oz/built_ins";
+import { namespacedBuiltIns } from "../../app/oz/built_ins";
 import { valueNumber, valueAtom } from "../../app/oz/machine/values";
 import { buildVariable } from "../../app/oz/machine/build";
 
-const operator = builtIns["Number"]["*"];
+const operator = namespacedBuiltIns["Number"]["*"];
 
 describe("The number multiplication built-in", () => {
   beforeEach(() => {

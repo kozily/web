@@ -15,6 +15,7 @@ import {
   valueNumber,
   valueBuiltIn,
   valueRecord,
+  valueBoolean,
 } from "../../app/oz/machine/values";
 import {
   errorException,
@@ -377,6 +378,43 @@ describe("Reducing {X ...} statements", () => {
             buildEquivalenceClass(valueNumber(5), buildVariable("y", 0)),
             buildEquivalenceClass(valueNumber(10), buildVariable("z", 0)),
             buildEquivalenceClass(valueNumber(15), buildVariable("r", 0)),
+          ),
+        }),
+      );
+    });
+
+    it("binds the appropriate value and executes the builtin is det with argument expressions correctly", () => {
+      const state = buildSingleThreadedState({
+        semanticStatements: [buildSemanticStatement(skipStatement())],
+        sigma: buildSigma(
+          buildEquivalenceClass(valueBuiltIn("IsDet"), buildVariable("x", 0)),
+          buildEquivalenceClass(valueNumber(5), buildVariable("y", 0)),
+          buildEquivalenceClass(undefined, buildVariable("r", 0)),
+        ),
+      });
+
+      const statement = buildSemanticStatement(
+        procedureApplicationStatement(
+          identifierExpression(lexicalIdentifier("X")),
+          [
+            identifierExpression(lexicalIdentifier("Y")),
+            identifierExpression(lexicalIdentifier("R")),
+          ],
+        ),
+        buildEnvironment({
+          X: buildVariable("x", 0),
+          Y: buildVariable("y", 0),
+          R: buildVariable("r", 0),
+        }),
+      );
+
+      expect(reduce(state, statement, 0)).toEqual(
+        buildSingleThreadedState({
+          semanticStatements: [buildSemanticStatement(skipStatement())],
+          sigma: buildSigma(
+            buildEquivalenceClass(valueBuiltIn("IsDet"), buildVariable("x", 0)),
+            buildEquivalenceClass(valueNumber(5), buildVariable("y", 0)),
+            buildEquivalenceClass(valueBoolean(true), buildVariable("r", 0)),
           ),
         }),
       );

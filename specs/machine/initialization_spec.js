@@ -26,6 +26,7 @@ describe("State initialization", () => {
       Float: buildVariable("float", 0, { system: true }),
       Record: buildVariable("record", 0, { system: true }),
       Value: buildVariable("value", 0, { system: true }),
+      IsDet: buildVariable("isdet", 0, { system: true }),
     });
 
     expect(state.getIn(["threads", 0, "stack", 0, "environment"])).toEqual(
@@ -123,5 +124,12 @@ describe("State initialization", () => {
     expect(lookupBuiltInInSigma(sigma, "vge")).toEqual(
       valueBuiltIn(">=", "Value"),
     );
+  });
+
+  it("must generate the appropiate sigma entries for the value built-ins", () => {
+    const state = buildFromKernelAST(skipStatement());
+    const sigma = state.get("sigma");
+
+    expect(lookupBuiltInInSigma(sigma, "isdet")).toEqual(valueBuiltIn("IsDet"));
   });
 });
