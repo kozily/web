@@ -1,4 +1,4 @@
-import { unifyVariableToEvaluation } from "../machine/sigma";
+import { unify } from "../machine/sigma";
 import {
   errorException,
   failureException,
@@ -29,9 +29,7 @@ export default function(state, semanticStatement, activeThreadIndex) {
     }
 
     try {
-      return state.update("sigma", sigma =>
-        unifyVariableToEvaluation(sigma, variable, evaluation),
-      );
+      return state.update("sigma", sigma => unify(sigma, variable, evaluation));
     } catch (error) {
       return raiseSystemException(state, activeThreadIndex, failureException());
     }

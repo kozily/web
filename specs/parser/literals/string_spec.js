@@ -10,7 +10,11 @@ describe("Parsing string literals", () => {
     jasmine.addCustomEqualityTester(Immutable.is);
   });
 
-  it("handles parsing correctly", () => {
+  it("handles parsing simple strings correctly", () => {
+    expect(parse('"ABC"')).toEqual(literalString("ABC"));
+  });
+
+  it("handles parsing complex strings correctly", () => {
     expect(parse('"a \\\\\\nSTRING"')).toEqual(literalString("a \\\nSTRING"));
   });
 });

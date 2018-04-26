@@ -20,9 +20,9 @@ export default (unify, sigma, equivalenceClassX, equivalenceClassY) => {
   }
 
   return xFeatures.reduce((updatedSigma, feature) => {
-    const xVariable = xValue.getIn(["features", feature]);
-    const yVariable = yValue.getIn(["features", feature]);
+    const lhsContents = xValue.getIn(["features", feature]);
+    const rhsContents = yValue.getIn(["features", feature]);
 
-    return unify(updatedSigma, xVariable, yVariable);
+    return unify(updatedSigma, lhsContents, rhsContents);
   }, sigma);
 };

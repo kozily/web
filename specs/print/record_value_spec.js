@@ -6,8 +6,9 @@ import {
   valueBoolean,
   valueTuple,
   valueList,
+  valueNumber,
 } from "../../app/oz/machine/values";
-import { lexicalIdentifier } from "../../app/oz/machine/lexical";
+import { buildVariable } from "../../app/oz/machine/build";
 
 describe("Printing a record value", () => {
   beforeEach(() => {
@@ -16,13 +17,13 @@ describe("Printing a record value", () => {
 
   it("Returns the appropriate string for standard records", () => {
     const value = valueRecord("person", {
-      name: lexicalIdentifier("N"),
-      age: lexicalIdentifier("Age"),
+      name: buildVariable("n", 0),
+      age: valueNumber(30),
     });
     const result = print(value, 2);
 
-    expect(result.abbreviated).toEqual("person(age:Age name:N)");
-    expect(result.full).toEqual("person(age:Age name:N)");
+    expect(result.abbreviated).toEqual("person(age:30 name:n0)");
+    expect(result.full).toEqual("person(age:30 name:n0)");
   });
 
   it("Returns the appropriate string for atoms", () => {
@@ -43,25 +44,35 @@ describe("Printing a record value", () => {
 
   it("Returns the appropriate string for generic tuples", () => {
     const value = valueTuple("person", [
-      lexicalIdentifier("X"),
-      lexicalIdentifier("Y"),
-      lexicalIdentifier("Z"),
+      buildVariable("x", 0),
+      valueNumber(30),
     ]);
     const result = print(value, 2);
 
-    expect(result.abbreviated).toEqual("person(X Y Z)");
-    expect(result.full).toEqual("person(X Y Z)");
+    expect(result.abbreviated).toEqual("person(x0 30)");
+    expect(result.full).toEqual("person(1:x0 2:30)");
   });
 
-  it("Returns the appropriate string for generic lists", () => {
-    const value = valueList([
-      lexicalIdentifier("X"),
-      lexicalIdentifier("Y"),
-      lexicalIdentifier("Z"),
-    ]);
+  it("Returns the appropriate string for lists", () => {
+    const value = valueList([buildVariable("x", 0), valueNumber(30)]);
     const result = print(value, 2);
 
-    expect(result.abbreviated).toEqual("[X Y Z]");
-    expect(result.full).toEqual("[X Y Z]");
+    expect(result.abbreviated).toEqual("[x0 30]");
+    expect(result.full).toEqual("'|'(1:x0 2:'|'(1:30 2:nil))");
+  });
+
+  it("Returns the appropriate string for nested recursive structures", () => {
+    const value = valueRecord("person", {
+      age: valueNumber(30),
+      address: valueRecord("address", {
+        number: valueNumber(1300),
+      }),
+    });
+    const result = print(value, 2);
+
+    expect(result.abbreviated).toEqual(
+      "person(address:address(number:1300) age:30)",
+    );
+    expect(result.full).toEqual("person(address:address(number:1300) age:30)");
   });
 });

@@ -1,3 +1,4 @@
+import Immutable from "immutable";
 import {
   buildVariable,
   makeAuxiliaryIdentifier,
@@ -11,7 +12,11 @@ const identifier2variable = identifier => {
   return identifier.charAt(0).toLowerCase() + identifier.substring(1);
 };
 
-export const makeNewVariable = ({ in: sigma, for: identifier }) => {
+export const makeNewVariable = ({
+  in: sigma,
+  for: identifier,
+  options = {},
+}) => {
   const variableName = identifier2variable(identifier);
 
   const currentMaximumVariable = sigma
@@ -20,7 +25,7 @@ export const makeNewVariable = ({ in: sigma, for: identifier }) => {
     .maxBy(variable => variable.get("sequence"));
 
   if (currentMaximumVariable === undefined) {
-    return buildVariable(variableName, 0);
+    return buildVariable(variableName, 0, options);
   }
 
   return currentMaximumVariable.update("sequence", sequence => sequence + 1);
@@ -42,7 +47,7 @@ export const lookupVariableInSigma = (sigma, variable) => {
   );
 };
 
-export const valueToVariable = (value, sigma, namespace = "") => {
+const valueToVariable = (value, sigma, namespace = "system") => {
   const auxIdentifier = makeAuxiliaryIdentifier(namespace);
   const auxVariable = makeNewVariable({
     in: sigma,
@@ -53,12 +58,24 @@ export const valueToVariable = (value, sigma, namespace = "") => {
   return { sigma: sigma.add(auxEquivalenceClass), variable: auxVariable };
 };
 
-export const evaluationToVariable = (evaluation, sigma, namespace = "") => {
-  if (evaluation.get("variable")) {
+const evaluationToVariable = (evaluation, sigma, namespace = "system") => {
+  if (evaluation.has("variable")) {
     return { sigma, variable: evaluation.get("variable") };
   }
 
   return valueToVariable(evaluation.get("value"), sigma, namespace);
+};
+
+export const convertToVariable = (thing, sigma, namespace = "system") => {
+  if (thing.get("node") === "value") {
+    return valueToVariable(thing, sigma, namespace);
+  }
+
+  if (thing.has("name") && thing.has("sequence")) {
+    return { sigma, variable: thing };
+  }
+
+  return evaluationToVariable(thing, sigma, namespace);
 };
 
 export const mergeEquivalenceClasses = (sigma, target, source) => {
@@ -74,18 +91,86 @@ export const mergeEquivalenceClasses = (sigma, target, source) => {
     .add(mergedEquivalenceClass);
 };
 
+const hasVariable = thing => {
+  return (thing.has("name") && thing.has("sequence")) || thing.has("variable");
+};
+
+const accumulateVariables = (sigma, ...args) => {
+  return Immutable.List(args).reduce(
+    (accumulator, argument) => {
+      const conversion = convertToVariable(argument, accumulator.sigma);
+
+      return {
+        sigma: conversion.sigma,
+        variables: accumulator.variables.push(conversion.variable),
+      };
+    },
+    { sigma, variables: Immutable.List() },
+  );
+};
+
+const clearTempVariable = (sigma, thing, variable) => {
+  if (hasVariable(thing)) {
+    return sigma;
+  }
+
+  const equivalenceClass = lookupVariableInSigma(sigma, variable);
+  const cleanSigma = sigma.delete(equivalenceClass);
+
+  const updatedEquivalenceClass = equivalenceClass.update(
+    "variables",
+    variables => variables.delete(variable),
+  );
+  if (updatedEquivalenceClass.get("variables").isEmpty()) {
+    return cleanSigma;
+  }
+
+  return cleanSigma.add(updatedEquivalenceClass);
+};
+
 export const unify = (sigma, x, y) => {
-  const equivalenceClassX = lookupVariableInSigma(sigma, x);
+  const { sigma: augmentedSigma, variables } = accumulateVariables(sigma, x, y);
+
+  const xVariable = variables.first();
+  const yVariable = variables.last();
+
+  const equivalenceClassX = lookupVariableInSigma(augmentedSigma, xVariable);
   const isXBound = isEquivalenceClassBound(equivalenceClassX);
-  const equivalenceClassY = lookupVariableInSigma(sigma, y);
+  const equivalenceClassY = lookupVariableInSigma(augmentedSigma, yVariable);
   const isYBound = isEquivalenceClassBound(equivalenceClassY);
 
+  const clearTempVariables = sigma => {
+    return clearTempVariable(
+      clearTempVariable(sigma, y, yVariable),
+      x,
+      xVariable,
+    );
+  };
+
   if (!isXBound && !isYBound) {
-    return mergeEquivalenceClasses(sigma, equivalenceClassX, equivalenceClassY);
+    return clearTempVariables(
+      mergeEquivalenceClasses(
+        augmentedSigma,
+        equivalenceClassX,
+        equivalenceClassY,
+      ),
+    );
   } else if (!isXBound && isYBound) {
-    return mergeEquivalenceClasses(sigma, equivalenceClassY, equivalenceClassX);
+    return clearTempVariables(
+      mergeEquivalenceClasses(
+        augmentedSigma,
+        equivalenceClassY,
+        equivalenceClassX,
+      ),
+    );
   } else if (isXBound && !isYBound) {
-    return mergeEquivalenceClasses(sigma, equivalenceClassX, equivalenceClassY);
+    return clearTempVariables(
+      mergeEquivalenceClasses(
+        augmentedSigma,
+        equivalenceClassX,
+        equivalenceClassY,
+      ),
+    );
   } else {
     const xType = equivalenceClassX.getIn(["value", "type"]);
     const yType = equivalenceClassY.getIn(["value", "type"]);
@@ -96,73 +181,17 @@ export const unify = (sigma, x, y) => {
 
     const unifiedSigma = unifyValue(
       unify,
-      sigma,
+      augmentedSigma,
       equivalenceClassX,
       equivalenceClassY,
     );
-    return mergeEquivalenceClasses(
-      unifiedSigma,
-      equivalenceClassX,
-      equivalenceClassY,
-    );
-  }
-};
 
-export const unifyVariableToValue = (sigma, variable, value) => {
-  const {
-    sigma: augmentedSigma,
-    variable: auxiliaryVariable,
-  } = valueToVariable(value, sigma);
-  const unifiedSigma = unify(augmentedSigma, variable, auxiliaryVariable);
-  const resultingEquivalenceClass = lookupVariableInSigma(
-    unifiedSigma,
-    auxiliaryVariable,
-  );
-
-  return unifiedSigma
-    .delete(resultingEquivalenceClass)
-    .add(
-      resultingEquivalenceClass.update("variables", variables =>
-        variables.delete(auxiliaryVariable),
+    return clearTempVariables(
+      mergeEquivalenceClasses(
+        unifiedSigma,
+        equivalenceClassX,
+        equivalenceClassY,
       ),
     );
-};
-
-export const unifyValues = (sigma, x, y) => {
-  const { sigma: xAugmentedSigma, variable: xVariable } = valueToVariable(
-    x,
-    sigma,
-  );
-  const { sigma: yAugmentedSigma, variable: yVariable } = valueToVariable(
-    y,
-    xAugmentedSigma,
-  );
-
-  const unifiedSigma = unify(yAugmentedSigma, xVariable, yVariable);
-
-  return unifiedSigma;
-};
-
-export const unifyVariableToEvaluation = (sigma, variable, evaluation) => {
-  if (evaluation.get("variable")) {
-    return unify(sigma, variable, evaluation.get("variable"));
   }
-
-  return unifyVariableToValue(sigma, variable, evaluation.get("value"));
-};
-
-export const unifyEvaluations = (sigma, x, y) => {
-  if (x.get("variable") && y.get("variable")) {
-    return unify(sigma, x.get("variable"), y.get("variable"));
-  }
-
-  if (x.get("variable")) {
-    return unifyVariableToValue(sigma, x.get("variable"), y.get("value"));
-  }
-
-  if (y.get("variable")) {
-    return unifyVariableToValue(sigma, y.get("variable"), x.get("value"));
-  }
-
-  return unifyValues(sigma, x.get("value"), y.get("value"));
 };

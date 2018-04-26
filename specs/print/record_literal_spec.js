@@ -6,6 +6,7 @@ import {
   literalBoolean,
   literalTuple,
   literalList,
+  literalNumber,
 } from "../../app/oz/machine/literals";
 import { lexicalIdentifier } from "../../app/oz/machine/lexical";
 
@@ -17,12 +18,12 @@ describe("Printing a record literal", () => {
   it("Returns the appropriate string for standard records", () => {
     const literal = literalRecord("person", {
       name: lexicalIdentifier("N"),
-      age: lexicalIdentifier("Age"),
+      age: literalNumber(30),
     });
     const result = print(literal, 2);
 
-    expect(result.abbreviated).toEqual("person(age:Age name:N)");
-    expect(result.full).toEqual("person(age:Age name:N)");
+    expect(result.abbreviated).toEqual("person(age:30 name:N)");
+    expect(result.full).toEqual("person(age:30 name:N)");
   });
 
   it("Returns the appropriate string for atoms", () => {
@@ -44,24 +45,34 @@ describe("Printing a record literal", () => {
   it("Returns the appropriate string for generic tuples", () => {
     const literal = literalTuple("person", [
       lexicalIdentifier("X"),
-      lexicalIdentifier("Y"),
-      lexicalIdentifier("Z"),
+      literalNumber(30),
     ]);
     const result = print(literal, 2);
 
-    expect(result.abbreviated).toEqual("person(X Y Z)");
-    expect(result.full).toEqual("person(X Y Z)");
+    expect(result.abbreviated).toEqual("person(X 30)");
+    expect(result.full).toEqual("person(X 30)");
   });
 
-  it("Returns the appropriate string for generic lists", () => {
-    const literal = literalList([
-      lexicalIdentifier("X"),
-      lexicalIdentifier("Y"),
-      lexicalIdentifier("Z"),
-    ]);
+  it("Returns the appropriate string for lists", () => {
+    const literal = literalList([lexicalIdentifier("X"), literalNumber(30)]);
     const result = print(literal, 2);
 
-    expect(result.abbreviated).toEqual("[X Y Z]");
-    expect(result.full).toEqual("[X Y Z]");
+    expect(result.abbreviated).toEqual("[X 30]");
+    expect(result.full).toEqual("[X 30]");
+  });
+
+  it("Returns the appropriate string for nested recursive structures", () => {
+    const literal = literalRecord("person", {
+      age: literalNumber(30),
+      address: literalRecord("address", {
+        number: literalNumber(1300),
+      }),
+    });
+    const result = print(literal, 2);
+
+    expect(result.abbreviated).toEqual(
+      "person(address:address(number:1300) age:30)",
+    );
+    expect(result.full).toEqual("person(address:address(number:1300) age:30)");
   });
 });

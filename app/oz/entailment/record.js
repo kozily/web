@@ -1,9 +1,19 @@
 import Immutable from "immutable";
 import { lookupVariableInSigma } from "../machine/sigma";
 
+const extractValueAndVariable = (thing, sigma) => {
+  if (thing.get("node") === "value") {
+    return { value: thing, variable: undefined };
+  }
+
+  const value = lookupVariableInSigma(sigma, thing).get("value");
+  return { value, variable: thing };
+};
+
 export default (recurse, args, sigma) => {
   const lhs = args.getIn([0, "value", "value"]);
   const rhs = args.getIn([1, "value", "value"]);
+
   if (lhs.get("label") !== rhs.get("label")) {
     return Immutable.Map({ value: false });
   }
@@ -20,16 +30,24 @@ export default (recurse, args, sigma) => {
     rhs.getIn(["features", x]),
   ]);
 
-  const reduction = valuePairs.reduce((result, [lhsVariable, rhsVariable]) => {
+  const reduction = valuePairs.reduce((result, [lhsContent, rhsContent]) => {
     if (result) {
       return result;
     }
 
-    if (Immutable.is(lhsVariable, rhsVariable)) {
+    if (Immutable.is(lhsContent, rhsContent)) {
       return Immutable.Map({ value: true });
     }
-    const lhsValue = lookupVariableInSigma(sigma, lhsVariable).get("value");
-    const rhsValue = lookupVariableInSigma(sigma, rhsVariable).get("value");
+
+    const { value: lhsValue, variable: lhsVariable } = extractValueAndVariable(
+      lhsContent,
+      sigma,
+    );
+    const { value: rhsValue, variable: rhsVariable } = extractValueAndVariable(
+      rhsContent,
+      sigma,
+    );
+
     const recursiveEntailment = recurse(
       Immutable.fromJS([
         { value: lhsValue, variable: lhsVariable },

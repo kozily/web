@@ -2,7 +2,7 @@ import Immutable from "immutable";
 import { parserFor } from "../../../app/oz/parser";
 import literalGrammar from "../../../app/oz/grammar/literals.ne";
 import { lexicalIdentifier } from "../../../app/oz/machine/lexical";
-import { literalList } from "../../../app/oz/machine/literals";
+import { literalList, literalNumber } from "../../../app/oz/machine/literals";
 
 const parse = parserFor(literalGrammar);
 
@@ -34,6 +34,16 @@ describe("Parsing list literals", () => {
   it("handles lists with more than 1 same element correctly", () => {
     expect(parse("[X A Y Z Z A]")).toEqual(
       identifiersList(["X", "A", "Y", "Z", "Z", "A"]),
+    );
+  });
+
+  it("handles nested literals", () => {
+    expect(parse("[1 2 [3 4]]")).toEqual(
+      literalList([
+        literalNumber(1),
+        literalNumber(2),
+        literalList([literalNumber(3), literalNumber(4)]),
+      ]),
     );
   });
 });

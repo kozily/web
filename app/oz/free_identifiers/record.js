@@ -1,8 +1,16 @@
 import Immutable from "immutable";
 
 export default (recurse, literal) => {
-  const features = literal.getIn(["value", "features"]);
-  const identifiers = features.valueSeq().map(id => id.get("identifier"));
+  const identifiers = literal
+    .getIn(["value", "features"])
+    .valueSeq()
+    .flatMap(feature => {
+      if (feature.get("node") === "identifier") {
+        return Immutable.Set(feature.get("identifier"));
+      }
+
+      return recurse(feature);
+    });
 
   return Immutable.Set(identifiers);
 };

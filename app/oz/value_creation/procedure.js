@@ -1,7 +1,7 @@
 import { buildEnvironment } from "../machine/build";
 import { collectFreeIdentifiers } from "../free_identifiers";
 
-export default (environment, literal) => {
+export default (recurse, environment, literal) => {
   const freeIdentifiers = collectFreeIdentifiers(literal);
 
   const context = freeIdentifiers.reduce((accumulator, identifier) => {

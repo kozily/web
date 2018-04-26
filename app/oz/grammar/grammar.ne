@@ -359,9 +359,15 @@ lit_record_feature_list ->
     lit_record_feature_list __ lit_record_feature {% function(d) { return d[0].concat(d[2]); } %}
   | lit_record_feature
 
-lit_record_feature -> lit_atom_syntax ":" ids_identifier {%
+lit_record_feature -> lit_atom_syntax ":" lit_record_value {%
   function(d, position, reject) {
     return {name: d[0], value: d[2]};
+  }
+%}
+
+lit_record_value -> (ids_identifier|lit_value) {%
+  function(d) {
+    return d[0][0];
   }
 %}
 
@@ -445,18 +451,72 @@ lit_record_like ->
   | lit_boolean {% id %}
 
 ##############################################################################
+# Tuple
+##############################################################################
+
+lit_tuple -> lit_atom_syntax "(" _ lit_list_items _ ")" {%
+  function(d, position, reject) {
+    var label = d[0];
+    var features = d[3].reduce(function(result, item, index) {
+      result[++index] = item;
+      return result;
+    }, {});
+    return litBuildRecord(label, features);
+  }
+%}
+
+##############################################################################
+# List
+##############################################################################
+@{%
+  function litBuildList(items) {
+    return items.reduceRight(function(result, item) {
+      return litBuildRecord("|", {
+        1: item,
+        2: result,
+      });
+    }, litBuildRecord("nil", {}));
+  }
+%}
+
+lit_list ->
+    lit_empty_list {% id %}
+  | lit_list_with_items {% id %}
+
+lit_list_with_items -> "[" _ lit_list_items _ "]" {%
+  function(d) {
+    return litBuildList(d[2]);
+  }
+%}
+
+lit_empty_list -> "[" _ "]" {%
+  function(d) {
+    return litBuildList([]);
+  }
+%}
+
+lit_list_items ->
+    lit_list_item
+  | lit_list_items __ lit_list_item {%
+      function(d) {
+        return d[0].concat(d[2]);
+      }
+    %}
+
+lit_list_item -> (ids_identifier | lit_value) {%
+  function(d) {
+    return d[0][0];
+  }
+%}
+
+##############################################################################
 # Strings
 ##############################################################################
 @{%
   function litBuildString(d) {
-    if (d[0] === "") {
-      return litBuildRecord("nil", {});
-    } else {
-      return litBuildRecord("|", {
-        1: d[0].charCodeAt(0),
-        2: litBuildString([d[0].substring(1)]),
-      });
-    }
+    return litBuildList(d[0].split("").map(function(s) {
+      return litBuildNumber([s.charCodeAt(0)])
+    }));
   }
 %}
 
@@ -573,56 +633,6 @@ lit_float -> "~":? [0-9]:+ "." [0-9]:* (("e" | "E") "~":? [0-9]:+):? {%
       d[3].join("") +
       (d[4] ? "e" + (translateWeirdOzUnaryMinus(d[4][1]) + d[4][2].join("")) : "")
     )]);
-  }
-%}
-
-##############################################################################
-# List
-##############################################################################
-
-lit_list ->
-    lit_empty_list {% id %}
-  | lit_list_with_items {% id %}
-
-lit_list_with_items -> "[" _ lit_list_items _ "]" {%
-  function(d) {
-    return d[2].reduceRight(
-      function(a, b) {
-        return litBuildRecord("|", {1: b, 2:a});
-      },
-      litBuildRecord("nil", {})
-    );
-  }
-%}
-
-lit_empty_list -> "[" _ "]" {%
-  function(d) {
-    return litBuildRecord("nil", {});
-  }
-%}
-
-lit_list_items ->
-    ids_identifier
-  | lit_list_items __ ids_identifier {%
-      function(d) {
-        return d[0].concat(d[2]);
-      }
-    %}
-
-
-
-##############################################################################
-# Tuple
-##############################################################################
-
-lit_tuple -> lit_atom_syntax "(" _ lit_list_items _ ")" {%
-  function(d, position, reject) {
-    var label = d[0];
-    var features = d[3].reduce(function(result, item, index) {
-      result[++index] = item;
-      return result;
-    }, {});
-    return litBuildRecord(label, features);
   }
 %}
 

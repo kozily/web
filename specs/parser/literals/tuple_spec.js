@@ -1,6 +1,6 @@
 import Immutable from "immutable";
 import { lexicalIdentifier } from "../../../app/oz/machine/lexical";
-import { literalTuple } from "../../../app/oz/machine/literals";
+import { literalTuple, literalNumber } from "../../../app/oz/machine/literals";
 import { parserFor } from "../../../app/oz/parser";
 import literalGrammar from "../../../app/oz/grammar/literals.ne";
 
@@ -44,6 +44,16 @@ describe("Parsing tuple literals", () => {
   it("handles a quoted label syntax", () => {
     expect(parse("'andthen'(X Y)")).toEqual(
       literalTuple("andthen", [lexicalIdentifier("X"), lexicalIdentifier("Y")]),
+    );
+  });
+
+  it("handles nested literals", () => {
+    expect(parse("label(30 50 Z)")).toEqual(
+      literalTuple("label", [
+        literalNumber(30),
+        literalNumber(50),
+        lexicalIdentifier("Z"),
+      ]),
     );
   });
 });
