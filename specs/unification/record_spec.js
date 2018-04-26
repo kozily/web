@@ -142,6 +142,50 @@ describe("Unifying records", () => {
     );
   });
 
+  it("Unifies correctly nested recursive unifications", () => {
+    const sigma = buildSigma(
+      buildEquivalenceClass(
+        valueRecord("person", { address: buildVariable("y", 0) }),
+        buildVariable("x", 0),
+        buildVariable("x", 1),
+      ),
+      buildEquivalenceClass(
+        valueRecord("address", { street: buildVariable("a", 0) }),
+        buildVariable("y", 0),
+      ),
+      buildEquivalenceClass(
+        valueRecord("person", {
+          address: valueRecord("address", { street: buildVariable("b", 0) }),
+        }),
+        buildVariable("z", 0),
+      ),
+      buildEquivalenceClass(undefined, buildVariable("a", 0)),
+      buildEquivalenceClass(undefined, buildVariable("b", 0)),
+    );
+
+    const unifiedSigma = buildSigma(
+      buildEquivalenceClass(
+        undefined,
+        buildVariable("a", 0),
+        buildVariable("b", 0),
+      ),
+      buildEquivalenceClass(
+        valueRecord("address", { street: buildVariable("a", 0) }),
+        buildVariable("y", 0),
+      ),
+      buildEquivalenceClass(
+        valueRecord("person", { address: buildVariable("y", 0) }),
+        buildVariable("x", 0),
+        buildVariable("x", 1),
+        buildVariable("z", 0),
+      ),
+    );
+
+    expect(unify(sigma, buildVariable("x", 0), buildVariable("z", 0))).toEqual(
+      unifiedSigma,
+    );
+  });
+
   it("fails if the records have different labels", () => {
     const sigma = buildSigma(
       buildEquivalenceClass(

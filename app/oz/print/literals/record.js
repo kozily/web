@@ -20,24 +20,6 @@ const isInteger = value => {
   return integerRegex.test(value);
 };
 
-const collectListRecordItems = (label, features) => {
-  if (label === "nil") {
-    return [""];
-  }
-
-  const firstItem = printValuePosition(features.get("1"));
-  const tail = features.get("2");
-  const tailLabel = tail.getIn(["value", "label"]);
-  const tailFeatures = tail.getIn(["value", "features"]);
-
-  return [firstItem].concat(collectListRecordItems(tailLabel, tailFeatures));
-};
-
-const printListRecord = (label, features) => {
-  const items = collectListRecordItems(label, features).filter(x => !!x);
-  return `[${items.join(" ")}]`;
-};
-
 const printTupleRecord = (label, features) => {
   const printedFeatures = features
     .entrySeq()
@@ -61,10 +43,6 @@ const printGenericRecord = (label, features) => {
 const printSpecificRecord = (label, features) => {
   if (features.isEmpty()) {
     return printLabel(label);
-  }
-
-  if (label === "|") {
-    return printListRecord(label, features);
   }
 
   if (features.keySeq().every(key => isInteger(key))) {

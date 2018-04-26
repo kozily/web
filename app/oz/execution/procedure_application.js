@@ -1,5 +1,5 @@
 import Immutable from "immutable";
-import { unifyEvaluations, evaluationToVariable } from "../machine/sigma";
+import { unify, convertToVariable } from "../machine/sigma";
 import { buildSemanticStatement } from "../machine/build";
 import {
   failureException,
@@ -59,7 +59,7 @@ const executeBuiltInValue = (
       );
     }
     return state.update("sigma", sigma =>
-      unifyEvaluations(sigma, resultEvaluation, builtInEvaluation),
+      unify(sigma, resultEvaluation, builtInEvaluation),
     );
   } catch (error) {
     return raiseSystemException(state, activeThreadIndex, failureException());
@@ -102,7 +102,7 @@ const executeProcedureValue = (
       const {
         sigma: newAugmentedSigma,
         variable: callArgumentVariable,
-      } = evaluationToVariable(evaluation, augmentedSigma, "argument");
+      } = convertToVariable(evaluation, augmentedSigma, "argument");
       return {
         augmentedSigma: newAugmentedSigma,
         callArgumentVariables: callArgumentVariables.push(callArgumentVariable),

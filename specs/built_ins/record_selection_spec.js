@@ -162,5 +162,18 @@ describe("The record selection built-in", () => {
       expect(evaluation.get("value")).toEqual(valueNumber(3));
       expect(evaluation.get("variable")).toEqual(buildVariable("n", 0));
     });
+
+    it("returns the value and no variable when it's a nested record", () => {
+      const args = Immutable.fromJS([
+        { value: valueRecord("person", { name: valueNumber(30) }) },
+        { value: valueAtom("name") },
+      ]);
+      const sigma = buildSigma();
+
+      const evaluation = operator.evaluate(args, sigma);
+
+      expect(evaluation.get("value")).toEqual(valueNumber(30));
+      expect(evaluation.get("variable")).toEqual(undefined);
+    });
   });
 });

@@ -69,6 +69,21 @@ describe("Entailing record values", () => {
     expect(result.get("waitCondition")).toEqual(undefined);
   });
 
+  it("returns true when features point to different variables with the same values", () => {
+    const args = Immutable.fromJS([
+      { value: valueRecord("person", { age: buildVariable("n", 0) }) },
+      { value: valueRecord("person", { age: buildVariable("n", 1) }) },
+    ]);
+    const sigma = buildSigma(
+      buildEquivalenceClass(valueNumber(30), buildVariable("n", 0)),
+      buildEquivalenceClass(valueNumber(30), buildVariable("n", 1)),
+    );
+    const result = entail(args, sigma);
+    expect(result.get("value")).toEqual(true);
+    expect(result.get("variable")).toEqual(undefined);
+    expect(result.get("waitCondition")).toEqual(undefined);
+  });
+
   it("returns undefined when features point to different unbound variables", () => {
     const args = Immutable.fromJS([
       { value: valueRecord("person", { age: buildVariable("n", 0) }) },
@@ -112,5 +127,35 @@ describe("Entailing record values", () => {
     expect(result.get("value")).toEqual(undefined);
     expect(result.get("variable")).toEqual(undefined);
     expect(result.get("waitCondition")).toEqual(buildVariable("n", 1));
+  });
+
+  it("returns true when there's a nested value which is the same as a variable value", () => {
+    const args = Immutable.fromJS([
+      {
+        value: valueRecord("person", {
+          age: buildVariable("n", 0),
+          address: valueRecord("address", { number: valueNumber(1200) }),
+        }),
+      },
+      {
+        value: valueRecord("person", {
+          age: valueNumber(30),
+          address: buildVariable("a", 0),
+        }),
+      },
+    ]);
+    const sigma = buildSigma(
+      buildEquivalenceClass(valueNumber(30), buildVariable("n", 0)),
+      buildEquivalenceClass(
+        valueRecord("address", { number: buildVariable("n", 1) }),
+        buildVariable("a", 0),
+      ),
+      buildEquivalenceClass(valueNumber(1200), buildVariable("n", 1)),
+    );
+
+    const result = entail(args, sigma);
+    expect(result.get("value")).toEqual(true);
+    expect(result.get("variable")).toEqual(undefined);
+    expect(result.get("waitCondition")).toEqual(undefined);
   });
 });

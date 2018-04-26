@@ -11,5 +11,5 @@ export const valueCreators = {
 
 export const createValue = (environment, literal) => {
   const creator = valueCreators[literal.get("type")];
-  return creator(environment, literal);
+  return creator(createValue, environment, literal);
 };

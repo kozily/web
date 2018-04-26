@@ -42,9 +42,12 @@ export default {
       }
       const record = args.getIn([0, "value", "value"]);
       const feature = args.getIn([1, "value", "value", "label"]);
-      const variable = record.getIn(["features", feature]);
-      const value = lookupVariableInSigma(sigma, variable).get("value");
-      return Immutable.fromJS({ value, variable });
+      const featureContents = record.getIn(["features", feature]);
+      if (featureContents.get("node") === "value") {
+        return Immutable.fromJS({ value: featureContents });
+      }
+      const value = lookupVariableInSigma(sigma, featureContents).get("value");
+      return Immutable.fromJS({ value, variable: featureContents });
     },
   },
 };

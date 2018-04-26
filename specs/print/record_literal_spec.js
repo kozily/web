@@ -5,7 +5,6 @@ import {
   literalAtom,
   literalBoolean,
   literalTuple,
-  literalList,
 } from "../../app/oz/machine/literals";
 import { lexicalIdentifier } from "../../app/oz/machine/lexical";
 
@@ -51,17 +50,5 @@ describe("Printing a record literal", () => {
 
     expect(result.abbreviated).toEqual("person(X Y Z)");
     expect(result.full).toEqual("person(X Y Z)");
-  });
-
-  it("Returns the appropriate string for generic lists", () => {
-    const literal = literalList([
-      lexicalIdentifier("X"),
-      lexicalIdentifier("Y"),
-      lexicalIdentifier("Z"),
-    ]);
-    const result = print(literal, 2);
-
-    expect(result.abbreviated).toEqual("[X Y Z]");
-    expect(result.full).toEqual("[X Y Z]");
   });
 });

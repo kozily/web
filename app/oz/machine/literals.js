@@ -8,6 +8,25 @@ export const literalTypes = {
 
 export const allLiteralTypes = Object.keys(literalTypes);
 
+export const literalNumber = value => {
+  return Immutable.fromJS({
+    node: "literal",
+    type: "number",
+    value,
+  });
+};
+
+export const literalProcedure = (args = [], body) => {
+  return Immutable.fromJS({
+    node: "literal",
+    type: "procedure",
+    value: {
+      args,
+      body,
+    },
+  });
+};
+
 export const literalRecord = (label, features = {}) => {
   return Immutable.fromJS({
     node: "literal",
@@ -44,36 +63,11 @@ export const literalListItem = (head, tail) => {
 export const literalList = (items = []) => {
   return items.reduceRight(
     (result, item) => literalListItem(item, result),
-    literalRecord("nil"),
+    literalAtom("nil"),
   );
 };
 
 export const literalString = value => {
-  if (value === "") {
-    return literalList();
-  }
-
-  return literalListItem(
-    value.charCodeAt(0),
-    literalString(value.substring(1)),
-  );
-};
-
-export const literalNumber = value => {
-  return Immutable.fromJS({
-    node: "literal",
-    type: "number",
-    value,
-  });
-};
-
-export const literalProcedure = (args = [], body) => {
-  return Immutable.fromJS({
-    node: "literal",
-    type: "procedure",
-    value: {
-      args,
-      body,
-    },
-  });
+  const items = value.split("").map(s => literalNumber(s.charCodeAt(0)));
+  return literalList(items);
 };

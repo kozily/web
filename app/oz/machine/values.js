@@ -1,5 +1,34 @@
 import Immutable from "immutable";
 
+export const valueNumber = value => {
+  return Immutable.fromJS({
+    node: "value",
+    type: "number",
+    value,
+  });
+};
+
+export const valueProcedure = (args = [], body, context = {}) => {
+  return Immutable.fromJS({
+    node: "value",
+    type: "procedure",
+    value: {
+      args,
+      body,
+      context,
+    },
+  });
+};
+
+export const valueBuiltIn = (operator, namespace) => {
+  return Immutable.fromJS({
+    node: "value",
+    type: "builtIn",
+    operator,
+    namespace,
+  });
+};
+
 export const valueTypes = {
   number: "number",
   record: "record",
@@ -45,43 +74,11 @@ export const valueListItem = (head, tail) => {
 export const valueList = (items = []) => {
   return items.reduceRight(
     (result, item) => valueListItem(item, result),
-    valueRecord("nil"),
+    valueAtom("nil"),
   );
 };
 
 export const valueString = value => {
-  if (value === "") {
-    return valueList();
-  }
-
-  return valueListItem(value.charCodeAt(0), valueString(value.substring(1)));
-};
-
-export const valueNumber = value => {
-  return Immutable.fromJS({
-    node: "value",
-    type: "number",
-    value,
-  });
-};
-
-export const valueProcedure = (args = [], body, context = {}) => {
-  return Immutable.fromJS({
-    node: "value",
-    type: "procedure",
-    value: {
-      args,
-      body,
-      context,
-    },
-  });
-};
-
-export const valueBuiltIn = (operator, namespace) => {
-  return Immutable.fromJS({
-    node: "value",
-    type: "builtIn",
-    operator,
-    namespace,
-  });
+  const items = value.split("").map(s => valueNumber(s.charCodeAt(0)));
+  return valueList(items);
 };

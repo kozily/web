@@ -1,4 +1,4 @@
-import { lookupVariableInSigma, evaluationToVariable } from "../machine/sigma";
+import { lookupVariableInSigma, convertToVariable } from "../machine/sigma";
 import { identifierExpression } from "../machine/expressions";
 import { lexicalIdentifier } from "../machine/lexical";
 import {
@@ -32,7 +32,7 @@ export default function(state, semanticStatement, activeThreadIndex) {
   const {
     sigma: augmentedSigma,
     variable: procedureVariable,
-  } = evaluationToVariable(evaluation, sigma, "triggerProcedure");
+  } = convertToVariable(evaluation, sigma, "triggerProcedure");
 
   const needed = statement.get("neededIdentifier");
   const neededIdentifier = needed.get("identifier");
