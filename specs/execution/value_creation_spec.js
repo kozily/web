@@ -1,5 +1,8 @@
 import Immutable from "immutable";
-import { valueCreationStatement } from "../../app/oz/machine/statements";
+import {
+  valueCreationStatement,
+  skipStatement,
+} from "../../app/oz/machine/statements";
 import { lexicalIdentifier } from "../../app/oz/machine/lexical";
 import { literalNumber, literalAtom } from "../../app/oz/machine/literals";
 import {
@@ -19,6 +22,7 @@ import {
   buildEnvironment,
 } from "../../app/oz/machine/build";
 import reduce from "../../app/oz/execution/value_creation";
+import { getLastEnvironmentIndex } from "../../app/oz/machine/environment";
 
 describe("Reducing X=VALUE statements", () => {
   beforeEach(() => {
@@ -173,6 +177,62 @@ describe("Reducing X=VALUE statements", () => {
 
       expect(reduce(state, statement, 0)).toEqual(
         buildSingleThreadedState({
+          sigma: buildSigma(
+            buildEquivalenceClass(
+              valueRecord("person", { age: buildVariable("a", 0) }),
+              buildVariable("p", 0),
+            ),
+            buildEquivalenceClass(
+              valueNumber(3),
+              buildVariable("a", 0),
+              buildVariable("x", 0),
+            ),
+          ),
+        }),
+      );
+    });
+
+    it("executes correctly keeping the environment index", () => {
+      const lastIndex = getLastEnvironmentIndex();
+      const state = buildSingleThreadedState({
+        semanticStatement: [
+          buildSemanticStatement(skipStatement(), buildEnvironment(), {
+            environmentIndex: lastIndex,
+          }),
+        ],
+        sigma: buildSigma(
+          buildEquivalenceClass(undefined, buildVariable("x", 0)),
+          buildEquivalenceClass(
+            valueRecord("person", { age: buildVariable("a", 0) }),
+            buildVariable("p", 0),
+          ),
+          buildEquivalenceClass(valueNumber(3), buildVariable("a", 0)),
+        ),
+      });
+
+      const statement = buildSemanticStatement(
+        valueCreationStatement(
+          lexicalIdentifier("X"),
+          operatorExpression(
+            ".",
+            identifierExpression(lexicalIdentifier("P")),
+            literalExpression(literalAtom("age")),
+          ),
+        ),
+        buildEnvironment({
+          P: buildVariable("p", 0),
+          X: buildVariable("x", 0),
+        }),
+        { environmentIndex: lastIndex },
+      );
+
+      expect(reduce(state, statement, 0)).toEqual(
+        buildSingleThreadedState({
+          semanticStatement: [
+            buildSemanticStatement(skipStatement(), buildEnvironment(), {
+              environmentIndex: lastIndex,
+            }),
+          ],
           sigma: buildSigma(
             buildEquivalenceClass(
               valueRecord("person", { age: buildVariable("a", 0) }),

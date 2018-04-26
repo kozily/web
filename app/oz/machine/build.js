@@ -2,6 +2,7 @@ import Immutable from "immutable";
 import { lexicalIdentifier } from "./lexical";
 import { valueRecord, valueBuiltIn } from "./values";
 import { builtIns, allBuiltInTypes } from "../built_ins";
+import { getLastEnvironmentIndex } from "./environment";
 
 export const buildEnvironment = (contents = {}) => {
   return Immutable.Map(contents);
@@ -10,10 +11,14 @@ export const buildEnvironment = (contents = {}) => {
 export const buildSemanticStatement = (
   statement,
   environment = buildEnvironment(),
+  { environmentIndex = getLastEnvironmentIndex() } = {},
 ) => {
-  return Immutable.Map({
+  return Immutable.fromJS({
     statement,
     environment,
+    metadata: {
+      environmentIndex,
+    },
   });
 };
 
@@ -21,7 +26,6 @@ export const threadStatus = {
   ready: "ready",
   blocked: "blocked",
 };
-
 export const buildThreadMetadata = ({
   status = threadStatus.ready,
   waitCondition = null,

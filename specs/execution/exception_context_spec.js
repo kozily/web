@@ -6,6 +6,7 @@ import {
   exceptionCatchStatement,
   bindingStatement,
 } from "../../app/oz/machine/statements";
+import { getLastEnvironmentIndex } from "../../app/oz/machine/environment";
 import { lexicalIdentifier } from "../../app/oz/machine/lexical";
 import {
   buildSingleThreadedState,
@@ -63,6 +64,64 @@ describe("Reducing try statements", () => {
             }),
           ),
           buildSemanticStatement(skipStatement()),
+        ],
+
+        sigma: state.get("sigma"),
+      }),
+    );
+  });
+
+  it("pushes the appropriate statements keeping the environment index", () => {
+    const lastIndex = getLastEnvironmentIndex();
+    const state = buildSingleThreadedState({
+      semanticStatements: [
+        buildSemanticStatement(skipStatement(), buildEnvironment(), {
+          environmentIndex: lastIndex,
+        }),
+      ],
+      sigma: buildSigma(
+        buildEquivalenceClass(undefined, buildVariable("x", 0)),
+      ),
+    });
+
+    const statement = buildSemanticStatement(
+      exceptionContextStatement(
+        sequenceStatement(skipStatement(), skipStatement()),
+        lexicalIdentifier("Error"),
+        bindingStatement(lexicalIdentifier("Error"), lexicalIdentifier("X")),
+      ),
+      buildEnvironment({
+        X: buildVariable("x", 0),
+      }),
+      { environmentIndex: lastIndex },
+    );
+
+    expect(reduce(state, statement, 0)).toEqual(
+      buildSingleThreadedState({
+        semanticStatements: [
+          buildSemanticStatement(
+            sequenceStatement(skipStatement(), skipStatement()),
+            buildEnvironment({
+              X: buildVariable("x", 0),
+            }),
+            { environmentIndex: lastIndex },
+          ),
+          buildSemanticStatement(
+            exceptionCatchStatement(
+              lexicalIdentifier("Error"),
+              bindingStatement(
+                lexicalIdentifier("Error"),
+                lexicalIdentifier("X"),
+              ),
+            ),
+            buildEnvironment({
+              X: buildVariable("x", 0),
+            }),
+            { environmentIndex: lastIndex },
+          ),
+          buildSemanticStatement(skipStatement(), buildEnvironment(), {
+            environmentIndex: lastIndex,
+          }),
         ],
 
         sigma: state.get("sigma"),

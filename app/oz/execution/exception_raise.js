@@ -3,11 +3,13 @@ import { UncaughtOzExceptionError } from "../machine/exceptions";
 import { evaluationToVariable } from "../machine/sigma";
 import { blockCurrentThread } from "../machine/threads";
 import { evaluate } from "../expression";
+import { makeNewEnvironmentIndex } from "../machine/environment";
 
 export default function(state, semanticStatement, activeThreadIndex) {
   const sigma = state.get("sigma");
   const statement = semanticStatement.get("statement");
   const environment = semanticStatement.get("environment");
+  const newIndex = makeNewEnvironmentIndex();
 
   const exceptionEvaluation = evaluate(
     statement.get("identifier"),
@@ -71,6 +73,7 @@ export default function(state, semanticStatement, activeThreadIndex) {
   const handlingSemanticStatement = buildSemanticStatement(
     handlingStatement,
     handlingEnvironment,
+    { environmentIndex: newIndex },
   );
 
   return poppedState

@@ -16,6 +16,7 @@ import {
   buildEnvironment,
 } from "../../app/oz/machine/build";
 import reduce from "../../app/oz/execution/binding";
+import { getLastEnvironmentIndex } from "../../app/oz/machine/environment";
 
 describe("Reducing X=Y statements", () => {
   beforeEach(() => {
@@ -175,6 +176,52 @@ describe("Reducing X=Y statements", () => {
     expect(reduce(state, statement, 0)).toEqual(
       buildSingleThreadedState({
         semanticStatements: [buildSemanticStatement(skipStatement())],
+        sigma: buildSigma(
+          buildEquivalenceClass(
+            undefined,
+            buildVariable("z", 0),
+            buildVariable("x", 0),
+            buildVariable("y", 0),
+          ),
+        ),
+      }),
+    );
+  });
+
+  it("reduces keeping the environment index", () => {
+    const lastIndex = getLastEnvironmentIndex();
+    const state = buildSingleThreadedState({
+      semanticStatements: [
+        buildSemanticStatement(skipStatement(), buildEnvironment(), {
+          environmentIndex: lastIndex,
+        }),
+      ],
+      sigma: buildSigma(
+        buildEquivalenceClass(
+          undefined,
+          buildVariable("x", 0),
+          buildVariable("y", 0),
+        ),
+        buildEquivalenceClass(undefined, buildVariable("z", 0)),
+      ),
+    });
+
+    const statement = buildSemanticStatement(
+      bindingStatement(lexicalIdentifier("Z"), lexicalIdentifier("X")),
+      buildEnvironment({
+        Z: buildVariable("z", 0),
+        X: buildVariable("y", 0),
+      }),
+      { environmentIndex: lastIndex },
+    );
+
+    expect(reduce(state, statement, 0)).toEqual(
+      buildSingleThreadedState({
+        semanticStatements: [
+          buildSemanticStatement(skipStatement(), buildEnvironment(), {
+            environmentIndex: lastIndex,
+          }),
+        ],
         sigma: buildSigma(
           buildEquivalenceClass(
             undefined,

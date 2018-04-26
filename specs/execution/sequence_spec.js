@@ -99,4 +99,47 @@ describe("Reducing sequence statements", () => {
       }),
     );
   });
+
+  it("reduces using the same environment index", () => {
+    const state = buildSingleThreadedState({
+      semanticStatements: [
+        buildSemanticStatement(skipStatement(), buildEnvironment(), {
+          environmentIndex: 0,
+        }),
+      ],
+    });
+
+    const sharedEnvironment = buildEnvironment({
+      X: buildVariable("x", 0),
+    });
+
+    const statement = buildSemanticStatement(
+      sequenceStatement(
+        bindingStatement(lexicalIdentifier("A"), lexicalIdentifier("B")),
+        bindingStatement(lexicalIdentifier("C"), lexicalIdentifier("D")),
+      ),
+      sharedEnvironment,
+      { environmentIndex: 0 },
+    );
+
+    expect(reduce(state, statement, 0)).toEqual(
+      buildSingleThreadedState({
+        semanticStatements: [
+          buildSemanticStatement(
+            bindingStatement(lexicalIdentifier("A"), lexicalIdentifier("B")),
+            sharedEnvironment,
+            { environmentIndex: 0 },
+          ),
+          buildSemanticStatement(
+            bindingStatement(lexicalIdentifier("C"), lexicalIdentifier("D")),
+            sharedEnvironment,
+            { environmentIndex: 0 },
+          ),
+          buildSemanticStatement(skipStatement(), buildEnvironment(), {
+            environmentIndex: 0,
+          }),
+        ],
+      }),
+    );
+  });
 });

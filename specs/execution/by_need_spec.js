@@ -25,6 +25,7 @@ import {
   buildTrigger,
   buildEnvironment,
 } from "../../app/oz/machine/build";
+import { getLastEnvironmentIndex } from "../../app/oz/machine/environment";
 import reduce from "../../app/oz/execution/by_need";
 
 describe("Reducing by need statements", () => {
@@ -69,8 +70,13 @@ describe("Reducing by need statements", () => {
   });
 
   it("activates a trigger when Y is bound", () => {
+    const lastIndex = getLastEnvironmentIndex();
     const state = buildSingleThreadedState({
-      semanticStatements: [buildSemanticStatement(skipStatement())],
+      semanticStatements: [
+        buildSemanticStatement(skipStatement(), buildEnvironment(), {
+          environmentIndex: lastIndex,
+        }),
+      ],
       sigma: buildSigma(
         buildEquivalenceClass(undefined, buildVariable("x", 0)),
         buildEquivalenceClass(valueNumber(5), buildVariable("w", 0)),
@@ -86,13 +92,18 @@ describe("Reducing by need statements", () => {
         X: buildVariable("x", 0),
         W: buildVariable("w", 0),
       }),
+      { environmentIndex: lastIndex },
     );
 
     expect(reduce(state, statement, 0)).toEqual(
       buildState({
         threads: [
           buildThread({
-            semanticStatements: [buildSemanticStatement(skipStatement())],
+            semanticStatements: [
+              buildSemanticStatement(skipStatement(), buildEnvironment(), {
+                environmentIndex: lastIndex,
+              }),
+            ],
           }),
 
           buildThread({
@@ -106,6 +117,7 @@ describe("Reducing by need statements", () => {
                   TriggerProcedure: buildVariable("x", 0),
                   W: buildVariable("w", 0),
                 }),
+                { environmentIndex: lastIndex + 1 },
               ),
             ],
           }),

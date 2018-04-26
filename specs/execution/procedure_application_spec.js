@@ -30,6 +30,7 @@ import {
   buildEnvironment,
   getLastAuxiliaryIdentifier,
 } from "../../app/oz/machine/build";
+import { getLastEnvironmentIndex } from "../../app/oz/machine/environment";
 import reduce from "../../app/oz/execution/procedure_application";
 
 describe("Reducing {X ...} statements", () => {
@@ -39,8 +40,13 @@ describe("Reducing {X ...} statements", () => {
 
   describe("when a procedure value is used", () => {
     it("executes simple functional procedures correctly", () => {
+      const lastIndex = getLastEnvironmentIndex();
       const state = buildSingleThreadedState({
-        semanticStatements: [buildSemanticStatement(skipStatement())],
+        semanticStatements: [
+          buildSemanticStatement(skipStatement(), buildEnvironment(), {
+            environmentIndex: lastIndex,
+          }),
+        ],
         sigma: buildSigma(
           buildEquivalenceClass(
             valueProcedure(
@@ -67,6 +73,7 @@ describe("Reducing {X ...} statements", () => {
           X: buildVariable("x", 0),
           Y: buildVariable("y", 0),
         }),
+        { environmentIndex: lastIndex },
       );
 
       expect(reduce(state, statement, 0)).toEqual(
@@ -78,8 +85,70 @@ describe("Reducing {X ...} statements", () => {
                 I: buildVariable("x", 0),
                 O: buildVariable("y", 0),
               }),
+              { environmentIndex: lastIndex + 1 },
             ),
-            buildSemanticStatement(skipStatement()),
+            buildSemanticStatement(skipStatement(), buildEnvironment(), {
+              environmentIndex: lastIndex,
+            }),
+          ],
+          sigma: state.get("sigma"),
+        }),
+      );
+    });
+
+    it("executes simple functional procedures correctly incrementing environment index", () => {
+      const lastIndex = getLastEnvironmentIndex();
+      const state = buildSingleThreadedState({
+        semanticStatements: [
+          buildSemanticStatement(skipStatement(), buildEnvironment(), {
+            environmentIndex: lastIndex,
+          }),
+        ],
+        sigma: buildSigma(
+          buildEquivalenceClass(
+            valueProcedure(
+              [lexicalIdentifier("I"), lexicalIdentifier("O")],
+              skipStatement(),
+            ),
+            buildVariable("p", 0),
+          ),
+          buildEquivalenceClass(valueNumber(10), buildVariable("x", 0)),
+          buildEquivalenceClass(undefined, buildVariable("y", 0)),
+        ),
+      });
+
+      const statement = buildSemanticStatement(
+        procedureApplicationStatement(
+          identifierExpression(lexicalIdentifier("P")),
+          [
+            identifierExpression(lexicalIdentifier("X")),
+            identifierExpression(lexicalIdentifier("Y")),
+          ],
+        ),
+        buildEnvironment({
+          P: buildVariable("p", 0),
+          X: buildVariable("x", 0),
+          Y: buildVariable("y", 0),
+        }),
+        {
+          environmentIndex: lastIndex,
+        },
+      );
+
+      expect(reduce(state, statement, 0)).toEqual(
+        buildSingleThreadedState({
+          semanticStatements: [
+            buildSemanticStatement(
+              skipStatement(),
+              buildEnvironment({
+                I: buildVariable("x", 0),
+                O: buildVariable("y", 0),
+              }),
+              { environmentIndex: lastIndex + 1 },
+            ),
+            buildSemanticStatement(skipStatement(), buildEnvironment(), {
+              environmentIndex: lastIndex,
+            }),
           ],
           sigma: state.get("sigma"),
         }),
@@ -87,8 +156,13 @@ describe("Reducing {X ...} statements", () => {
     });
 
     it("executes procedure values with closure and arguments correctly", () => {
+      const lastIndex = getLastEnvironmentIndex();
       const state = buildSingleThreadedState({
-        semanticStatements: [buildSemanticStatement(skipStatement())],
+        semanticStatements: [
+          buildSemanticStatement(skipStatement(), buildEnvironment(), {
+            environmentIndex: lastIndex,
+          }),
+        ],
         sigma: buildSigma(
           buildEquivalenceClass(
             valueProcedure(
@@ -122,6 +196,7 @@ describe("Reducing {X ...} statements", () => {
           Y: buildVariable("y", 0),
           Z: buildVariable("z", 0),
         }),
+        { environmentIndex: lastIndex },
       );
 
       expect(reduce(state, statement, 0)).toEqual(
@@ -134,8 +209,11 @@ describe("Reducing {X ...} statements", () => {
                 Output: buildVariable("z", 0),
                 ClosureValue: buildVariable("c", 0),
               }),
+              { environmentIndex: lastIndex + 1 },
             ),
-            buildSemanticStatement(skipStatement()),
+            buildSemanticStatement(skipStatement(), buildEnvironment(), {
+              environmentIndex: lastIndex,
+            }),
           ],
           sigma: state.get("sigma"),
         }),
@@ -143,8 +221,13 @@ describe("Reducing {X ...} statements", () => {
     });
 
     it("executes simple functional procedures with expressions as arguments correctly", () => {
+      const lastIndex = getLastEnvironmentIndex();
       const state = buildSingleThreadedState({
-        semanticStatements: [buildSemanticStatement(skipStatement())],
+        semanticStatements: [
+          buildSemanticStatement(skipStatement(), buildEnvironment(), {
+            environmentIndex: lastIndex,
+          }),
+        ],
         sigma: buildSigma(
           buildEquivalenceClass(
             valueProcedure(
@@ -175,6 +258,7 @@ describe("Reducing {X ...} statements", () => {
           X: buildVariable("x", 0),
           Y: buildVariable("y", 0),
         }),
+        { environmentIndex: lastIndex },
       );
 
       expect(reduce(state, statement, 0)).toEqual(
@@ -189,8 +273,11 @@ describe("Reducing {X ...} statements", () => {
                 ),
                 O: buildVariable("y", 0),
               }),
+              { environmentIndex: lastIndex + 1 },
             ),
-            buildSemanticStatement(skipStatement()),
+            buildSemanticStatement(skipStatement(), buildEnvironment(), {
+              environmentIndex: lastIndex,
+            }),
           ],
           sigma: buildSigma(
             buildEquivalenceClass(

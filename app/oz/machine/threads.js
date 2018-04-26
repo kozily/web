@@ -9,6 +9,7 @@ import { lookupVariableInSigma } from "./sigma";
 import { procedureApplicationStatement } from "./statements";
 import { identifierExpression } from "./expressions";
 import { lexicalIdentifier } from "./lexical";
+import { makeNewEnvironmentIndex } from "./environment";
 
 export const blockCurrentThread = (
   state,
@@ -62,8 +63,13 @@ export const activateTrigger = (state, trigger) => {
     [neededVariableIdentifier]: trigger.get("neededVariable"),
   });
 
+  const newIndex = makeNewEnvironmentIndex();
   const newThread = buildThread({
-    semanticStatements: [buildSemanticStatement(statement, environment)],
+    semanticStatements: [
+      buildSemanticStatement(statement, environment, {
+        environmentIndex: newIndex,
+      }),
+    ],
   });
 
   return state

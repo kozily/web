@@ -10,6 +10,7 @@ import {
 import { procedureApplicationStatement } from "../machine/statements";
 import { blockCurrentThread } from "../machine/threads";
 import { evaluate } from "../expression";
+import { makeNewEnvironmentIndex } from "../machine/environment";
 
 export default function(state, semanticStatement, activeThreadIndex) {
   const sigma = state.get("sigma");
@@ -46,6 +47,7 @@ export default function(state, semanticStatement, activeThreadIndex) {
       identifierExpression(lexicalIdentifier("TriggerProcedure")),
       [identifierExpression(needed)],
     );
+    const newIndex = makeNewEnvironmentIndex();
     const newThread = buildThread({
       semanticStatements: [
         buildSemanticStatement(
@@ -54,6 +56,7 @@ export default function(state, semanticStatement, activeThreadIndex) {
             TriggerProcedure: procedureVariable,
             [neededIdentifier]: neededVariable,
           }),
+          { environmentIndex: newIndex },
         ),
       ],
     });

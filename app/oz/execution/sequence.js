@@ -1,6 +1,7 @@
 import Immutable from "immutable";
 import { statementTypes } from "../machine/statements";
 import { buildSemanticStatement } from "../machine/build";
+import { getLastEnvironmentIndex } from "../machine/environment";
 
 const collectStatements = statement => {
   if (statement.get("type") !== statementTypes.sequence) {
@@ -14,9 +15,10 @@ const collectStatements = statement => {
 export default function(state, semanticStatement, activeThreadIndex) {
   const statement = semanticStatement.get("statement");
   const environment = semanticStatement.get("environment");
+  const environmentIndex = getLastEnvironmentIndex();
 
   const semanticStatements = collectStatements(statement).map(s =>
-    buildSemanticStatement(s, environment),
+    buildSemanticStatement(s, environment, environmentIndex),
   );
 
   return state.updateIn(["threads", activeThreadIndex, "stack"], stack =>
