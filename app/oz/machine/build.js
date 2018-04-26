@@ -4,7 +4,7 @@ import { valueRecord, valueBuiltIn } from "./values";
 import { getLastEnvironmentIndex } from "./environment";
 import {
   namespacedBuiltIns,
-  allNamesapcedBuiltInTypes,
+  allNamespacedBuiltInTypes,
   allNoNamespacedBuiltInTypes,
   allBuiltInTypes,
 } from "../built_ins";
@@ -148,7 +148,7 @@ export const defaultEnvironment = () =>
 
 export const defaultSigma = () =>
   Immutable.OrderedSet(
-    allNamesapcedBuiltInTypes.reduce((sigma, builtInType) => {
+    allNamespacedBuiltInTypes.reduce((sigma, builtInType) => {
       const builtInOperators = namespacedBuiltIns[builtInType];
       const builtInTypeVariable = buildVariable(builtInType.toLowerCase(), 0, {
         system: true,

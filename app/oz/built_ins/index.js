@@ -15,10 +15,10 @@ export const noNamespacedBuiltIns = {
   IsDet,
 };
 
-export const allNamesapcedBuiltInTypes = Object.keys(namespacedBuiltIns);
+export const allNamespacedBuiltInTypes = Object.keys(namespacedBuiltIns);
 
 export const allNoNamespacedBuiltInTypes = Object.keys(noNamespacedBuiltIns);
 
-export const allBuiltInTypes = allNamesapcedBuiltInTypes.concat(
+export const allBuiltInTypes = allNamespacedBuiltInTypes.concat(
   allNoNamespacedBuiltInTypes,
 );
