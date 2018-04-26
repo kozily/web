@@ -1,9 +1,19 @@
 import Immutable from "immutable";
 
+export const valueTypes = {
+  number: "number",
+  record: "record",
+  procedure: "procedure",
+  builtIn: "builtIn",
+  mutable: "mutable",
+};
+
+export const allValueTypes = Object.keys(valueTypes);
+
 export const valueNumber = value => {
   return Immutable.fromJS({
     node: "value",
-    type: "number",
+    type: valueTypes.number,
     value,
   });
 };
@@ -11,7 +21,7 @@ export const valueNumber = value => {
 export const valueProcedure = (args = [], body, context = {}) => {
   return Immutable.fromJS({
     node: "value",
-    type: "procedure",
+    type: valueTypes.procedure,
     value: {
       args,
       body,
@@ -23,25 +33,25 @@ export const valueProcedure = (args = [], body, context = {}) => {
 export const valueBuiltIn = (operator, namespace) => {
   return Immutable.fromJS({
     node: "value",
-    type: "builtIn",
+    type: valueTypes.builtIn,
     operator,
     namespace,
   });
 };
 
-export const valueTypes = {
-  number: "number",
-  record: "record",
-  procedure: "procedure",
-  builtIn: "builtIn",
+export const valueMutableVariable = (kind, sequence) => {
+  return Immutable.fromJS({
+    node: "value",
+    type: valueTypes.mutable,
+    kind,
+    sequence,
+  });
 };
-
-export const allValueTypes = Object.keys(valueTypes);
 
 export const valueRecord = (label, features = {}) => {
   return Immutable.fromJS({
     node: "value",
-    type: "record",
+    type: valueTypes.record,
     value: {
       label,
       features,

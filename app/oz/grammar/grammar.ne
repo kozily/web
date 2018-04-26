@@ -7,6 +7,7 @@
 @{%
   STM_SPECIAL_PROCEDURES = [
     "ByNeed",
+    "NewCell",
   ];
 %}
 
@@ -37,6 +38,7 @@ stm_simple ->
   | stm_raise {% id %}
   | stm_thread {% id %}
   | stm_by_need {% id %}
+  | stm_cell_creation {% id %}
 
 stm_skip -> "skip" {%
   function (d) {
@@ -186,6 +188,17 @@ stm_by_need -> "{" _ "ByNeed" __ exp_expression __ ids_identifier _ "}" {%
       type: "byNeedSyntax",
       procedure: d[4],
       neededIdentifier: d[6],
+    };
+  }
+%}
+
+stm_cell_creation -> "{" _ "NewCell" __ exp_expression __ ids_identifier _ "}" {%
+  function(d) {
+    return {
+      node: "statement",
+      type: "cellCreationSyntax",
+      value: d[4],
+      cell: d[6],
     };
   }
 %}

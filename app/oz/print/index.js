@@ -15,13 +15,15 @@ import exceptionRaise from "./exception_raise";
 import exceptionCatch from "./exception_catch";
 import thread from "./thread";
 import byNeed from "./by_need";
+import cellCreation from "./cell_creation";
 import numberLiteral from "./literals/number";
 import recordLiteral from "./literals/record";
 import procedureLiteral from "./literals/procedure";
 import numberValue from "./values/number";
 import recordValue from "./values/record";
 import procedureValue from "./values/procedure";
-import builtIn from "./built_in";
+import builtInValue from "./values/built_in";
+import mutableValue from "./values/mutable";
 import literalExpression from "./literal_expression";
 import identifierExpression from "./identifier_expression";
 import operatorExpression from "./operator_expression";
@@ -41,6 +43,7 @@ export const printers = {
     [statementTypes.exceptionCatch]: exceptionCatch,
     [statementTypes.thread]: thread,
     [statementTypes.byNeed]: byNeed,
+    [statementTypes.cellCreation]: cellCreation,
   },
   literal: {
     [literalTypes.number]: numberLiteral,
@@ -51,7 +54,8 @@ export const printers = {
     [valueTypes.number]: numberValue,
     [valueTypes.record]: recordValue,
     [valueTypes.procedure]: procedureValue,
-    [valueTypes.builtIn]: builtIn,
+    [valueTypes.builtIn]: builtInValue,
+    [valueTypes.mutable]: mutableValue,
   },
   expression: {
     [expressionTypes.literal]: literalExpression,

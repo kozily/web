@@ -12,6 +12,7 @@ import exceptionRaise from "./exception_raise";
 import exceptionCatch from "./exception_catch";
 import thread from "./thread";
 import byNeed from "./by_need";
+import cellCreation from "./cell_creation";
 
 export const executors = {
   statement: {
@@ -28,6 +29,7 @@ export const executors = {
     [statementTypes.exceptionCatch]: exceptionCatch,
     [statementTypes.thread]: thread,
     [statementTypes.byNeed]: byNeed,
+    [statementTypes.cellCreation]: cellCreation,
   },
 };
 

@@ -13,6 +13,7 @@ export const statementSyntaxTypes = {
   exceptionRaiseSyntax: "exceptionRaiseSyntax",
   threadSyntax: "threadSyntax",
   byNeedSyntax: "byNeedSyntax",
+  cellCreationSyntax: "cellCreationSyntax",
 };
 
 export const allStatementSyntaxTypes = Object.keys(statementSyntaxTypes);
@@ -34,7 +35,7 @@ export const skipStatementSyntax = () => {
 };
 
 export const localStatementSyntax = (identifiers, statement) => {
-  return new Immutable.fromJS({
+  return Immutable.fromJS({
     node: "statement",
     type: statementSyntaxTypes.localSyntax,
     identifiers: identifiers,
@@ -43,7 +44,7 @@ export const localStatementSyntax = (identifiers, statement) => {
 };
 
 export const bindingStatementSyntax = (lhs, rhs) => {
-  return new Immutable.Map({
+  return Immutable.Map({
     node: "statement",
     type: statementSyntaxTypes.bindingSyntax,
     lhs,
@@ -52,7 +53,7 @@ export const bindingStatementSyntax = (lhs, rhs) => {
 };
 
 export const valueCreationStatementSyntax = (lhs, rhs) => {
-  return new Immutable.Map({
+  return Immutable.Map({
     node: "statement",
     type: statementSyntaxTypes.valueCreationSyntax,
     lhs,
@@ -65,7 +66,7 @@ export const conditionalStatementSyntax = (
   trueStatement,
   falseStatement = undefined,
 ) => {
-  return new Immutable.Map({
+  return Immutable.Map({
     node: "statement",
     type: statementSyntaxTypes.conditionalSyntax,
     condition,
@@ -79,7 +80,7 @@ export const patternMatchingStatementSyntax = (
   clauses,
   falseStatement = undefined,
 ) => {
-  return new Immutable.fromJS({
+  return Immutable.fromJS({
     node: "statement",
     type: statementSyntaxTypes.patternMatchingSyntax,
     identifier,
@@ -89,7 +90,7 @@ export const patternMatchingStatementSyntax = (
 };
 
 export const procedureApplicationStatementSyntax = (procedure, args = []) => {
-  return new Immutable.fromJS({
+  return Immutable.fromJS({
     node: "statement",
     type: statementSyntaxTypes.procedureApplicationSyntax,
     procedure,
@@ -102,7 +103,7 @@ export const exceptionContextStatementSyntax = (
   exceptionIdentifier,
   exceptionStatement,
 ) => {
-  return new Immutable.fromJS({
+  return Immutable.fromJS({
     node: "statement",
     type: statementSyntaxTypes.exceptionContextSyntax,
     triedStatement,
@@ -112,7 +113,7 @@ export const exceptionContextStatementSyntax = (
 };
 
 export const exceptionRaiseStatementSyntax = identifier => {
-  return new Immutable.fromJS({
+  return Immutable.fromJS({
     node: "statement",
     type: statementSyntaxTypes.exceptionRaiseSyntax,
     identifier,
@@ -120,7 +121,7 @@ export const exceptionRaiseStatementSyntax = identifier => {
 };
 
 export const threadStatementSyntax = body => {
-  return new Immutable.fromJS({
+  return Immutable.fromJS({
     node: "statement",
     type: statementSyntaxTypes.threadSyntax,
     body,
@@ -128,10 +129,19 @@ export const threadStatementSyntax = body => {
 };
 
 export const byNeedStatementSyntax = (procedure, neededIdentifier) => {
-  return new Immutable.fromJS({
+  return Immutable.fromJS({
     node: "statement",
     type: statementSyntaxTypes.byNeedSyntax,
     procedure,
     neededIdentifier,
+  });
+};
+
+export const cellCreationStatementSyntax = (value, cell) => {
+  return Immutable.fromJS({
+    node: "statement",
+    type: statementSyntaxTypes.cellCreationSyntax,
+    value,
+    cell,
   });
 };

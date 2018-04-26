@@ -11,7 +11,7 @@ describe("Printing a built in value", () => {
     const value = valueBuiltIn("+", "Number");
     const result = print(value, 2);
 
-    expect(result.abbreviated).toEqual("  BuiltIn(Number.'+')");
-    expect(result.full).toEqual("  BuiltIn(Number.'+')");
+    expect(result.abbreviated).toEqual("BuiltIn(Number.'+')");
+    expect(result.full).toEqual("BuiltIn(Number.'+')");
   });
 });
