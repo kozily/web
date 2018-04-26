@@ -1,5 +1,5 @@
 import Immutable from "immutable";
-import { builtIns } from "../built_ins";
+import { namespacedBuiltIns } from "../built_ins";
 
 export default (recurse, expression, environment, sigma) => {
   const operator = expression.get("operator");
@@ -13,8 +13,8 @@ export default (recurse, expression, environment, sigma) => {
     return waitingEvaluation;
   }
 
-  for (let namespaceKey in builtIns) {
-    const namespace = builtIns[namespaceKey];
+  for (let namespaceKey in namespacedBuiltIns) {
+    const namespace = namespacedBuiltIns[namespaceKey];
     if (namespace[operator]) {
       return namespace[operator].evaluate(argsEvaluations, sigma);
     }

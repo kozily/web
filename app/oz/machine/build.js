@@ -1,8 +1,13 @@
 import Immutable from "immutable";
 import { lexicalIdentifier } from "./lexical";
 import { valueRecord, valueBuiltIn } from "./values";
-import { builtIns, allBuiltInTypes } from "../built_ins";
 import { getLastEnvironmentIndex } from "./environment";
+import {
+  namespacedBuiltIns,
+  allNamesapcedBuiltInTypes,
+  allNoNamespacedBuiltInTypes,
+  allBuiltInTypes,
+} from "../built_ins";
 
 export const buildEnvironment = (contents = {}) => {
   return Immutable.Map(contents);
@@ -143,8 +148,8 @@ export const defaultEnvironment = () =>
 
 export const defaultSigma = () =>
   Immutable.OrderedSet(
-    allBuiltInTypes.reduce((sigma, builtInType) => {
-      const builtInOperators = builtIns[builtInType];
+    allNamesapcedBuiltInTypes.reduce((sigma, builtInType) => {
+      const builtInOperators = namespacedBuiltIns[builtInType];
       const builtInTypeVariable = buildVariable(builtInType.toLowerCase(), 0, {
         system: true,
       });
@@ -180,7 +185,16 @@ export const defaultSigma = () =>
             buildEquivalenceClass(operatorValue, operatorVariable),
           );
         },
-        buildSigma(),
+        allNoNamespacedBuiltInTypes.reduce((sigma, operatorKey) => {
+          const variable = buildVariable(operatorKey.toLowerCase(), 0, {
+            system: true,
+          });
+          const equivalenceClass = buildEquivalenceClass(
+            valueBuiltIn(operatorKey),
+            variable,
+          );
+          return sigma.add(equivalenceClass);
+        }, buildSigma()),
       );
 
       return sigma

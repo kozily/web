@@ -1,5 +1,5 @@
 import Immutable from "immutable";
-import { builtIns } from "../../app/oz/built_ins";
+import { namespacedBuiltIns } from "../../app/oz/built_ins";
 import {
   valueNumber,
   valueAtom,
@@ -7,8 +7,8 @@ import {
 } from "../../app/oz/machine/values";
 import { buildVariable, buildSigma } from "../../app/oz/machine/build";
 
-const entailmentOperator = builtIns["Value"]["=="];
-const disentailmentOperator = builtIns["Value"]["\\="];
+const entailmentOperator = namespacedBuiltIns["Value"]["=="];
+const disentailmentOperator = namespacedBuiltIns["Value"]["\\="];
 
 const expectSuccessfulEvaluationResult = (
   args,

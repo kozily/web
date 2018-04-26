@@ -2,6 +2,10 @@ export const binaryOperator = args => {
   return args.size === 2;
 };
 
+export const unaryOperator = args => {
+  return args.size === 1;
+};
+
 export const typedOperator = type => args => {
   return (
     args.some(arg => arg.get("value") === undefined) ||
