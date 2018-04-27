@@ -5,6 +5,7 @@ import { valueTypes, valueNumber } from "../machine/values";
 export default {
   "+": {
     name: "nsum",
+    returnResult: true,
     validateArgs: args =>
       binaryOperator(args) && typedOperator(valueTypes.number)(args),
     evaluate: args => {
@@ -24,6 +25,7 @@ export default {
   },
   "-": {
     name: "nsub",
+    returnResult: true,
     validateArgs: args =>
       binaryOperator(args) && typedOperator(valueTypes.number)(args),
     evaluate: args => {
@@ -43,6 +45,7 @@ export default {
   },
   "*": {
     name: "nmul",
+    returnResult: true,
     validateArgs: args =>
       binaryOperator(args) && typedOperator(valueTypes.number)(args),
     evaluate: args => {
@@ -62,6 +65,7 @@ export default {
   },
   div: {
     name: "ndiv",
+    returnResult: true,
     validateArgs: args =>
       binaryOperator(args) &&
       typedOperator(valueTypes.number)(args) &&
@@ -83,6 +87,7 @@ export default {
   },
   mod: {
     name: "nmod",
+    returnResult: true,
     validateArgs: args =>
       binaryOperator(args) &&
       typedOperator(valueTypes.number)(args) &&

@@ -5,6 +5,7 @@ import { valueTypes, valueNumber } from "../machine/values";
 export default {
   "/": {
     name: "fdiv",
+    returnResult: true,
     validateArgs: args =>
       binaryOperator(args) &&
       typedOperator(valueTypes.number)(args) &&

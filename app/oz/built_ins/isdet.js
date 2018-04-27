@@ -3,6 +3,7 @@ import { unaryOperator } from "./validations";
 import { valueBoolean } from "../machine/values";
 
 export default {
+  returnResult: true,
   validateArgs: args => unaryOperator(args),
   evaluate: args => {
     const argument = args.get(0);

@@ -5,6 +5,7 @@ import Value from "./value";
 import IsDet from "./isdet";
 import Arity from "./arity";
 import Label from "./label";
+import Wait from "./wait";
 
 export const namespacedBuiltIns = {
   Number,
@@ -17,6 +18,7 @@ export const noNamespacedBuiltIns = {
   IsDet,
   Arity,
   Label,
+  Wait,
 };
 
 export const allNamespacedBuiltInTypes = Object.keys(namespacedBuiltIns);
