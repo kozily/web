@@ -2,15 +2,126 @@
 @builtin "postprocessors.ne"
 
 ##############################################################################
-# STM - STATEMENTS
+# Utilities and functions
 ##############################################################################
+
 @{%
   STM_SPECIAL_PROCEDURES = [
     "ByNeed",
     "NewCell",
   ];
+
+  LIT_KEYWORDS = [
+    "andthen", "at", "attr", "break", "case", "catch", "choice", "class",
+    "collect", "cond", "continue", "declare", "default", "define", "dis", "div",
+    "do", "else", "elsecase", "elseif", "elseof", "end", "export", "fail", "false",
+    "feat", "finally", "for", "from", "fun", "functor", "if", "import", "in",
+    "lazy", "local", "lock", "meth", "mod", "not", "of", "or", "orelse", "prepare",
+    "proc", "prop", "raise", "require", "return", "self", "skip", "then", "thread",
+    "true", "try", "unit",
+  ];
+
+  var LIB_ESCAPED_CHARS = {
+    "a": String.fromCharCode(7),
+    "b": String.fromCharCode(8),
+    "f": String.fromCharCode(12),
+    "n": String.fromCharCode(10),
+    "r": String.fromCharCode(13),
+    "t": String.fromCharCode(9),
+    "v": String.fromCharCode(11),
+    "\\": String.fromCharCode(92),
+    "'": String.fromCharCode(39),
+    "\"": String.fromCharCode(34),
+    "`": String.fromCharCode(96),
+    "&": String.fromCharCode(38)
+  };
+
+  function logActivation(name, f) {
+    return function() {
+      console.log("Activating rule", name, "with arguments", JSON.stringify(arguments, null, 2));
+      return f.apply(null, arguments);
+    };
+  }
+
+  function expBuildExpressionWrapper(index, type) {
+    return function(d) {
+      var result =  {
+        node: "expression",
+        type: type,
+      };
+      result[type] = d[index];
+      return result;
+    };
+  };
+
+  function expBuildOperatorExpression(lhsIndex, rhsIndex, operatorIndices) {
+    return function(d) {
+      var lhs = d[lhsIndex];
+      var rhs = d[rhsIndex]
+      var operator = operatorIndices.reduce(function (result, index) { return result[index]; }, d);
+
+      return {
+        node: "expression",
+        type: "operator",
+        operator: operator,
+        lhs: lhs,
+        rhs: rhs,
+      };
+    };
+  }
+
+  function idsBuildIdentifier(d) {
+    return {
+      node: "identifier",
+      identifier: d[0],
+    };
+  }
+
+  function litBuildRecord(label, features) {
+    return { node: "literal", type: "record", value: { label: label, features: features } };
+  }
+
+  function litBuildAtom(d) {
+    return litBuildRecord(d[0], {});
+  }
+
+  function litBuildBoolean(d) {
+    return litBuildRecord(d.toString(), {});
+  }
+
+  function litBuildList(items) {
+    return items.reduceRight(function(result, item) {
+      return litBuildRecord("|", {
+        1: item,
+        2: result,
+      });
+    }, litBuildRecord("nil", {}));
+  }
+
+  function litBuildString(d) {
+    return litBuildList(d[0].split("").map(function(s) {
+      return litBuildNumber([s.charCodeAt(0)])
+    }));
+  }
+
+  function litBuildNumber(value) {
+    return { node: "literal", type: "number", value: value[0] };
+  }
+
+  function litBuildProcedure(args, body) {
+    return {
+      node: "literal",
+      type: "procedure",
+      value: { args: (args || []), body: body },
+    };
+  }
+
+  function translateWeirdOzUnaryMinus(v) { return v === "~" ? "-" : "+"; }
 %}
 
+##############################################################################
+# STM - STATEMENTS
+##############################################################################
 stm_root -> _ stm_sequence _ {% nth(1) %}
 
 stm_sequence ->
@@ -213,63 +324,37 @@ exp_comparison ->
     exp_sum {% id %}
   | exp_comparison_term {% id %}
 
-exp_comparison_term -> exp_sum _ ("=="|"\\="|"<"|"<="|">"|">=") _ exp_sum {%
-  function(d) {
-    return {
-      node: "expression",
-      type: "operator",
-      operator: d[2][0],
-      lhs: d[0],
-      rhs: d[4],
-    };
-  }
-%}
+exp_comparison_term -> exp_sum _ ("=="|"\\="|"<"|"<="|">"|">=") _ exp_sum {% expBuildOperatorExpression(0, 4, [2, 0]) %}
 
 exp_sum ->
     exp_product {% id %}
   | exp_sum_term {% id %}
 
-exp_sum_term -> exp_sum _ ("+"|"-") _ exp_product {%
-  function(d) {
-    return {
-      node: "expression",
-      type: "operator",
-      operator: d[2][0],
-      lhs: d[0],
-      rhs: d[4],
-    };
-  }
-%}
+exp_sum_term -> exp_sum _ ("+"|"-") _ exp_product {% expBuildOperatorExpression(0, 4, [2, 0]) %}
 
 exp_product ->
     exp_feature_selection {% id %}
   | exp_product_term {% id %}
 
-exp_product_term -> exp_product _ ("*"|"div"|"mod"|"/") _ exp_feature_selection {%
-  function(d) {
-    return {
-      node: "expression",
-      type: "operator",
-      operator: d[2][0],
-      lhs: d[0],
-      rhs: d[4],
-    };
-  }
-%}
+exp_product_term -> exp_product _ ("*"|"div"|"mod"|"/") _ exp_feature_selection {% expBuildOperatorExpression(0, 4, [2, 0]) %}
 
 exp_feature_selection ->
     exp_terminal {% id %}
   | exp_feature_selection_term {% id %}
 
-exp_feature_selection_term -> exp_feature_selection "." exp_terminal {%
-  function(d, position, reject) {
-    return {
-      node: "expression",
-      type: "operator",
-      operator: ".",
-      lhs: d[0],
-      rhs: d[2],
-    };
+exp_feature_selection_term -> exp_feature_selection "." exp_feature_selection_rhs {% expBuildOperatorExpression(0, 2, [1]) %}
+
+exp_feature_selection_rhs ->
+    exp_terminal_identifier {% id %}
+  | lit_atom {% expBuildExpressionWrapper(0, "literal") %}
+  | exp_feature_selection_tuple_integers {% expBuildExpressionWrapper(0, "literal") %}
+  | exp_terminal_paren {% id %}
+
+exp_feature_selection_tuple_integers -> [1-9] [0-9]:* {%
+  function(d) {
+    var concatenated = "" + d[0] + d[1].join("");
+    var value = parseInt(concatenated, 10);
+    return litBuildNumber([value]);
   }
 %}
 
@@ -278,40 +363,15 @@ exp_terminal ->
   | exp_terminal_literal {% id %}
   | exp_terminal_paren {% id %}
 
-exp_terminal_identifier -> ids_identifier {%
-  function(d) {
-    return {
-      node: "expression",
-      type: "identifier",
-      identifier: d[0],
-    };
-  }
-%}
+exp_terminal_identifier -> ids_identifier {% expBuildExpressionWrapper(0, "identifier") %}
 
-exp_terminal_literal -> lit_value {%
-  function (d) {
-    return {
-      node: "expression",
-      type: "literal",
-      literal: d[0],
-    };
-  }
-%}
+exp_terminal_literal -> lit_value {% expBuildExpressionWrapper(0, "literal") %}
 
 exp_terminal_paren -> "(" _ exp_expression _ ")" {% nth(2) %}
 
 ##############################################################################
 # IDS - IDENTIFIERS
 ##############################################################################
-@{%
-  function idsBuildIdentifier(d) {
-    return {
-      node: "identifier",
-      identifier: d[0],
-    };
-  };
-%}
-
 ids_identifier ->
     ids_identifier_syntax {% idsBuildIdentifier %}
 
@@ -351,12 +411,6 @@ lit_value ->
 ##############################################################################
 # Records
 ##############################################################################
-@{%
-  function litBuildRecord(label, features) {
-    return { node: "literal", type: "record", value: { label: label, features: features } };
-  }
-%}
-
 lit_record -> lit_atom_syntax "(" _ lit_record_feature_list _ ")" {%
   function(d, position, reject) {
     var label = d[0];
@@ -387,22 +441,6 @@ lit_record_value -> (ids_identifier|lit_value) {%
 ##############################################################################
 # Atoms
 ##############################################################################
-@{%
-  function litBuildAtom(d) {
-    return litBuildRecord(d[0], {});
-  }
-
-  LIT_KEYWORDS = [
-    "andthen", "at", "attr", "break", "case", "catch", "choice", "class",
-    "collect", "cond", "continue", "declare", "default", "define", "dis", "div",
-    "do", "else", "elsecase", "elseif", "elseof", "end", "export", "fail", "false",
-    "feat", "finally", "for", "from", "fun", "functor", "if", "import", "in",
-    "lazy", "local", "lock", "meth", "mod", "not", "of", "or", "orelse", "prepare",
-    "proc", "prop", "raise", "require", "return", "self", "skip", "then", "thread",
-    "true", "try", "unit",
-  ];
-%}
-
 lit_atom ->
     lit_atom_syntax {% litBuildAtom %}
 
@@ -430,12 +468,6 @@ lit_atom_quoted -> "'" ([^'\\] | lib_pseudo_char):* "'" {%
 ##############################################################################
 # Booleans
 ##############################################################################
-@{%
-  function litBuildBoolean(d) {
-    return litBuildRecord(d.toString(), {});
-  }
-%}
-
 lit_boolean ->
     lit_boolean_syntax {% litBuildBoolean %}
 
@@ -481,17 +513,6 @@ lit_tuple -> lit_atom_syntax "(" _ lit_list_items _ ")" {%
 ##############################################################################
 # List
 ##############################################################################
-@{%
-  function litBuildList(items) {
-    return items.reduceRight(function(result, item) {
-      return litBuildRecord("|", {
-        1: item,
-        2: result,
-      });
-    }, litBuildRecord("nil", {}));
-  }
-%}
-
 lit_list ->
     lit_empty_list {% id %}
   | lit_list_with_items {% id %}
@@ -525,29 +546,12 @@ lit_list_item -> (ids_identifier | lit_value) {%
 ##############################################################################
 # Strings
 ##############################################################################
-@{%
-  function litBuildString(d) {
-    return litBuildList(d[0].split("").map(function(s) {
-      return litBuildNumber([s.charCodeAt(0)])
-    }));
-  }
-%}
-
 lit_string ->
     lit_string_syntax {% litBuildString %}
 
 lit_string_syntax -> "\"" ([^"\\] | lib_pseudo_char):* "\"" {%
   function(d) {
     return d[1].join("");
-  }
-%}
-
-##############################################################################
-# Generic numbers
-##############################################################################
-@{%
-  function litBuildNumber(value) {
-    return { node: "literal", type: "number", value: value[0] };
   }
 %}
 
@@ -652,16 +656,6 @@ lit_float -> "~":? [0-9]:+ "." [0-9]:* (("e" | "E") "~":? [0-9]:+):? {%
 ##############################################################################
 # Procedures
 ##############################################################################
-@{%
-  function litBuildProcedure(args, body) {
-    return {
-      node: "literal",
-      type: "procedure",
-      value: { args: (args || []), body: body },
-    };
-  }
-%}
-
 lit_procedure -> "proc" _ "{" _ "$" lit_procedure_args:? _ "}" _  stm_sequence __ "end" {%
   function(d) {
     return litBuildProcedure(d[5], d[9]);
@@ -679,11 +673,6 @@ lit_procedure_args ->
 ##############################################################################
 # LIB - UTILITIES
 ##############################################################################
-
-@{%
-  function translateWeirdOzUnaryMinus(v) { return v === "~" ? "-" : "+"; }
-%}
-
 lib_pseudo_char ->
     lib_octal_char {% id %}
   | lib_hexal_char {% id %}
@@ -703,23 +692,6 @@ lib_octal_char -> "\\" ([0-7] [0-7] [0-7]) {%
 lib_hexal_char -> "\\" ("x" | "X") ([0-9a-fA-F] [0-9a-fA-F]) {%
   function (d) {
     return String.fromCharCode(parseInt(d[2].join(""), 16));
-  }
-%}
-
-@{%
-  var LIB_ESCAPED_CHARS = {
-    "a": String.fromCharCode(7),
-    "b": String.fromCharCode(8),
-    "f": String.fromCharCode(12),
-    "n": String.fromCharCode(10),
-    "r": String.fromCharCode(13),
-    "t": String.fromCharCode(9),
-    "v": String.fromCharCode(11),
-    "\\": String.fromCharCode(92),
-    "'": String.fromCharCode(39),
-    "\"": String.fromCharCode(34),
-    "`": String.fromCharCode(96),
-    "&": String.fromCharCode(38)
   }
 %}
 

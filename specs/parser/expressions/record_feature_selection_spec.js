@@ -1,5 +1,5 @@
 import Immutable from "immutable";
-import { literalAtom } from "../../../app/oz/machine/literals";
+import { literalAtom, literalNumber } from "../../../app/oz/machine/literals";
 import { lexicalIdentifier } from "../../../app/oz/machine/lexical";
 import {
   operatorExpression,
@@ -26,6 +26,16 @@ describe("Parsing record feature selection expressions", () => {
     );
   });
 
+  it("parses successfully when rhs is a number", () => {
+    expect(parse("X.1")).toEqual(
+      operatorExpression(
+        ".",
+        identifierExpression(lexicalIdentifier("X")),
+        literalExpression(literalNumber(1)),
+      ),
+    );
+  });
+
   it("parses successfully when rhs is an identifier", () => {
     expect(parse("X.F")).toEqual(
       operatorExpression(
@@ -36,7 +46,7 @@ describe("Parsing record feature selection expressions", () => {
     );
   });
 
-  it("parses sequences successfully", () => {
+  it("parses sequences of atoms successfully", () => {
     expect(parse("X.age.number")).toEqual(
       operatorExpression(
         ".",
@@ -46,6 +56,34 @@ describe("Parsing record feature selection expressions", () => {
           literalExpression(literalAtom("age")),
         ),
         literalExpression(literalAtom("number")),
+      ),
+    );
+  });
+
+  it("parses sequences of identifiers successfully", () => {
+    expect(parse("X.Y.Z")).toEqual(
+      operatorExpression(
+        ".",
+        operatorExpression(
+          ".",
+          identifierExpression(lexicalIdentifier("X")),
+          identifierExpression(lexicalIdentifier("Y")),
+        ),
+        identifierExpression(lexicalIdentifier("Z")),
+      ),
+    );
+  });
+
+  it("parses sequences of integers successfully", () => {
+    expect(parse("X.1.2")).toEqual(
+      operatorExpression(
+        ".",
+        operatorExpression(
+          ".",
+          identifierExpression(lexicalIdentifier("X")),
+          literalExpression(literalNumber(1)),
+        ),
+        literalExpression(literalNumber(2)),
       ),
     );
   });
