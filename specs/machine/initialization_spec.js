@@ -29,6 +29,7 @@ describe("State initialization", () => {
       IsDet: buildVariable("isdet", 0, { system: true }),
       Arity: buildVariable("arity", 0, { system: true }),
       Label: buildVariable("label", 0, { system: true }),
+      Wait: buildVariable("wait", 0, { system: true }),
     });
 
     expect(state.getIn(["threads", 0, "stack", 0, "environment"])).toEqual(
@@ -141,5 +142,12 @@ describe("State initialization", () => {
 
     expect(lookupBuiltInInSigma(sigma, "arity")).toEqual(valueBuiltIn("Arity"));
     expect(lookupBuiltInInSigma(sigma, "label")).toEqual(valueBuiltIn("Label"));
+  });
+
+  it("must generate the appropiate sigma entries for the wait built-ins", () => {
+    const state = buildFromKernelAST(skipStatement());
+    const sigma = state.get("sigma");
+
+    expect(lookupBuiltInInSigma(sigma, "wait")).toEqual(valueBuiltIn("Wait"));
   });
 });

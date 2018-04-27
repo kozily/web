@@ -420,6 +420,31 @@ describe("Reducing {X ...} statements", () => {
       );
     });
 
+    it("binds the appropriate value and executes the builtin wait with argument expressions correctly", () => {
+      const state = buildSingleThreadedState({
+        semanticStatements: [buildSemanticStatement(skipStatement())],
+        sigma: buildSigma(
+          buildEquivalenceClass(valueBuiltIn("Wait"), buildVariable("x", 0)),
+          buildEquivalenceClass(undefined, buildVariable("r", 0)),
+        ),
+      });
+
+      const statement = buildSemanticStatement(
+        procedureApplicationStatement(
+          identifierExpression(lexicalIdentifier("X")),
+          [identifierExpression(lexicalIdentifier("R"))],
+        ),
+        buildEnvironment({
+          X: buildVariable("x", 0),
+          R: buildVariable("r", 0),
+        }),
+      );
+
+      expect(reduce(state, statement, 0)).toEqual(
+        buildBlockedState(state, statement, 0, buildVariable("r", 0)),
+      );
+    });
+
     it("binds the appropriate value and executes argument expressions correctly", () => {
       const state = buildSingleThreadedState({
         semanticStatements: [buildSemanticStatement(skipStatement())],

@@ -27,6 +27,7 @@ const bothNumberOrAtoms = args => {
 export default {
   "==": {
     name: "veq",
+    returnResult: true,
     validateArgs: args => binaryOperator(args),
     evaluate: (args, sigma) => {
       const entailment = entail(args, sigma);
@@ -39,6 +40,7 @@ export default {
 
   "\\=": {
     name: "vneq",
+    returnResult: true,
     validateArgs: args => binaryOperator(args),
     evaluate: (args, sigma) => {
       const entailment = entail(args, sigma);
@@ -51,6 +53,7 @@ export default {
 
   "<": {
     name: "vlt",
+    returnResult: true,
     validateArgs: args => binaryOperator(args) && bothNumberOrAtoms(args),
     evaluate: args => {
       const missingArgument = args.find(x => !x.get("value"));
@@ -71,6 +74,7 @@ export default {
 
   "<=": {
     name: "vle",
+    returnResult: true,
     validateArgs: args => binaryOperator(args) && bothNumberOrAtoms(args),
     evaluate: args => {
       const missingArgument = args.find(x => !x.get("value"));
@@ -91,6 +95,7 @@ export default {
 
   ">": {
     name: "vgt",
+    returnResult: true,
     validateArgs: args => binaryOperator(args) && bothNumberOrAtoms(args),
     evaluate: args => {
       const missingArgument = args.find(x => !x.get("value"));
@@ -111,6 +116,7 @@ export default {
 
   ">=": {
     name: "vge",
+    returnResult: true,
     validateArgs: args => binaryOperator(args) && bothNumberOrAtoms(args),
     evaluate: args => {
       const missingArgument = args.find(x => !x.get("value"));

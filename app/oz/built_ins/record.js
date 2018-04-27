@@ -26,6 +26,7 @@ const featureExists = args => {
 export default {
   ".": {
     name: "rsel",
+    returnResult: true,
     validateArgs: args =>
       binaryOperator(args) &&
       typedOperator(valueTypes.record)(args) &&

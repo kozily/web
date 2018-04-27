@@ -33,6 +33,28 @@ const executeBuiltInValue = (
     return raiseSystemException(state, activeThreadIndex, errorException());
   }
 
+  if (!builtIn.returnResult) {
+    const actualArgs = args.map(x => evaluate(x, environment, sigma));
+
+    if (!builtIn.validateArgs(actualArgs)) {
+      return raiseSystemException(state, activeThreadIndex, errorException());
+    }
+
+    try {
+      const builtInEvaluation = builtIn.evaluate(actualArgs, sigma);
+      if (builtInEvaluation.get("waitCondition")) {
+        return blockCurrentThread(
+          state,
+          semanticStatement,
+          activeThreadIndex,
+          builtInEvaluation.get("waitCondition"),
+        );
+      }
+      return state;
+    } catch (error) {
+      return raiseSystemException(state, activeThreadIndex, failureException());
+    }
+  }
   const resultArg = args.last();
   const resultEvaluation = evaluate(resultArg, environment, sigma);
 
