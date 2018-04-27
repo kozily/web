@@ -3,6 +3,8 @@ import Float from "./float";
 import Record from "./record";
 import Value from "./value";
 import IsDet from "./isdet";
+import Arity from "./arity";
+import Label from "./label";
 
 export const namespacedBuiltIns = {
   Number,
@@ -13,6 +15,8 @@ export const namespacedBuiltIns = {
 
 export const noNamespacedBuiltIns = {
   IsDet,
+  Arity,
+  Label,
 };
 
 export const allNamespacedBuiltInTypes = Object.keys(namespacedBuiltIns);

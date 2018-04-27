@@ -27,6 +27,8 @@ describe("State initialization", () => {
       Record: buildVariable("record", 0, { system: true }),
       Value: buildVariable("value", 0, { system: true }),
       IsDet: buildVariable("isdet", 0, { system: true }),
+      Arity: buildVariable("arity", 0, { system: true }),
+      Label: buildVariable("label", 0, { system: true }),
     });
 
     expect(state.getIn(["threads", 0, "stack", 0, "environment"])).toEqual(
@@ -126,10 +128,18 @@ describe("State initialization", () => {
     );
   });
 
-  it("must generate the appropiate sigma entries for the value built-ins", () => {
+  it("must generate the appropiate sigma entries for the IsDet built-in", () => {
     const state = buildFromKernelAST(skipStatement());
     const sigma = state.get("sigma");
 
     expect(lookupBuiltInInSigma(sigma, "isdet")).toEqual(valueBuiltIn("IsDet"));
+  });
+
+  it("must generate thhe appropriate sigma entries for the Record built-ins", () => {
+    const state = buildFromKernelAST(skipStatement());
+    const sigma = state.get("sigma");
+
+    expect(lookupBuiltInInSigma(sigma, "arity")).toEqual(valueBuiltIn("Arity"));
+    expect(lookupBuiltInInSigma(sigma, "label")).toEqual(valueBuiltIn("Label"));
   });
 });
