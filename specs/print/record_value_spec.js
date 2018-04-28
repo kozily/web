@@ -6,6 +6,7 @@ import {
   valueBoolean,
   valueTuple,
   valueList,
+  valueListItem,
   valueNumber,
 } from "../../app/oz/machine/values";
 import { buildVariable } from "../../app/oz/machine/build";
@@ -59,6 +60,14 @@ describe("Printing a record value", () => {
 
     expect(result.abbreviated).toEqual("[x0 30]");
     expect(result.full).toEqual("'|'(1:x0 2:'|'(1:30 2:nil))");
+  });
+
+  it("Returns the appropriate string for list conses", () => {
+    const value = valueListItem(valueNumber(30), buildVariable("x", 0));
+    const result = print(value, 2);
+
+    expect(result.abbreviated).toEqual("30|x0");
+    expect(result.full).toEqual("'|'(1:30 2:x0)");
   });
 
   it("Returns the appropriate string for nested recursive structures", () => {
