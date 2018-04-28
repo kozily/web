@@ -1,5 +1,5 @@
 import Immutable from "immutable";
-import { binaryOperator, typedOperator } from "./validations";
+import { binaryOperator, typedArgument } from "./validations";
 import { valueTypes } from "../machine/values";
 import { lookupVariableInSigma } from "../machine/sigma";
 
@@ -10,15 +10,28 @@ const emptyFeatures = index => args => {
   );
 };
 
-const featureExists = args => {
+const atomFeatureExists = args => {
   return (
     args.some(x => x.get("value") === undefined) ||
-    !!args.getIn([
+    args.hasIn([
       0,
       "value",
       "value",
       "features",
       args.getIn([1, "value", "value", "label"]),
+    ])
+  );
+};
+
+const numberFeatureExists = args => {
+  return (
+    args.some(x => x.get("value") === undefined) ||
+    args.hasIn([
+      0,
+      "value",
+      "value",
+      "features",
+      args.getIn([1, "value", "value"]).toString(),
     ])
   );
 };
@@ -29,9 +42,12 @@ export default {
     returnResult: true,
     validateArgs: args =>
       binaryOperator(args) &&
-      typedOperator(valueTypes.record)(args) &&
-      emptyFeatures(1)(args) &&
-      featureExists(args),
+      typedArgument(valueTypes.record, 0)(args) &&
+      ((typedArgument(valueTypes.record, 1)(args) &&
+        emptyFeatures(1)(args) &&
+        atomFeatureExists(args)) ||
+        (typedArgument(valueTypes.number, 1)(args) &&
+          numberFeatureExists(args))),
     evaluate: (args, sigma) => {
       const missingArgument = args.find(x => !x.get("value"));
       if (missingArgument) {
@@ -42,7 +58,10 @@ export default {
         });
       }
       const record = args.getIn([0, "value", "value"]);
-      const feature = args.getIn([1, "value", "value", "label"]);
+      const feature =
+        args.getIn([1, "value", "type"]) === "record"
+          ? args.getIn([1, "value", "value", "label"])
+          : args.getIn([1, "value", "value"]).toString();
       const featureContents = record.getIn(["features", feature]);
       if (featureContents.get("node") === "value") {
         return Immutable.fromJS({ value: featureContents });

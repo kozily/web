@@ -13,6 +13,13 @@ export const typedOperator = type => args => {
   );
 };
 
+export const typedArgument = (type, index) => args => {
+  return (
+    args.some(arg => arg.get("value") === undefined) ||
+    args.getIn([index, "value", "type"]) === type
+  );
+};
+
 export const dividendNotZero = args => {
   return (
     args.getIn([1, "value"]) === undefined ||

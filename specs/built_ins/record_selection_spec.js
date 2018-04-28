@@ -9,6 +9,7 @@ import {
   valueNumber,
   valueAtom,
   valueRecord,
+  valueBuiltIn,
 } from "../../app/oz/machine/values";
 
 const operator = namespacedBuiltIns["Record"]["."];
@@ -41,10 +42,10 @@ describe("The record selection built-in", () => {
       expect(operator.validateArgs(args)).toEqual(false);
     });
 
-    it("fails when the second argument is not a record", () => {
+    it("fails when the second argument is not a record or a number", () => {
       const args = Immutable.fromJS([
         { value: valueRecord("person", { age: buildVariable("x", 0) }) },
-        { value: valueNumber(3) },
+        { value: valueBuiltIn("+", "Number") },
       ]);
       expect(operator.validateArgs(args)).toEqual(false);
     });
@@ -65,10 +66,26 @@ describe("The record selection built-in", () => {
       expect(operator.validateArgs(args)).toEqual(false);
     });
 
-    it("succeeds when everything is right", () => {
+    it("fails when the first argument does not have the numbered feature of the second argument", () => {
+      const args = Immutable.fromJS([
+        { value: valueRecord("person", { 1: buildVariable("n", 0) }) },
+        { value: valueNumber(2) },
+      ]);
+      expect(operator.validateArgs(args)).toEqual(false);
+    });
+
+    it("succeeds when everything is right with an atom as the second argument", () => {
       const args = Immutable.fromJS([
         { value: valueRecord("person", { name: buildVariable("n", 0) }) },
         { value: valueAtom("name") },
+      ]);
+      expect(operator.validateArgs(args)).toEqual(true);
+    });
+
+    it("succeeds when everything is right with a number as the second argument", () => {
+      const args = Immutable.fromJS([
+        { value: valueRecord("person", { 1: buildVariable("n", 0) }) },
+        { value: valueNumber(1) },
       ]);
       expect(operator.validateArgs(args)).toEqual(true);
     });
@@ -148,7 +165,7 @@ describe("The record selection built-in", () => {
       expect(evaluation.get("variable")).toEqual(buildVariable("n", 0));
     });
 
-    it("returns the value and the variable when everything is bound", () => {
+    it("returns the value and the variable when everything is bound and the second argument is a record", () => {
       const args = Immutable.fromJS([
         { value: valueRecord("person", { name: buildVariable("n", 0) }) },
         { value: valueAtom("name") },
@@ -163,10 +180,38 @@ describe("The record selection built-in", () => {
       expect(evaluation.get("variable")).toEqual(buildVariable("n", 0));
     });
 
-    it("returns the value and no variable when it's a nested record", () => {
+    it("returns the value and no variable when it's a nested record and the second argument is a record", () => {
       const args = Immutable.fromJS([
         { value: valueRecord("person", { name: valueNumber(30) }) },
         { value: valueAtom("name") },
+      ]);
+      const sigma = buildSigma();
+
+      const evaluation = operator.evaluate(args, sigma);
+
+      expect(evaluation.get("value")).toEqual(valueNumber(30));
+      expect(evaluation.get("variable")).toEqual(undefined);
+    });
+
+    it("returns the value and the variable when everything is bound and the second argument is a number", () => {
+      const args = Immutable.fromJS([
+        { value: valueRecord("person", { 1: buildVariable("n", 0) }) },
+        { value: valueNumber(1) },
+      ]);
+      const sigma = buildSigma(
+        buildEquivalenceClass(valueNumber(3), buildVariable("n", 0)),
+      );
+
+      const evaluation = operator.evaluate(args, sigma);
+
+      expect(evaluation.get("value")).toEqual(valueNumber(3));
+      expect(evaluation.get("variable")).toEqual(buildVariable("n", 0));
+    });
+
+    it("returns the value and no variable when it's a nested record and the second argument is a record", () => {
+      const args = Immutable.fromJS([
+        { value: valueRecord("person", { 1: valueNumber(30) }) },
+        { value: valueNumber(1) },
       ]);
       const sigma = buildSigma();
 
