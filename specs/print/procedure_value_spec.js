@@ -17,7 +17,9 @@ describe("Printing a procedure value", () => {
     );
     const result = print(value, 2);
 
-    expect(result.abbreviated).toEqual("proc {$ A B} local X in ... end end");
+    expect(result.abbreviated).toEqual(
+      "proc {$ A B} local X in ... end end, {}",
+    );
     expect(result.full).toEqual(
       "proc {$ A B}\n    local X in\n      skip\n    end\n  end, {}",
     );
@@ -33,7 +35,9 @@ describe("Printing a procedure value", () => {
     );
     const result = print(value, 2);
 
-    expect(result.abbreviated).toEqual("proc {$ A B} local X in ... end end");
+    expect(result.abbreviated).toEqual(
+      "proc {$ A B} local X in ... end end, {Y->y0}",
+    );
     expect(result.full).toEqual(
       "proc {$ A B}\n    local X in\n      skip\n    end\n  end, {Y->y0}",
     );
@@ -50,9 +54,11 @@ describe("Printing a procedure value", () => {
     );
     const result = print(value, 2);
 
-    expect(result.abbreviated).toEqual("proc {$ A B} local X in ... end end");
+    expect(result.abbreviated).toEqual(
+      "proc {$ A B} local X in ... end end, {Y->y0, Z->z0}",
+    );
     expect(result.full).toEqual(
-      "proc {$ A B}\n    local X in\n      skip\n    end\n  end, {Y->y0,Z->z0}",
+      "proc {$ A B}\n    local X in\n      skip\n    end\n  end, {Y->y0, Z->z0}",
     );
   });
 });
