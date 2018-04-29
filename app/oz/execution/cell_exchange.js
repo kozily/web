@@ -1,60 +1,76 @@
-// import { blockCurrentThread } from "../machine/threads";
-// import { updateMutableVariable } from "../machine/mu";
-// import { unify, convertToVariable } from "../machine/sigma";
-// import { failureException, raiseSystemException } from "../machine/exceptions";
-// import { buildMutableMapping } from "../machine/build";
-// import { evaluate } from "../expression";
+import { blockCurrentThread } from "../machine/threads";
+import { valueTypes } from "../machine/values";
+import { updateMutableMapping, lookupMutableMapping } from "../machine/mu";
+import { unify, convertToVariable } from "../machine/sigma";
+import {
+  errorException,
+  failureException,
+  raiseSystemException,
+} from "../machine/exceptions";
+import { evaluate } from "../expression";
 
-export default function(state) {
-  return state;
-  // const sigma = state.get("sigma");
-  // const mu = state.get("mu");
-  // const statement = semanticStatement.get("statement");
-  // const environment = semanticStatement.get("environment");
+export default function(state, semanticStatement, activeThreadIndex) {
+  const sigma = state.get("sigma");
+  const mu = state.get("mu");
+  const statement = semanticStatement.get("statement");
+  const environment = semanticStatement.get("environment");
 
-  // const cellExpression = statement.get("cell");
-  // const cellEvaluation = evaluate(cellExpression, environment, sigma);
+  const cellExpression = statement.get("cell");
+  const cellEvaluation = evaluate(cellExpression, environment, sigma);
+  const cell = cellEvaluation.get("value");
 
-  // if (!cellEvaluation.get("value")) {
-  //   return blockCurrentThread(
-  //     state,
-  //     semanticStatement,
-  //     activeThreadIndex,
-  //     cellEvaluation.get("waitCondition") || cellEvaluation.get("variable"),
-  //   );
-  // }
+  if (!cell) {
+    return blockCurrentThread(
+      state,
+      semanticStatement,
+      activeThreadIndex,
+      cellEvaluation.get("waitCondition") || cellEvaluation.get("variable"),
+    );
+  }
 
-  // const currentValue = statement.get("current");
-  // const currentValueIdentifier = currentValue.get("identifier");
-  // const currentValueVariable = environment.get(currentValueIdentifier);
+  const currentValue = statement.get("current");
+  const currentValueIdentifier = currentValue.get("identifier");
+  const currentValueVariable = environment.get(currentValueIdentifier);
 
-  // const nextValueExpression = statement.get("next");
-  // const nextValueEvaluation = evaluate(nextValueExpression, environment, sigma);
+  const nextValueExpression = statement.get("next");
+  const nextValueEvaluation = evaluate(nextValueExpression, environment, sigma);
 
-  // if (nextValueEvaluation.get("waitCondition")) {
-  //   return blockCurrentThread(
-  //     state,
-  //     semanticStatement,
-  //     activeThreadIndex,
-  //     nextValueEvaluation.get("waitCondition"),
-  //   );
-  // }
+  if (nextValueEvaluation.get("waitCondition")) {
+    return blockCurrentThread(
+      state,
+      semanticStatement,
+      activeThreadIndex,
+      nextValueEvaluation.get("waitCondition"),
+    );
+  }
 
-  // try {
-  //   const unifiedSigma = unify(sigma, cellVariable, mutableVariable);
+  if (cell.get("type") !== valueTypes.mutable || cell.get("kind") !== "cell") {
+    return raiseSystemException(state, activeThreadIndex, errorException());
+  }
 
-  //   const { sigma: finalSigma, variable: valueVariable } = convertToVariable(
-  //     valueEvaluation,
-  //     unifiedSigma,
-  //     "cellValue",
-  //   );
+  const currentMapping = lookupMutableMapping(mu, cell);
+  const currentImmutableVariable = currentMapping.get("immutableVariable");
 
-  //   return state
-  //     .set("sigma", finalSigma)
-  //     .update("mu", mu =>
-  //       mu.add(buildMutableMapping(mutableVariable, valueVariable)),
-  //     );
-  // } catch (error) {
-  //   return raiseSystemException(state, activeThreadIndex, failureException());
-  // }
+  const {
+    sigma: sigmaWithNextValue,
+    variable: nextImmutableVariable,
+  } = convertToVariable(nextValueEvaluation, sigma, "cellValue");
+
+  const nextMapping = currentMapping.set(
+    "immutableVariable",
+    nextImmutableVariable,
+  );
+
+  try {
+    const unifiedSigma = unify(
+      sigmaWithNextValue,
+      currentValueVariable,
+      currentImmutableVariable,
+    );
+    const updatedMu = updateMutableMapping(mu, nextMapping);
+
+    return state.set("sigma", unifiedSigma).set("mu", updatedMu);
+  } catch (error) {
+    return raiseSystemException(state, activeThreadIndex, failureException());
+  }
 }

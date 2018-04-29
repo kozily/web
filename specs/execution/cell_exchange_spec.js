@@ -256,27 +256,29 @@ describe("Reducing cell exchange statements", () => {
       }),
     );
 
-    expect(reduce(state, statement, 0)).toEqual({
-      semanticStatements: [buildSemanticStatement(skipStatement())],
-      sigma: buildSigma(
-        buildEquivalenceClass(
-          valueMutableVariable("cell", 0),
-          buildVariable("x", 0),
+    expect(reduce(state, statement, 0)).toEqual(
+      buildSingleThreadedState({
+        semanticStatements: [buildSemanticStatement(skipStatement())],
+        sigma: buildSigma(
+          buildEquivalenceClass(
+            valueMutableVariable("cell", 0),
+            buildVariable("x", 0),
+          ),
+          buildEquivalenceClass(valueNumber(10), buildVariable("z", 0)),
+          buildEquivalenceClass(
+            valueNumber(5),
+            buildVariable("v", 0),
+            buildVariable("y", 0),
+          ),
         ),
-        buildEquivalenceClass(valueNumber(10), buildVariable("z", 0)),
-        buildEquivalenceClass(
-          valueNumber(5),
-          buildVariable("v", 0),
-          buildVariable("y", 0),
+        mu: buildMu(
+          buildMutableMapping(
+            valueMutableVariable("cell", 0),
+            buildVariable("z", 0),
+          ),
         ),
-      ),
-      mu: buildMu(
-        buildMutableMapping(
-          valueMutableVariable("cell", 0),
-          buildVariable("z", 0),
-        ),
-      ),
-    });
+      }),
+    );
   });
 
   it("executes correctly when the current variable and the next variable are the same", () => {
@@ -310,25 +312,27 @@ describe("Reducing cell exchange statements", () => {
       }),
     );
 
-    expect(reduce(state, statement, 0)).toEqual({
-      semanticStatements: [buildSemanticStatement(skipStatement())],
-      sigma: buildSigma(
-        buildEquivalenceClass(
-          valueMutableVariable("cell", 0),
-          buildVariable("x", 0),
+    expect(reduce(state, statement, 0)).toEqual(
+      buildSingleThreadedState({
+        semanticStatements: [buildSemanticStatement(skipStatement())],
+        sigma: buildSigma(
+          buildEquivalenceClass(
+            valueMutableVariable("cell", 0),
+            buildVariable("x", 0),
+          ),
+          buildEquivalenceClass(
+            valueNumber(5),
+            buildVariable("v", 0),
+            buildVariable("y", 0),
+          ),
         ),
-        buildEquivalenceClass(
-          valueNumber(5),
-          buildVariable("v", 0),
-          buildVariable("y", 0),
+        mu: buildMu(
+          buildMutableMapping(
+            valueMutableVariable("cell", 0),
+            buildVariable("y", 0),
+          ),
         ),
-      ),
-      mu: buildMu(
-        buildMutableMapping(
-          valueMutableVariable("cell", 0),
-          buildVariable("y", 0),
-        ),
-      ),
-    });
+      }),
+    );
   });
 });
