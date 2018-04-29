@@ -2,7 +2,6 @@ import Immutable from "immutable";
 import { print } from "../../app/oz/print";
 import { portCreationStatement } from "../../app/oz/machine/statements";
 import { lexicalIdentifier } from "../../app/oz/machine/lexical";
-import { identifierExpression } from "../../app/oz/machine/expressions";
 
 describe("Printing a port creation statement", () => {
   beforeEach(() => {
@@ -11,7 +10,7 @@ describe("Printing a port creation statement", () => {
 
   it("Returns the appropriate string", () => {
     const statement = portCreationStatement(
-      identifierExpression(lexicalIdentifier("OneVariable")),
+      lexicalIdentifier("OneVariable"),
       lexicalIdentifier("OtherVariable"),
     );
     const result = print(statement, 2);

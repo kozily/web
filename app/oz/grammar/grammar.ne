@@ -322,7 +322,7 @@ stm_cell_creation -> "{" _ "NewCell" __ exp_expression __ ids_identifier _ "}" {
   }
 %}
 
-stm_port_creation -> "{" _ "NewPort" __ exp_expression __ ids_identifier _ "}" {%
+stm_port_creation -> "{" _ "NewPort" __ ids_identifier __ ids_identifier _ "}" {%
   function(d) {
     return {
       node: "statement",
