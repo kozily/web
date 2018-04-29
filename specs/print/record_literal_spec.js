@@ -54,6 +54,18 @@ describe("Printing a record literal", () => {
     expect(result.full).toEqual("person(X 30)");
   });
 
+  it("Returns the appropriate string for cons tuples", () => {
+    const literal = literalTuple("#", [
+      lexicalIdentifier("X"),
+      literalNumber(30),
+      literalNumber(35),
+    ]);
+    const result = print(literal, 2);
+
+    expect(result.abbreviated).toEqual("X#30#35");
+    expect(result.full).toEqual("X#30#35");
+  });
+
   it("Returns the appropriate string for lists", () => {
     const literal = literalList([lexicalIdentifier("X"), literalNumber(30)]);
     const result = print(literal, 2);

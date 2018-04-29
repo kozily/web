@@ -495,7 +495,11 @@ lit_false_literal -> "false" {%
 # Tuple
 ##############################################################################
 
-lit_tuple -> lit_atom_syntax "(" _ lit_list_items _ ")" {%
+lit_tuple ->
+    lit_tuple_generic {% id %}
+  | lit_tuple_cons {% id %}
+
+lit_tuple_generic -> lit_atom_syntax "(" _ lit_list_items _ ")" {%
   function(d, position, reject) {
     var label = d[0];
     var features = d[3].reduce(function(result, item, index) {
@@ -505,6 +509,32 @@ lit_tuple -> lit_atom_syntax "(" _ lit_list_items _ ")" {%
     return litBuildRecord(label, features);
   }
 %}
+
+lit_tuple_cons -> lit_tuple_cons_item ("#" lit_tuple_cons_item):+ {%
+  function(d) {
+    var label = "#";
+    var featureList = [d[0]].concat(d[1].map(function(item) {
+      return item[1];
+    }));
+    var features = featureList.reduce(function(result, item, index) {
+      result[++index] = item;
+      return result;
+    }, {});
+
+    return litBuildRecord(label, features);
+  }
+%}
+
+lit_tuple_cons_item ->
+    ids_identifier {% id %}
+  | lit_atom {% id %}
+  | lit_boolean {% id %}
+  | lit_string {% id %}
+  | lit_char {% id %}
+  | lit_integer {% id %}
+  | lit_float {% id %}
+  | lit_list {% id %}
+  | lit_procedure {% id %}
 
 ##############################################################################
 # List

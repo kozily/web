@@ -56,4 +56,20 @@ describe("Parsing tuple literals", () => {
       ]),
     );
   });
+
+  it("handles hashed literals", () => {
+    expect(parse("H#T")).toEqual(
+      literalTuple("#", [lexicalIdentifier("H"), lexicalIdentifier("T")]),
+    );
+  });
+
+  it("handles repeated hashed literals", () => {
+    expect(parse("1#2#T")).toEqual(
+      literalTuple("#", [
+        literalNumber(1),
+        literalNumber(2),
+        lexicalIdentifier("T"),
+      ]),
+    );
+  });
 });
