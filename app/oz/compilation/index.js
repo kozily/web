@@ -13,6 +13,7 @@ import exceptionContext from "./exception_context";
 import exceptionRaise from "./exception_raise";
 import cellCreation from "./cell_creation";
 import portCreation from "./port_creation";
+import portSend from "./port_send";
 import thread from "./thread";
 import byNeed from "./by_need";
 import number from "./number";
@@ -38,6 +39,7 @@ export const compilers = {
     [statementSyntaxTypes.byNeedSyntax]: byNeed,
     [statementSyntaxTypes.cellCreationSyntax]: cellCreation,
     [statementSyntaxTypes.portCreationSyntax]: portCreation,
+    [statementSyntaxTypes.portSendSyntax]: portSend,
   },
   literal: {
     [literalTypes.number]: number,

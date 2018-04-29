@@ -17,6 +17,7 @@ import thread from "./thread";
 import byNeed from "./by_need";
 import cellCreation from "./cell_creation";
 import portCreation from "./port_creation";
+import portSend from "./port_send";
 import numberLiteral from "./literals/number";
 import recordLiteral from "./literals/record";
 import procedureLiteral from "./literals/procedure";
@@ -46,6 +47,7 @@ export const printers = {
     [statementTypes.byNeed]: byNeed,
     [statementTypes.cellCreation]: cellCreation,
     [statementTypes.portCreation]: portCreation,
+    [statementTypes.portSend]: portSend,
   },
   literal: {
     [literalTypes.number]: numberLiteral,
