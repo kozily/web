@@ -12,6 +12,7 @@ import procedureApplication from "./procedure_application";
 import exceptionContext from "./exception_context";
 import exceptionRaise from "./exception_raise";
 import cellCreation from "./cell_creation";
+import cellExchange from "./cell_exchange";
 import portCreation from "./port_creation";
 import portSend from "./port_send";
 import nameCreation from "./name_creation";
@@ -39,6 +40,7 @@ export const compilers = {
     [statementSyntaxTypes.threadSyntax]: thread,
     [statementSyntaxTypes.byNeedSyntax]: byNeed,
     [statementSyntaxTypes.cellCreationSyntax]: cellCreation,
+    [statementSyntaxTypes.cellExchangeSyntax]: cellExchange,
     [statementSyntaxTypes.portCreationSyntax]: portCreation,
     [statementSyntaxTypes.portSendSyntax]: portSend,
     [statementSyntaxTypes.nameCreationSyntax]: nameCreation,

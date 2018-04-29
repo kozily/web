@@ -15,6 +15,7 @@ export const statementTypes = {
   thread: "thread",
   byNeed: "byNeed",
   cellCreation: "cellCreation",
+  cellExchange: "cellExchange",
   portCreation: "portCreation",
   portSend: "portSend",
   nameCreation: "nameCreation",
@@ -161,6 +162,16 @@ export const cellCreationStatement = (value, cell) => {
     type: statementTypes.cellCreation,
     value,
     cell,
+  });
+};
+
+export const cellExchangeStatement = (cell, current, next) => {
+  return Immutable.fromJS({
+    node: "statement",
+    type: statementTypes.cellExchange,
+    cell,
+    current,
+    next,
   });
 };
 
