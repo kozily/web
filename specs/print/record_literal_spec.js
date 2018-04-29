@@ -6,6 +6,7 @@ import {
   literalBoolean,
   literalTuple,
   literalList,
+  literalListItem,
   literalNumber,
 } from "../../app/oz/machine/literals";
 import { lexicalIdentifier } from "../../app/oz/machine/lexical";
@@ -59,6 +60,14 @@ describe("Printing a record literal", () => {
 
     expect(result.abbreviated).toEqual("[X 30]");
     expect(result.full).toEqual("[X 30]");
+  });
+
+  it("Returns the appropriate string for list conses", () => {
+    const literal = literalListItem(literalNumber(30), lexicalIdentifier("Y"));
+    const result = print(literal, 2);
+
+    expect(result.abbreviated).toEqual("30|Y");
+    expect(result.full).toEqual("30|Y");
   });
 
   it("Returns the appropriate string for nested recursive structures", () => {

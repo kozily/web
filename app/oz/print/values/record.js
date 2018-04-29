@@ -1,3 +1,5 @@
+import { valueTypes } from "../../machine/values";
+
 const printLabel = label => {
   const unquotedRegex = /^[a-z].*$/;
   if (unquotedRegex.test(label)) {
@@ -61,11 +63,31 @@ const collectListRecordItems = (recurse, label, features) => {
   );
 };
 
-const printListRecord = (recurse, label, features) => {
+const printCompleteListRecord = (recurse, label, features) => {
   const items = collectListRecordItems(recurse, label, features).filter(
     x => !!x,
   );
   return `[${items.join(" ")}]`;
+};
+
+const printConsListRecord = (recurse, label, features) => {
+  const head = printValue(recurse, features.get("1")).abbreviated;
+  const tail = printValue(recurse, features.get("2")).abbreviated;
+
+  return `${head}|${tail}`;
+};
+
+const printListRecord = (recurse, label, features) => {
+  const tail = features.get("2");
+
+  if (
+    tail.get("type") === valueTypes.record &&
+    tail.getIn(["value", "label"]) === "|"
+  ) {
+    return printCompleteListRecord(recurse, label, features);
+  }
+
+  return printConsListRecord(recurse, label, features);
 };
 
 const printTupleRecord = (recurse, label, features) => {

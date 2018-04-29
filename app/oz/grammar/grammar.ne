@@ -89,12 +89,16 @@
     return litBuildRecord(d.toString(), {});
   }
 
+  function litBuildListItem(head, tail) {
+    return litBuildRecord("|", {
+      1: head,
+      2: tail,
+    });
+  }
+
   function litBuildList(items) {
     return items.reduceRight(function(result, item) {
-      return litBuildRecord("|", {
-        1: item,
-        2: result,
-      });
+      return litBuildListItem(item, result);
     }, litBuildRecord("nil", {}));
   }
 
@@ -216,7 +220,7 @@ stm_conditional -> "if" __ exp_expression __ "then" __ stm_sequence __ ("else" _
   }
 %}
 
-stm_pattern_matching -> "case" __ exp_expression __ "of" __ lit_record_like __ "then" __ stm_sequence __ ("[]" __ lit_record_like __ "then" __ stm_sequence __ ):* ("else" __ stm_sequence __):? "end" {%
+stm_pattern_matching -> "case" __ exp_expression __ "of" __ pat_pattern __ "then" __ stm_sequence __ ("[]" __ pat_pattern __ "then" __ stm_sequence __ ):* ("else" __ stm_sequence __):? "end" {%
   function(d, position, reject) {
     const clauses = d[12].reduce(function(result, clause) {
       result.push({
@@ -488,14 +492,6 @@ lit_false_literal -> "false" {%
 %}
 
 ##############################################################################
-# Record-like items
-##############################################################################
-lit_record_like ->
-    lit_record {% id %}
-  | lit_atom {% id %}
-  | lit_boolean {% id %}
-
-##############################################################################
 # Tuple
 ##############################################################################
 
@@ -516,6 +512,7 @@ lit_tuple -> lit_atom_syntax "(" _ lit_list_items _ ")" {%
 lit_list ->
     lit_empty_list {% id %}
   | lit_list_with_items {% id %}
+  | lit_cons_list {% id %}
 
 lit_list_with_items -> "[" _ lit_list_items _ "]" {%
   function(d) {
@@ -540,6 +537,15 @@ lit_list_items ->
 lit_list_item -> (ids_identifier | lit_value) {%
   function(d) {
     return d[0][0];
+  }
+%}
+
+lit_cons_list -> lit_list_item "|" (lit_list | ids_identifier) {%
+  function(d) {
+    return litBuildListItem(
+      d[0],
+      d[2][0]
+    );
   }
 %}
 
@@ -669,6 +675,18 @@ lit_procedure_args ->
       return d[0].concat(d[2])
     }
   %}
+
+
+##############################################################################
+# PAT - PATTERNS
+##############################################################################
+ pat_pattern ->
+    lit_record {% id %}
+  | lit_atom {% id %}
+  | lit_boolean {% id %}
+  | lit_tuple {% id %}
+  | lit_list {% id %}
+
 
 ##############################################################################
 # LIB - UTILITIES

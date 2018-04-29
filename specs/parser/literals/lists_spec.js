@@ -2,7 +2,11 @@ import Immutable from "immutable";
 import { parserFor } from "../../../app/oz/parser";
 import literalGrammar from "../../../app/oz/grammar/literals.ne";
 import { lexicalIdentifier } from "../../../app/oz/machine/lexical";
-import { literalList, literalNumber } from "../../../app/oz/machine/literals";
+import {
+  literalList,
+  literalListItem,
+  literalNumber,
+} from "../../../app/oz/machine/literals";
 
 const parse = parserFor(literalGrammar);
 
@@ -44,6 +48,30 @@ describe("Parsing list literals", () => {
         literalNumber(2),
         literalList([literalNumber(3), literalNumber(4)]),
       ]),
+    );
+  });
+
+  it("handles piped literals", () => {
+    expect(parse("H|T")).toEqual(
+      literalListItem(lexicalIdentifier("H"), lexicalIdentifier("T")),
+    );
+  });
+
+  it("handles repeated piped literals", () => {
+    expect(parse("1|2|T")).toEqual(
+      literalListItem(
+        literalNumber(1),
+        literalListItem(literalNumber(2), lexicalIdentifier("T")),
+      ),
+    );
+  });
+
+  it("handles nested piped literals", () => {
+    expect(parse("1|2|[3]")).toEqual(
+      literalListItem(
+        literalNumber(1),
+        literalListItem(literalNumber(2), literalList([literalNumber(3)])),
+      ),
     );
   });
 });
