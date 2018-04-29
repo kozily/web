@@ -11,6 +11,9 @@ export const RuntimeStacksSemanticStatement = props => {
   const environmentName = "E".concat(
     props.semanticStatement.getIn(["metadata", "environmentIndex"]),
   );
+  const reducedEnvironment = props.showSystemVariables
+    ? environment
+    : environment.filter(value => !value.get("system"));
 
   const item = (
     <Segment attached>
@@ -25,7 +28,7 @@ export const RuntimeStacksSemanticStatement = props => {
       <Header textAlign="center" size="tiny" content="Statement" />
       <pre>{printedStatement.full}</pre>
       <Header textAlign="center" size="tiny" content="Environment" />
-      <Environment environment={environment} />
+      <Environment environment={reducedEnvironment} />
     </Popup>
   );
 };

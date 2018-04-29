@@ -9,7 +9,7 @@ export const initialState = Immutable.fromJS({
   source: "",
   steps: [buildState()],
   currentStep: 0,
-  showSigmaSystemVariables: false,
+  showSystemVariables: false,
   error: null,
 });
 
@@ -38,9 +38,9 @@ export const previous = () => {
   };
 };
 
-export const toggleShowSigmaSystemVariables = () => {
+export const toggleShowSystemVariables = () => {
   return {
-    type: "RUNTIME_TOGGLE_SHOW_SIGMA_SYSTEM_VARIABLES",
+    type: "RUNTIME_TOGGLE_SHOW_SYSTEM_VARIABLES",
   };
 };
 
@@ -97,8 +97,8 @@ export const reducer = (previousState = initialState, action) => {
     case "CHANGE_SOURCE_CODE": {
       return previousState.set("source", action.payload);
     }
-    case "RUNTIME_TOGGLE_SHOW_SIGMA_SYSTEM_VARIABLES": {
-      return previousState.update("showSigmaSystemVariables", value => !value);
+    case "RUNTIME_TOGGLE_SHOW_SYSTEM_VARIABLES": {
+      return previousState.update("showSystemVariables", value => !value);
     }
     default: {
       return previousState;
