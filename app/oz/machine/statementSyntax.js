@@ -16,6 +16,7 @@ export const statementSyntaxTypes = {
   cellCreationSyntax: "cellCreationSyntax",
   portCreationSyntax: "portCreationSyntax",
   portSendSyntax: "portSendSyntax",
+  nameCreationSyntax: "nameCreationSyntax",
 };
 
 export const allStatementSyntaxTypes = Object.keys(statementSyntaxTypes);
@@ -163,5 +164,13 @@ export const portSendStatementSyntax = (port, value) => {
     type: statementSyntaxTypes.portSendSyntax,
     port,
     value,
+  });
+};
+
+export const nameCreationStatementSyntax = name => {
+  return Immutable.fromJS({
+    node: "statement",
+    type: statementSyntaxTypes.nameCreationSyntax,
+    name,
   });
 };

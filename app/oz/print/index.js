@@ -18,6 +18,7 @@ import byNeed from "./by_need";
 import cellCreation from "./cell_creation";
 import portCreation from "./port_creation";
 import portSend from "./port_send";
+import nameCreation from "./name_creation";
 import numberLiteral from "./literals/number";
 import recordLiteral from "./literals/record";
 import procedureLiteral from "./literals/procedure";
@@ -26,6 +27,7 @@ import recordValue from "./values/record";
 import procedureValue from "./values/procedure";
 import builtInValue from "./values/built_in";
 import mutableValue from "./values/mutable";
+import nameCreationValue from "./values/name_creation";
 import literalExpression from "./literal_expression";
 import identifierExpression from "./identifier_expression";
 import operatorExpression from "./operator_expression";
@@ -48,6 +50,7 @@ export const printers = {
     [statementTypes.cellCreation]: cellCreation,
     [statementTypes.portCreation]: portCreation,
     [statementTypes.portSend]: portSend,
+    [statementTypes.nameCreation]: nameCreation,
   },
   literal: {
     [literalTypes.number]: numberLiteral,
@@ -60,6 +63,7 @@ export const printers = {
     [valueTypes.procedure]: procedureValue,
     [valueTypes.builtIn]: builtInValue,
     [valueTypes.mutable]: mutableValue,
+    [valueTypes.nameCreation]: nameCreationValue,
   },
   expression: {
     [expressionTypes.literal]: literalExpression,

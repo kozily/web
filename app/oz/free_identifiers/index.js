@@ -18,6 +18,7 @@ import byNeed from "./by_need";
 import cellCreation from "./cell_creation";
 import portCreation from "./port_creation";
 import portSend from "./port_send";
+import nameCreation from "./name_creation";
 import number from "./number";
 import record from "./record";
 import procedure from "./procedure";
@@ -43,6 +44,7 @@ export const collectors = {
     [statementTypes.cellCreation]: cellCreation,
     [statementTypes.portCreation]: portCreation,
     [statementTypes.portSend]: portSend,
+    [statementTypes.nameCreation]: nameCreation,
   },
   literal: {
     [literalTypes.number]: number,
