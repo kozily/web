@@ -11,12 +11,12 @@ export default (recurse, node, identation) => {
     .map((variable, identifier) =>
       identifier.concat("->", variable.get("name"), variable.get("sequence")),
     )
-    .join(",");
+    .join(", ");
   const fullBody = recurse(value.get("body"), identation + 2).full;
   const abbreviatedBody = recurse(value.get("body")).abbreviated;
 
   return {
-    abbreviated: `proc {$ ${printedArgs}} ${abbreviatedBody} end`,
+    abbreviated: `proc {$ ${printedArgs}} ${abbreviatedBody} end, {${printedContext}}`,
     full: `proc {$ ${printedArgs}}\n${fullBody}\n${ident}end, {${printedContext}}`,
   };
 };
