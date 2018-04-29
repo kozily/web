@@ -12,6 +12,7 @@ import procedureApplication from "./procedure_application";
 import exceptionContext from "./exception_context";
 import exceptionRaise from "./exception_raise";
 import cellCreation from "./cell_creation";
+import portCreation from "./port_creation";
 import thread from "./thread";
 import byNeed from "./by_need";
 import number from "./number";
@@ -36,6 +37,7 @@ export const compilers = {
     [statementSyntaxTypes.threadSyntax]: thread,
     [statementSyntaxTypes.byNeedSyntax]: byNeed,
     [statementSyntaxTypes.cellCreationSyntax]: cellCreation,
+    [statementSyntaxTypes.portCreationSyntax]: portCreation,
   },
   literal: {
     [literalTypes.number]: number,
