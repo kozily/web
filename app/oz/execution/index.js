@@ -14,6 +14,7 @@ import thread from "./thread";
 import byNeed from "./by_need";
 import cellCreation from "./cell_creation";
 import portCreation from "./port_creation";
+import portSend from "./port_send";
 
 export const executors = {
   statement: {
@@ -32,6 +33,7 @@ export const executors = {
     [statementTypes.byNeed]: byNeed,
     [statementTypes.cellCreation]: cellCreation,
     [statementTypes.portCreation]: portCreation,
+    [statementTypes.portSend]: portSend,
   },
 };
 

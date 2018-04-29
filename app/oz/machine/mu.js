@@ -1,3 +1,4 @@
+import Immutable from "immutable";
 import { valueMutableVariable } from "./values";
 
 export const makeNewMutableVariable = ({ in: mu, for: kind }) => {
@@ -11,4 +12,15 @@ export const makeNewMutableVariable = ({ in: mu, for: kind }) => {
   }
 
   return valueMutableVariable(kind, currentMaximumVariable + 1);
+};
+
+export const lookupMutableMapping = (mu, variable) => {
+  return mu.find(mapping =>
+    Immutable.is(mapping.get("mutableVariable"), variable),
+  );
+};
+
+export const updateMutableMapping = (mu, mapping) => {
+  const oldMapping = lookupMutableMapping(mu, mapping.get("mutableVariable"));
+  return mu.delete(oldMapping).add(mapping);
 };
