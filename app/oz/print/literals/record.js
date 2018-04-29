@@ -90,14 +90,30 @@ const printListRecord = (recurse, label, features) => {
   return printConsListRecord(recurse, label, features);
 };
 
-const printTupleRecord = (recurse, label, features) => {
+const printConsTupleRecord = (recurse, label, features) => {
+  return features
+    .entrySeq()
+    .sortBy(entry => parseInt(entry[0], 10))
+    .map(entry => printValue(recurse, entry[1]).abbreviated)
+    .join("#");
+};
+
+const printGenericTupleRecord = (recurse, label, features) => {
   const printedFeatures = features
     .entrySeq()
-    .sortBy(entry => parseInt(entry[0]))
-    .map(entry => `${printValue(recurse, entry[1]).abbreviated}`)
+    .sortBy(entry => parseInt(entry[0], 10))
+    .map(entry => printValue(recurse, entry[1]).abbreviated)
     .join(" ");
 
   return `${printLabel(label)}(${printedFeatures})`;
+};
+
+const printTupleRecord = (recurse, label, features) => {
+  if (label === "#") {
+    return printConsTupleRecord(recurse, label, features);
+  }
+
+  return printGenericTupleRecord(recurse, label, features);
 };
 
 export default (recurse, node) => {

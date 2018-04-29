@@ -54,6 +54,18 @@ describe("Printing a record value", () => {
     expect(result.full).toEqual("person(1:x0 2:30)");
   });
 
+  it("Returns the appropriate string for cons tuples", () => {
+    const value = valueTuple("#", [
+      buildVariable("x", 0),
+      valueNumber(30),
+      valueNumber(35),
+    ]);
+    const result = print(value, 2);
+
+    expect(result.abbreviated).toEqual("x0#30#35");
+    expect(result.full).toEqual("'#'(1:x0 2:30 3:35)");
+  });
+
   it("Returns the appropriate string for lists", () => {
     const value = valueList([buildVariable("x", 0), valueNumber(30)]);
     const result = print(value, 2);
