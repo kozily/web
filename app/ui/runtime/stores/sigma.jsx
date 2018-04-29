@@ -1,5 +1,5 @@
 import React from "react";
-import { Menu, Table, Popup, Dropdown } from "semantic-ui-react";
+import { Menu, Table, Popup } from "semantic-ui-react";
 import EquivalenceClass from "./equivalence_class";
 import Code from "../code";
 import { print } from "../../../oz/print";
@@ -29,8 +29,6 @@ export const RuntimeStoreRow = props => {
 };
 
 export const RuntimeStoresSigma = props => {
-  const showHide = props.showSystemVariables ? "Hide" : "Show";
-  const showHideMessage = `${showHide} system variables`;
   const equivalenceClasses = props.showSystemVariables
     ? props.store
     : props.store.filter(ec => ec.get("variables").some(v => !v.get("system")));
@@ -40,16 +38,6 @@ export const RuntimeStoresSigma = props => {
     <div>
       <Menu borderless attached="top" size="tiny">
         <Menu.Item header content={"Immutable (\u03c3)"} />
-        <Menu.Menu position="right">
-          <Dropdown item icon="ellipsis vertical">
-            <Dropdown.Menu>
-              <Dropdown.Item
-                content={showHideMessage}
-                onClick={props.onToggleShowSystemVariables}
-              />
-            </Dropdown.Menu>
-          </Dropdown>
-        </Menu.Menu>
       </Menu>
       <Table attached selectable compact>
         <Table.Header>

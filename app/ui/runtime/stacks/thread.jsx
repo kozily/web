@@ -52,14 +52,24 @@ export const RuntimeStacksThread = props => {
         </Menu>
       ) : null}
       {stack.map((semanticStatement, index) => (
-        <SemanticStatement key={index} semanticStatement={semanticStatement} />
+        <SemanticStatement
+          key={index}
+          semanticStatement={semanticStatement}
+          showSystemVariables={props.showSystemVariables}
+        />
       ))}
     </div>
   );
 };
 
+const mapStateToProps = state => ({
+  showSystemVariables: state.getIn(["runtime", "showSystemVariables"]),
+});
+
 const mapDispatchToProps = dispatch => ({
   onNext: index => dispatch(next(index)),
 });
 
-export default connect(undefined, mapDispatchToProps)(RuntimeStacksThread);
+export default connect(mapStateToProps, mapDispatchToProps)(
+  RuntimeStacksThread,
+);

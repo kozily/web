@@ -4,7 +4,6 @@ import { connect } from "react-redux";
 import Sigma from "./sigma";
 import Tau from "./tau";
 import Mu from "./mu";
-import { toggleShowSigmaSystemVariables } from "../../../state/runtime";
 
 export const RuntimeStores = props => {
   const sigma = props.machineState.get("sigma");
@@ -18,10 +17,7 @@ export const RuntimeStores = props => {
         <Grid.Column>
           <Sigma
             store={sigma}
-            showSystemVariables={props.showSigmaSystemVariables}
-            onToggleShowSystemVariables={() =>
-              props.onToggleShowSigmaSystemVariable()
-            }
+            showSystemVariables={props.showSystemVariables}
           />
         </Grid.Column>
         <Grid.Column>
@@ -41,15 +37,7 @@ const mapStateToProps = state => ({
     "steps",
     state.getIn(["runtime", "currentStep"]),
   ]),
-  showSigmaSystemVariables: state.getIn([
-    "runtime",
-    "showSigmaSystemVariables",
-  ]),
+  showSystemVariables: state.getIn(["runtime", "showSystemVariables"]),
 });
 
-const mapDispatchToProps = dispatch => ({
-  onToggleShowSigmaSystemVariable: () =>
-    dispatch(toggleShowSigmaSystemVariables()),
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(RuntimeStores);
+export default connect(mapStateToProps)(RuntimeStores);
