@@ -14,6 +14,7 @@ import exceptionRaise from "./exception_raise";
 import cellCreation from "./cell_creation";
 import portCreation from "./port_creation";
 import portSend from "./port_send";
+import nameCreation from "./name_creation";
 import thread from "./thread";
 import byNeed from "./by_need";
 import number from "./number";
@@ -40,6 +41,7 @@ export const compilers = {
     [statementSyntaxTypes.cellCreationSyntax]: cellCreation,
     [statementSyntaxTypes.portCreationSyntax]: portCreation,
     [statementSyntaxTypes.portSendSyntax]: portSend,
+    [statementSyntaxTypes.nameCreationSyntax]: nameCreation,
   },
   literal: {
     [literalTypes.number]: number,

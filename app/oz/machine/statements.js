@@ -17,6 +17,7 @@ export const statementTypes = {
   cellCreation: "cellCreation",
   portCreation: "portCreation",
   portSend: "portSend",
+  nameCreation: "nameCreation",
 };
 
 export const allStatementTypes = Object.keys(statementTypes);
@@ -178,5 +179,13 @@ export const portSendStatement = (port, value) => {
     type: statementTypes.portSend,
     port,
     value,
+  });
+};
+
+export const nameCreationStatement = name => {
+  return Immutable.fromJS({
+    node: "statement",
+    type: statementTypes.nameCreation,
+    name,
   });
 };

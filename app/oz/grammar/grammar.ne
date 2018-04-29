@@ -11,6 +11,7 @@
     "NewCell",
     "NewPort",
     "Send",
+    "NewName",
   ];
 
   LIT_KEYWORDS = [
@@ -158,6 +159,7 @@ stm_simple ->
   | stm_cell_creation {% id %}
   | stm_port_creation {% id %}
   | stm_port_send {% id %}
+  | stm_name_creation {% id %}
 
 stm_skip -> "skip" {%
   function (d) {
@@ -340,6 +342,16 @@ stm_port_send -> "{" _ "Send" __ exp_expression __ exp_expression _ "}" {%
       type: "portSendSyntax",
       port: d[4],
       value: d[6],
+    };
+  }
+%}
+
+stm_name_creation-> "{" _ "NewName" __ ids_identifier _ "}" {%
+  function(d) {
+    return {
+      node: "statement",
+      type: "nameCreationSyntax",
+      name: d[4],
     };
   }
 %}
