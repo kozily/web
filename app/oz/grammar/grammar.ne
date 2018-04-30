@@ -1,4 +1,3 @@
-@builtin "whitespace.ne"
 @builtin "postprocessors.ne"
 
 ##############################################################################
@@ -77,7 +76,7 @@
   function idsBuildIdentifier(d) {
     return {
       node: "identifier",
-      identifier: d[0],
+      identifier: d[1],
     };
   }
 
@@ -414,7 +413,7 @@ exp_terminal_paren -> "(" _ exp_expression _ ")" {% nth(2) %}
 # IDS - IDENTIFIERS
 ##############################################################################
 ids_identifier ->
-    ids_identifier_syntax {% idsBuildIdentifier %}
+   "?":? ids_identifier_syntax {% idsBuildIdentifier %}
 
 ids_identifier_syntax ->
     ids_identifier_unquoted {% id %}
@@ -758,6 +757,19 @@ lit_procedure_args ->
 ##############################################################################
 # LIB - UTILITIES
 ##############################################################################
+whitespace -> wschar | comment
+
+_ -> whitespace:* {% function(d) {return null;} %}
+__ -> whitespace:+ {% function(d) {return null;} %}
+
+wschar -> [ \t\n\v\f\r] {% id %}
+
+comment -> inline_comment | nested_comment
+
+inline_comment -> "%" [^\n\r]:* [\n\r] {% function (d) { return null; } %}
+
+nested_comment -> "/*" [^\*/]:* "*/" {% function (d) { return null; } %}
+
 lib_pseudo_char ->
     lib_octal_char {% id %}
   | lib_hexal_char {% id %}
