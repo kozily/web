@@ -22,8 +22,14 @@ describe("Collecting free identifiers in a conditional statement", () => {
         identifierExpression(lexicalIdentifier("P")),
         identifierExpression(lexicalIdentifier("Q")),
       ),
-      bindingStatement(lexicalIdentifier("A"), lexicalIdentifier("B")),
-      bindingStatement(lexicalIdentifier("X"), lexicalIdentifier("Y")),
+      bindingStatement(
+        identifierExpression(lexicalIdentifier("A")),
+        identifierExpression(lexicalIdentifier("B")),
+      ),
+      bindingStatement(
+        identifierExpression(lexicalIdentifier("X")),
+        identifierExpression(lexicalIdentifier("Y")),
+      ),
     );
 
     expect(collectFreeIdentifiers(statement)).toEqual(

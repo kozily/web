@@ -20,8 +20,14 @@ describe("Printing a pattern matching statement", () => {
         age: lexicalIdentifier("A"),
         name: lexicalIdentifier("N"),
       }),
-      bindingStatement(lexicalIdentifier("Y"), lexicalIdentifier("A")),
-      bindingStatement(lexicalIdentifier("Z"), lexicalIdentifier("N")),
+      bindingStatement(
+        identifierExpression(lexicalIdentifier("Y")),
+        identifierExpression(lexicalIdentifier("A")),
+      ),
+      bindingStatement(
+        identifierExpression(lexicalIdentifier("Z")),
+        identifierExpression(lexicalIdentifier("N")),
+      ),
     );
     const result = print(statement, 2);
 

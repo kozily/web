@@ -5,6 +5,7 @@ import {
   bindingStatement,
 } from "../../app/oz/machine/statements";
 import { lexicalIdentifier } from "../../app/oz/machine/lexical";
+import { identifierExpression } from "../../app/oz/machine/expressions";
 
 describe("Collecting free identifiers in a sequence statement", () => {
   beforeEach(() => {
@@ -13,8 +14,14 @@ describe("Collecting free identifiers in a sequence statement", () => {
 
   it("collects all identifiers from all substatements", () => {
     const statement = sequenceStatement(
-      bindingStatement(lexicalIdentifier("A"), lexicalIdentifier("B")),
-      bindingStatement(lexicalIdentifier("X"), lexicalIdentifier("Y")),
+      bindingStatement(
+        identifierExpression(lexicalIdentifier("A")),
+        identifierExpression(lexicalIdentifier("B")),
+      ),
+      bindingStatement(
+        identifierExpression(lexicalIdentifier("X")),
+        identifierExpression(lexicalIdentifier("Y")),
+      ),
     );
 
     expect(collectFreeIdentifiers(statement)).toEqual(

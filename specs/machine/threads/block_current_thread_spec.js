@@ -4,6 +4,7 @@ import {
   bindingStatement,
 } from "../../../app/oz/machine/statements";
 import { lexicalIdentifier } from "../../../app/oz/machine/lexical";
+import { identifierExpression } from "../../../app/oz/machine/expressions";
 import {
   threadStatus,
   buildState,
@@ -26,7 +27,10 @@ describe("threads#blockCurrentThread", () => {
         buildThread({
           semanticStatements: [
             buildSemanticStatement(
-              bindingStatement(lexicalIdentifier("X"), lexicalIdentifier("Y")),
+              bindingStatement(
+                identifierExpression(lexicalIdentifier("X")),
+                identifierExpression(lexicalIdentifier("Y")),
+              ),
               buildEnvironment({
                 X: buildVariable("x", 0),
                 Y: buildVariable("y", 0),
@@ -37,7 +41,10 @@ describe("threads#blockCurrentThread", () => {
         buildThread({
           semanticStatements: [
             buildSemanticStatement(
-              bindingStatement(lexicalIdentifier("A"), lexicalIdentifier("B")),
+              bindingStatement(
+                identifierExpression(lexicalIdentifier("A")),
+                identifierExpression(lexicalIdentifier("B")),
+              ),
               buildEnvironment({
                 A: buildVariable("x", 0),
                 B: buildVariable("y", 0),
@@ -69,8 +76,8 @@ describe("threads#blockCurrentThread", () => {
             semanticStatements: [
               buildSemanticStatement(
                 bindingStatement(
-                  lexicalIdentifier("X"),
-                  lexicalIdentifier("Y"),
+                  identifierExpression(lexicalIdentifier("X")),
+                  identifierExpression(lexicalIdentifier("Y")),
                 ),
                 buildEnvironment({
                   X: buildVariable("x", 0),
@@ -84,8 +91,8 @@ describe("threads#blockCurrentThread", () => {
               blockingStatement,
               buildSemanticStatement(
                 bindingStatement(
-                  lexicalIdentifier("A"),
-                  lexicalIdentifier("B"),
+                  identifierExpression(lexicalIdentifier("A")),
+                  identifierExpression(lexicalIdentifier("B")),
                 ),
                 buildEnvironment({
                   A: buildVariable("x", 0),

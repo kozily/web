@@ -11,6 +11,7 @@ import {
   buildVariable,
 } from "../../app/oz/machine/build";
 import { lexicalIdentifier } from "../../app/oz/machine/lexical";
+import { identifierExpression } from "../../app/oz/machine/expressions";
 import reduce from "../../app/oz/execution/sequence";
 
 describe("Reducing sequence statements", () => {
@@ -29,8 +30,14 @@ describe("Reducing sequence statements", () => {
 
     const statement = buildSemanticStatement(
       sequenceStatement(
-        bindingStatement(lexicalIdentifier("A"), lexicalIdentifier("B")),
-        bindingStatement(lexicalIdentifier("C"), lexicalIdentifier("D")),
+        bindingStatement(
+          identifierExpression(lexicalIdentifier("A")),
+          identifierExpression(lexicalIdentifier("B")),
+        ),
+        bindingStatement(
+          identifierExpression(lexicalIdentifier("C")),
+          identifierExpression(lexicalIdentifier("D")),
+        ),
       ),
       sharedEnvironment,
     );
@@ -39,11 +46,17 @@ describe("Reducing sequence statements", () => {
       buildSingleThreadedState({
         semanticStatements: [
           buildSemanticStatement(
-            bindingStatement(lexicalIdentifier("A"), lexicalIdentifier("B")),
+            bindingStatement(
+              identifierExpression(lexicalIdentifier("A")),
+              identifierExpression(lexicalIdentifier("B")),
+            ),
             sharedEnvironment,
           ),
           buildSemanticStatement(
-            bindingStatement(lexicalIdentifier("C"), lexicalIdentifier("D")),
+            bindingStatement(
+              identifierExpression(lexicalIdentifier("C")),
+              identifierExpression(lexicalIdentifier("D")),
+            ),
             sharedEnvironment,
           ),
           buildSemanticStatement(skipStatement()),
@@ -63,12 +76,24 @@ describe("Reducing sequence statements", () => {
 
     const statement = buildSemanticStatement(
       sequenceStatement(
-        bindingStatement(lexicalIdentifier("A"), lexicalIdentifier("B")),
+        bindingStatement(
+          identifierExpression(lexicalIdentifier("A")),
+          identifierExpression(lexicalIdentifier("B")),
+        ),
         sequenceStatement(
-          bindingStatement(lexicalIdentifier("B"), lexicalIdentifier("C")),
+          bindingStatement(
+            identifierExpression(lexicalIdentifier("B")),
+            identifierExpression(lexicalIdentifier("C")),
+          ),
           sequenceStatement(
-            bindingStatement(lexicalIdentifier("C"), lexicalIdentifier("D")),
-            bindingStatement(lexicalIdentifier("D"), lexicalIdentifier("E")),
+            bindingStatement(
+              identifierExpression(lexicalIdentifier("C")),
+              identifierExpression(lexicalIdentifier("D")),
+            ),
+            bindingStatement(
+              identifierExpression(lexicalIdentifier("D")),
+              identifierExpression(lexicalIdentifier("E")),
+            ),
           ),
         ),
       ),
@@ -79,19 +104,31 @@ describe("Reducing sequence statements", () => {
       buildSingleThreadedState({
         semanticStatements: [
           buildSemanticStatement(
-            bindingStatement(lexicalIdentifier("A"), lexicalIdentifier("B")),
+            bindingStatement(
+              identifierExpression(lexicalIdentifier("A")),
+              identifierExpression(lexicalIdentifier("B")),
+            ),
             sharedEnvironment,
           ),
           buildSemanticStatement(
-            bindingStatement(lexicalIdentifier("B"), lexicalIdentifier("C")),
+            bindingStatement(
+              identifierExpression(lexicalIdentifier("B")),
+              identifierExpression(lexicalIdentifier("C")),
+            ),
             sharedEnvironment,
           ),
           buildSemanticStatement(
-            bindingStatement(lexicalIdentifier("C"), lexicalIdentifier("D")),
+            bindingStatement(
+              identifierExpression(lexicalIdentifier("C")),
+              identifierExpression(lexicalIdentifier("D")),
+            ),
             sharedEnvironment,
           ),
           buildSemanticStatement(
-            bindingStatement(lexicalIdentifier("D"), lexicalIdentifier("E")),
+            bindingStatement(
+              identifierExpression(lexicalIdentifier("D")),
+              identifierExpression(lexicalIdentifier("E")),
+            ),
             sharedEnvironment,
           ),
           buildSemanticStatement(skipStatement()),
@@ -115,8 +152,14 @@ describe("Reducing sequence statements", () => {
 
     const statement = buildSemanticStatement(
       sequenceStatement(
-        bindingStatement(lexicalIdentifier("A"), lexicalIdentifier("B")),
-        bindingStatement(lexicalIdentifier("C"), lexicalIdentifier("D")),
+        bindingStatement(
+          identifierExpression(lexicalIdentifier("A")),
+          identifierExpression(lexicalIdentifier("B")),
+        ),
+        bindingStatement(
+          identifierExpression(lexicalIdentifier("C")),
+          identifierExpression(lexicalIdentifier("D")),
+        ),
       ),
       sharedEnvironment,
       { environmentIndex: 0 },
@@ -126,12 +169,18 @@ describe("Reducing sequence statements", () => {
       buildSingleThreadedState({
         semanticStatements: [
           buildSemanticStatement(
-            bindingStatement(lexicalIdentifier("A"), lexicalIdentifier("B")),
+            bindingStatement(
+              identifierExpression(lexicalIdentifier("A")),
+              identifierExpression(lexicalIdentifier("B")),
+            ),
             sharedEnvironment,
             { environmentIndex: 0 },
           ),
           buildSemanticStatement(
-            bindingStatement(lexicalIdentifier("C"), lexicalIdentifier("D")),
+            bindingStatement(
+              identifierExpression(lexicalIdentifier("C")),
+              identifierExpression(lexicalIdentifier("D")),
+            ),
             sharedEnvironment,
             { environmentIndex: 0 },
           ),

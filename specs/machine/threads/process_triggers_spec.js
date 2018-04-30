@@ -1,11 +1,14 @@
 import Immutable from "immutable";
 import {
   skipStatement,
-  valueCreationStatement,
+  bindingStatement,
   procedureApplicationStatement,
 } from "../../../app/oz/machine/statements";
 import { lexicalIdentifier } from "../../../app/oz/machine/lexical";
-import { identifierExpression } from "../../../app/oz/machine/expressions";
+import {
+  identifierExpression,
+  literalExpression,
+} from "../../../app/oz/machine/expressions";
 import { literalNumber } from "../../../app/oz/machine/literals";
 import { valueProcedure, valueNumber } from "../../../app/oz/machine/values";
 import {
@@ -46,7 +49,10 @@ describe("threads#processTriggers", () => {
         buildEquivalenceClass(
           valueProcedure(
             [lexicalIdentifier("O")],
-            valueCreationStatement(lexicalIdentifier("O"), literalNumber(3)),
+            bindingStatement(
+              identifierExpression(lexicalIdentifier("O")),
+              literalExpression(literalNumber(3)),
+            ),
           ),
           buildVariable("p", 0),
         ),
@@ -72,7 +78,10 @@ describe("threads#processTriggers", () => {
         buildEquivalenceClass(
           valueProcedure(
             [lexicalIdentifier("O")],
-            valueCreationStatement(lexicalIdentifier("O"), literalNumber(3)),
+            bindingStatement(
+              identifierExpression(lexicalIdentifier("O")),
+              literalExpression(literalNumber(3)),
+            ),
           ),
           buildVariable("p", 0),
         ),
@@ -131,7 +140,10 @@ describe("threads#processTriggers", () => {
         buildEquivalenceClass(
           valueProcedure(
             [lexicalIdentifier("O")],
-            valueCreationStatement(lexicalIdentifier("O"), literalNumber(3)),
+            bindingStatement(
+              identifierExpression(lexicalIdentifier("O")),
+              literalExpression(literalNumber(3)),
+            ),
           ),
           buildVariable("p", 0),
         ),

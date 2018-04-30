@@ -5,7 +5,6 @@ export const statementTypes = {
   sequence: "sequence",
   local: "local",
   binding: "binding",
-  valueCreation: "valueCreation",
   conditional: "conditional",
   patternMatching: "patternMatching",
   procedureApplication: "procedureApplication",
@@ -52,15 +51,6 @@ export const bindingStatement = (lhs, rhs) => {
   return Immutable.Map({
     node: "statement",
     type: statementTypes.binding,
-    lhs,
-    rhs,
-  });
-};
-
-export const valueCreationStatement = (lhs, rhs) => {
-  return Immutable.Map({
-    node: "statement",
-    type: statementTypes.valueCreation,
     lhs,
     rhs,
   });

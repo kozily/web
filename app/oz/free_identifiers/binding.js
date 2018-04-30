@@ -1,8 +1,6 @@
-import Immutable from "immutable";
-
 export default (recurse, statement) => {
-  return Immutable.Set([
-    statement.getIn(["lhs", "identifier"]),
-    statement.getIn(["rhs", "identifier"]),
-  ]);
+  const lhsIdentifiers = recurse(statement.get("lhs"));
+  const rhsIdentifiers = recurse(statement.get("rhs"));
+
+  return lhsIdentifiers.union(rhsIdentifiers);
 };

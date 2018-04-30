@@ -48,22 +48,22 @@ describe("Compiling patternMatching statements", () => {
         {
           pattern: literalRecord("person"),
           statement: bindingStatementSyntax(
-            lexicalIdentifier("A"),
-            lexicalIdentifier("B"),
+            identifierExpression(lexicalIdentifier("A")),
+            identifierExpression(lexicalIdentifier("B")),
           ),
         },
         {
           pattern: literalRecord("animal"),
           statement: bindingStatementSyntax(
-            lexicalIdentifier("B"),
-            lexicalIdentifier("C"),
+            identifierExpression(lexicalIdentifier("B")),
+            identifierExpression(lexicalIdentifier("C")),
           ),
         },
         {
           pattern: literalRecord("mineral"),
           statement: bindingStatementSyntax(
-            lexicalIdentifier("C"),
-            lexicalIdentifier("D"),
+            identifierExpression(lexicalIdentifier("C")),
+            identifierExpression(lexicalIdentifier("D")),
           ),
         },
       ],
@@ -74,15 +74,24 @@ describe("Compiling patternMatching statements", () => {
       patternMatchingStatement(
         identifierExpression(lexicalIdentifier("X")),
         literalRecord("person"),
-        bindingStatement(lexicalIdentifier("A"), lexicalIdentifier("B")),
+        bindingStatement(
+          identifierExpression(lexicalIdentifier("A")),
+          identifierExpression(lexicalIdentifier("B")),
+        ),
         patternMatchingStatement(
           identifierExpression(lexicalIdentifier("X")),
           literalRecord("animal"),
-          bindingStatement(lexicalIdentifier("B"), lexicalIdentifier("C")),
+          bindingStatement(
+            identifierExpression(lexicalIdentifier("B")),
+            identifierExpression(lexicalIdentifier("C")),
+          ),
           patternMatchingStatement(
             identifierExpression(lexicalIdentifier("X")),
             literalRecord("mineral"),
-            bindingStatement(lexicalIdentifier("C"), lexicalIdentifier("D")),
+            bindingStatement(
+              identifierExpression(lexicalIdentifier("C")),
+              identifierExpression(lexicalIdentifier("D")),
+            ),
             skipStatement(),
           ),
         ),
@@ -97,8 +106,8 @@ describe("Compiling patternMatching statements", () => {
         {
           pattern: literalRecord("person"),
           statement: bindingStatementSyntax(
-            lexicalIdentifier("A"),
-            lexicalIdentifier("B"),
+            identifierExpression(lexicalIdentifier("A")),
+            identifierExpression(lexicalIdentifier("B")),
           ),
         },
       ],
@@ -108,7 +117,10 @@ describe("Compiling patternMatching statements", () => {
       patternMatchingStatement(
         identifierExpression(lexicalIdentifier("X")),
         literalRecord("person"),
-        bindingStatement(lexicalIdentifier("A"), lexicalIdentifier("B")),
+        bindingStatement(
+          identifierExpression(lexicalIdentifier("A")),
+          identifierExpression(lexicalIdentifier("B")),
+        ),
         skipStatement(),
       ),
     );

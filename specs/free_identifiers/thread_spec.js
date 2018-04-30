@@ -5,6 +5,7 @@ import {
   bindingStatement,
 } from "../../app/oz/machine/statements";
 import { lexicalIdentifier } from "../../app/oz/machine/lexical";
+import { identifierExpression } from "../../app/oz/machine/expressions";
 
 describe("Collecting free identifiers in a thread statement", () => {
   beforeEach(() => {
@@ -13,7 +14,10 @@ describe("Collecting free identifiers in a thread statement", () => {
 
   it("collects all identifiers from substatements", () => {
     const statement = threadStatement(
-      bindingStatement(lexicalIdentifier("X"), lexicalIdentifier("Y")),
+      bindingStatement(
+        identifierExpression(lexicalIdentifier("X")),
+        identifierExpression(lexicalIdentifier("Y")),
+      ),
     );
 
     expect(collectFreeIdentifiers(statement)).toEqual(

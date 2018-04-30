@@ -1,12 +1,12 @@
 import Immutable from "immutable";
 import { print } from "../../app/oz/print";
-import { identifierExpression } from "../../app/oz/machine/expressions";
 import {
   conditionalStatement,
   skipStatement,
   bindingStatement,
 } from "../../app/oz/machine/statements";
 import { lexicalIdentifier } from "../../app/oz/machine/lexical";
+import { identifierExpression } from "../../app/oz/machine/expressions";
 
 describe("Printing a conditional statement", () => {
   beforeEach(() => {
@@ -17,7 +17,10 @@ describe("Printing a conditional statement", () => {
     const statement = conditionalStatement(
       identifierExpression(lexicalIdentifier("Variable")),
       skipStatement(),
-      bindingStatement(lexicalIdentifier("X"), lexicalIdentifier("Y")),
+      bindingStatement(
+        identifierExpression(lexicalIdentifier("X")),
+        identifierExpression(lexicalIdentifier("Y")),
+      ),
     );
     const result = print(statement, 2);
 

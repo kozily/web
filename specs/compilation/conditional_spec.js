@@ -37,13 +37,19 @@ describe("Compiling conditional statements", () => {
   it("compiles appropriately conditionals without else", () => {
     const statement = conditionalStatementSyntax(
       identifierExpression(lexicalIdentifier("X")),
-      bindingStatementSyntax(lexicalIdentifier("A"), lexicalIdentifier("B")),
+      bindingStatementSyntax(
+        identifierExpression(lexicalIdentifier("A")),
+        identifierExpression(lexicalIdentifier("B")),
+      ),
     );
 
     expect(compile(statement)).toEqual(
       conditionalStatement(
         identifierExpression(lexicalIdentifier("X")),
-        bindingStatement(lexicalIdentifier("A"), lexicalIdentifier("B")),
+        bindingStatement(
+          identifierExpression(lexicalIdentifier("A")),
+          identifierExpression(lexicalIdentifier("B")),
+        ),
         skipStatement(),
       ),
     );

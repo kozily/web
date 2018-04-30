@@ -5,6 +5,7 @@ import {
   bindingStatement,
 } from "../../app/oz/machine/statements";
 import { lexicalIdentifier } from "../../app/oz/machine/lexical";
+import { identifierExpression } from "../../app/oz/machine/expressions";
 
 describe("Collecting free identifiers in a catch statement", () => {
   beforeEach(() => {
@@ -14,7 +15,10 @@ describe("Collecting free identifiers in a catch statement", () => {
   it("collects substatement identifiers except for the exception identifier", () => {
     const statement = exceptionCatchStatement(
       lexicalIdentifier("X"),
-      bindingStatement(lexicalIdentifier("A"), lexicalIdentifier("X")),
+      bindingStatement(
+        identifierExpression(lexicalIdentifier("A")),
+        identifierExpression(lexicalIdentifier("X")),
+      ),
     );
     expect(collectFreeIdentifiers(statement)).toEqual(Immutable.Set(["A"]));
   });

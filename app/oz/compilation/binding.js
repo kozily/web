@@ -1,5 +1,7 @@
-import { statementTypes } from "../machine/statements";
+import { bindingStatement } from "../machine/statements";
 
 export default (recurse, node) => {
-  return node.set("type", statementTypes.binding);
+  const lhs = recurse(node.get("lhs"));
+  const rhs = recurse(node.get("rhs"));
+  return bindingStatement(lhs, rhs);
 };

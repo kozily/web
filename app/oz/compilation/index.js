@@ -6,7 +6,6 @@ import binding from "./binding";
 import sequence from "./sequence";
 import conditional from "./conditional";
 import local from "./local";
-import valueCreation from "./value_creation";
 import patternMatching from "./pattern_matching";
 import procedureApplication from "./procedure_application";
 import exceptionContext from "./exception_context";
@@ -32,7 +31,6 @@ export const compilers = {
     [statementSyntaxTypes.sequenceSyntax]: sequence,
     [statementSyntaxTypes.conditionalSyntax]: conditional,
     [statementSyntaxTypes.localSyntax]: local,
-    [statementSyntaxTypes.valueCreationSyntax]: valueCreation,
     [statementSyntaxTypes.patternMatchingSyntax]: patternMatching,
     [statementSyntaxTypes.procedureApplicationSyntax]: procedureApplication,
     [statementSyntaxTypes.exceptionContextSyntax]: exceptionContext,

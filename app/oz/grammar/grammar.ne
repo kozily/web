@@ -149,7 +149,6 @@ stm_simple ->
     stm_skip {% id %}
   | stm_local {% id %}
   | stm_binding {% id %}
-  | stm_value_creation {% id %}
   | stm_conditional {% id %}
   | stm_pattern_matching {% id %}
   | stm_procedure_application {% id %}
@@ -191,25 +190,11 @@ stm_local_identifier_list ->
     }
   %}
 
-stm_binding -> ids_identifier _ "=" _ ids_identifier {%
+stm_binding -> exp_expression _ "=" _ exp_expression {%
   function(d, position, reject) {
     return {
       node: "statement",
       type: "bindingSyntax",
-      lhs: d[0],
-      rhs: d[4],
-    };
-  }
-%}
-
-stm_value_creation -> ids_identifier _ "=" _ exp_expression {%
-  function(d, position, reject) {
-    if (d[4].type === "identifier") {
-      return reject;
-    }
-    return {
-      node: "statement",
-      type: "valueCreationSyntax",
       lhs: d[0],
       rhs: d[4],
     };

@@ -7,7 +7,6 @@ import binding from "./binding";
 import sequence from "./sequence";
 import conditional from "./conditional";
 import local from "./local";
-import valueCreation from "./value_creation";
 import patternMatching from "./pattern_matching";
 import procedureApplication from "./procedure_application";
 import exceptionContext from "./exception_context";
@@ -40,7 +39,6 @@ export const printers = {
     [statementTypes.sequence]: sequence,
     [statementTypes.conditional]: conditional,
     [statementTypes.local]: local,
-    [statementTypes.valueCreation]: valueCreation,
     [statementTypes.patternMatching]: patternMatching,
     [statementTypes.procedureApplication]: procedureApplication,
     [statementTypes.exceptionContext]: exceptionContext,
