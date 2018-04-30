@@ -71,22 +71,22 @@ describe("Parsing case statements", () => {
           {
             pattern: literalRecord("person"),
             statement: bindingStatementSyntax(
-              lexicalIdentifier("A"),
-              lexicalIdentifier("B"),
+              identifierExpression(lexicalIdentifier("A")),
+              identifierExpression(lexicalIdentifier("B")),
             ),
           },
           {
             pattern: literalRecord("animal"),
             statement: bindingStatementSyntax(
-              lexicalIdentifier("B"),
-              lexicalIdentifier("C"),
+              identifierExpression(lexicalIdentifier("B")),
+              identifierExpression(lexicalIdentifier("C")),
             ),
           },
           {
             pattern: literalRecord("mineral"),
             statement: bindingStatementSyntax(
-              lexicalIdentifier("C"),
-              lexicalIdentifier("D"),
+              identifierExpression(lexicalIdentifier("C")),
+              identifierExpression(lexicalIdentifier("D")),
             ),
           },
         ],

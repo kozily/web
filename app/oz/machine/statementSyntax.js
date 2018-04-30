@@ -5,7 +5,6 @@ export const statementSyntaxTypes = {
   sequenceSyntax: "sequenceSyntax",
   localSyntax: "localSyntax",
   bindingSyntax: "bindingSyntax",
-  valueCreationSyntax: "valueCreationSyntax",
   conditionalSyntax: "conditionalSyntax",
   patternMatchingSyntax: "patternMatchingSyntax",
   procedureApplicationSyntax: "procedureApplicationSyntax",
@@ -50,15 +49,6 @@ export const bindingStatementSyntax = (lhs, rhs) => {
   return Immutable.Map({
     node: "statement",
     type: statementSyntaxTypes.bindingSyntax,
-    lhs,
-    rhs,
-  });
-};
-
-export const valueCreationStatementSyntax = (lhs, rhs) => {
-  return Immutable.Map({
-    node: "statement",
-    type: statementSyntaxTypes.valueCreationSyntax,
     lhs,
     rhs,
   });

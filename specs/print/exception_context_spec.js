@@ -5,6 +5,7 @@ import {
   bindingStatement,
 } from "../../app/oz/machine/statements";
 import { lexicalIdentifier } from "../../app/oz/machine/lexical";
+import { identifierExpression } from "../../app/oz/machine/expressions";
 
 describe("Printing an exception context statement", () => {
   beforeEach(() => {
@@ -13,9 +14,15 @@ describe("Printing an exception context statement", () => {
 
   it("Returns the appropriate string", () => {
     const statement = exceptionContextStatement(
-      bindingStatement(lexicalIdentifier("A"), lexicalIdentifier("B")),
+      bindingStatement(
+        identifierExpression(lexicalIdentifier("A")),
+        identifierExpression(lexicalIdentifier("B")),
+      ),
       lexicalIdentifier("E"),
-      bindingStatement(lexicalIdentifier("E"), lexicalIdentifier("C")),
+      bindingStatement(
+        identifierExpression(lexicalIdentifier("E")),
+        identifierExpression(lexicalIdentifier("C")),
+      ),
     );
     const result = print(statement, 2);
 

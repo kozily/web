@@ -5,8 +5,12 @@ import { literalNumber, literalProcedure } from "../../app/oz/machine/literals";
 import { valueProcedure } from "../../app/oz/machine/values";
 import { lexicalIdentifier } from "../../app/oz/machine/lexical";
 import {
+  identifierExpression,
+  literalExpression,
+} from "../../app/oz/machine/expressions";
+import {
   skipStatement,
-  valueCreationStatement,
+  bindingStatement,
 } from "../../app/oz/machine/statements";
 
 describe("Creating procedure values in the sigma", () => {
@@ -55,13 +59,19 @@ describe("Creating procedure values in the sigma", () => {
 
     const literal = literalProcedure(
       [lexicalIdentifier("A"), lexicalIdentifier("B")],
-      valueCreationStatement(lexicalIdentifier("X"), literalNumber(5)),
+      bindingStatement(
+        identifierExpression(lexicalIdentifier("X")),
+        literalExpression(literalNumber(5)),
+      ),
     );
 
     expect(createValue(environment, literal)).toEqual(
       valueProcedure(
         [lexicalIdentifier("A"), lexicalIdentifier("B")],
-        valueCreationStatement(lexicalIdentifier("X"), literalNumber(5)),
+        bindingStatement(
+          identifierExpression(lexicalIdentifier("X")),
+          literalExpression(literalNumber(5)),
+        ),
         { X: buildVariable("x", 0) },
       ),
     );

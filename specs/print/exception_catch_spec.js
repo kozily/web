@@ -5,6 +5,7 @@ import {
   bindingStatement,
 } from "../../app/oz/machine/statements";
 import { lexicalIdentifier } from "../../app/oz/machine/lexical";
+import { identifierExpression } from "../../app/oz/machine/expressions";
 
 describe("Printing an exception catch statement", () => {
   beforeEach(() => {
@@ -14,7 +15,10 @@ describe("Printing an exception catch statement", () => {
   it("Returns the appropriate string", () => {
     const statement = exceptionCatchStatement(
       lexicalIdentifier("E"),
-      bindingStatement(lexicalIdentifier("E"), lexicalIdentifier("C")),
+      bindingStatement(
+        identifierExpression(lexicalIdentifier("E")),
+        identifierExpression(lexicalIdentifier("C")),
+      ),
     );
     const result = print(statement, 2);
 

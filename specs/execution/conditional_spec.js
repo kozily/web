@@ -8,9 +8,11 @@ import {
 import {
   identifierExpression,
   operatorExpression,
+  literalExpression,
 } from "../../app/oz/machine/expressions";
 import { lexicalIdentifier } from "../../app/oz/machine/lexical";
-import { literalNumber, literalRecord } from "../../app/oz/machine/literals";
+import { literalNumber } from "../../app/oz/machine/literals";
+import { valueNumber, valueRecord } from "../../app/oz/machine/values";
 import { errorException } from "../../app/oz/machine/exceptions";
 import { buildSystemExceptionState, buildBlockedState } from "./helpers";
 import {
@@ -34,7 +36,7 @@ describe("Reducing if statements", () => {
         semanticStatements: [buildSemanticStatement(skipStatement())],
         sigma: buildSigma(
           buildEquivalenceClass(
-            literalNumber(24),
+            valueNumber(24),
             buildVariable("x", 0),
             buildVariable("x", 1),
           ),
@@ -67,7 +69,7 @@ describe("Reducing if statements", () => {
         semanticStatements: [buildSemanticStatement(skipStatement())],
         sigma: buildSigma(
           buildEquivalenceClass(
-            literalRecord("person", { name: buildVariable("y", 0) }),
+            valueRecord("person", { name: buildVariable("y", 0) }),
             buildVariable("x", 0),
             buildVariable("x", 1),
           ),
@@ -100,7 +102,7 @@ describe("Reducing if statements", () => {
         semanticStatements: [buildSemanticStatement(skipStatement())],
         sigma: buildSigma(
           buildEquivalenceClass(
-            literalRecord("person"),
+            valueRecord("person"),
             buildVariable("x", 0),
             buildVariable("x", 1),
           ),
@@ -135,7 +137,7 @@ describe("Reducing if statements", () => {
         semanticStatements: [buildSemanticStatement(skipStatement())],
         sigma: buildSigma(
           buildEquivalenceClass(
-            literalRecord("true"),
+            valueRecord("true"),
             buildVariable("x", 0),
             buildVariable("x", 1),
           ),
@@ -150,8 +152,14 @@ describe("Reducing if statements", () => {
       const statement = buildSemanticStatement(
         conditionalStatement(
           identifierExpression(lexicalIdentifier("X")),
-          bindingStatement(lexicalIdentifier("Y"), literalNumber(84)),
-          bindingStatement(lexicalIdentifier("Y"), literalNumber(345)),
+          bindingStatement(
+            identifierExpression(lexicalIdentifier("Y")),
+            literalExpression(literalNumber(84)),
+          ),
+          bindingStatement(
+            identifierExpression(lexicalIdentifier("Y")),
+            literalExpression(literalNumber(345)),
+          ),
         ),
         buildEnvironment({
           X: buildVariable("x", 0),
@@ -163,7 +171,10 @@ describe("Reducing if statements", () => {
         buildSingleThreadedState({
           semanticStatements: [
             buildSemanticStatement(
-              bindingStatement(lexicalIdentifier("Y"), literalNumber(84)),
+              bindingStatement(
+                identifierExpression(lexicalIdentifier("Y")),
+                literalExpression(literalNumber(84)),
+              ),
               buildEnvironment({
                 X: buildVariable("x", 0),
                 Y: buildVariable("y", 0),
@@ -181,7 +192,7 @@ describe("Reducing if statements", () => {
         semanticStatements: [buildSemanticStatement(skipStatement())],
         sigma: buildSigma(
           buildEquivalenceClass(
-            literalRecord("false"),
+            valueRecord("false"),
             buildVariable("x", 0),
             buildVariable("x", 1),
           ),
@@ -196,8 +207,14 @@ describe("Reducing if statements", () => {
       const statement = buildSemanticStatement(
         conditionalStatement(
           identifierExpression(lexicalIdentifier("X")),
-          bindingStatement(lexicalIdentifier("Y"), literalNumber(84)),
-          bindingStatement(lexicalIdentifier("Y"), literalNumber(345)),
+          bindingStatement(
+            identifierExpression(lexicalIdentifier("Y")),
+            literalExpression(literalNumber(84)),
+          ),
+          bindingStatement(
+            identifierExpression(lexicalIdentifier("Y")),
+            literalExpression(literalNumber(345)),
+          ),
         ),
         buildEnvironment({
           X: buildVariable("x", 0),
@@ -209,7 +226,10 @@ describe("Reducing if statements", () => {
         buildSingleThreadedState({
           semanticStatements: [
             buildSemanticStatement(
-              bindingStatement(lexicalIdentifier("Y"), literalNumber(345)),
+              bindingStatement(
+                identifierExpression(lexicalIdentifier("Y")),
+                literalExpression(literalNumber(345)),
+              ),
               buildEnvironment({
                 X: buildVariable("x", 0),
                 Y: buildVariable("y", 0),
@@ -244,8 +264,14 @@ describe("Reducing if statements", () => {
       const statement = buildSemanticStatement(
         conditionalStatement(
           identifierExpression(lexicalIdentifier("X")),
-          bindingStatement(lexicalIdentifier("Y"), literalNumber(84)),
-          bindingStatement(lexicalIdentifier("Y"), literalNumber(345)),
+          bindingStatement(
+            identifierExpression(lexicalIdentifier("Y")),
+            literalExpression(literalNumber(84)),
+          ),
+          bindingStatement(
+            identifierExpression(lexicalIdentifier("Y")),
+            literalExpression(literalNumber(345)),
+          ),
         ),
         buildEnvironment({
           X: buildVariable("x", 0),
@@ -284,8 +310,14 @@ describe("Reducing if statements", () => {
             identifierExpression(lexicalIdentifier("X")),
             identifierExpression(lexicalIdentifier("X")),
           ),
-          bindingStatement(lexicalIdentifier("Y"), literalNumber(84)),
-          bindingStatement(lexicalIdentifier("Y"), literalNumber(345)),
+          bindingStatement(
+            identifierExpression(lexicalIdentifier("Y")),
+            literalExpression(literalNumber(84)),
+          ),
+          bindingStatement(
+            identifierExpression(lexicalIdentifier("Y")),
+            literalExpression(literalNumber(345)),
+          ),
         ),
         buildEnvironment({
           X: buildVariable("x", 0),

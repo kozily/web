@@ -8,6 +8,7 @@ import {
 } from "../../app/oz/machine/statements";
 import { getLastEnvironmentIndex } from "../../app/oz/machine/environment";
 import { lexicalIdentifier } from "../../app/oz/machine/lexical";
+import { identifierExpression } from "../../app/oz/machine/expressions";
 import {
   buildSingleThreadedState,
   buildSemanticStatement,
@@ -35,7 +36,10 @@ describe("Reducing try statements", () => {
       exceptionContextStatement(
         sequenceStatement(skipStatement(), skipStatement()),
         lexicalIdentifier("Error"),
-        bindingStatement(lexicalIdentifier("Error"), lexicalIdentifier("X")),
+        bindingStatement(
+          identifierExpression(lexicalIdentifier("Error")),
+          identifierExpression(lexicalIdentifier("X")),
+        ),
       ),
       buildEnvironment({
         X: buildVariable("x", 0),
@@ -55,8 +59,8 @@ describe("Reducing try statements", () => {
             exceptionCatchStatement(
               lexicalIdentifier("Error"),
               bindingStatement(
-                lexicalIdentifier("Error"),
-                lexicalIdentifier("X"),
+                identifierExpression(lexicalIdentifier("Error")),
+                identifierExpression(lexicalIdentifier("X")),
               ),
             ),
             buildEnvironment({
@@ -88,7 +92,10 @@ describe("Reducing try statements", () => {
       exceptionContextStatement(
         sequenceStatement(skipStatement(), skipStatement()),
         lexicalIdentifier("Error"),
-        bindingStatement(lexicalIdentifier("Error"), lexicalIdentifier("X")),
+        bindingStatement(
+          identifierExpression(lexicalIdentifier("Error")),
+          identifierExpression(lexicalIdentifier("X")),
+        ),
       ),
       buildEnvironment({
         X: buildVariable("x", 0),
@@ -110,8 +117,8 @@ describe("Reducing try statements", () => {
             exceptionCatchStatement(
               lexicalIdentifier("Error"),
               bindingStatement(
-                lexicalIdentifier("Error"),
-                lexicalIdentifier("X"),
+                identifierExpression(lexicalIdentifier("Error")),
+                identifierExpression(lexicalIdentifier("X")),
               ),
             ),
             buildEnvironment({

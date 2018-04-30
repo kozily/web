@@ -6,6 +6,7 @@ import {
   sequenceStatement,
 } from "../../app/oz/machine/statements";
 import { lexicalIdentifier } from "../../app/oz/machine/lexical";
+import { identifierExpression } from "../../app/oz/machine/expressions";
 
 describe("Collecting free identifiers in a number literal", () => {
   beforeEach(() => {
@@ -16,8 +17,14 @@ describe("Collecting free identifiers in a number literal", () => {
     const literal = literalProcedure(
       [lexicalIdentifier("A"), lexicalIdentifier("B")],
       sequenceStatement(
-        bindingStatement(lexicalIdentifier("Y"), lexicalIdentifier("A")),
-        bindingStatement(lexicalIdentifier("B"), lexicalIdentifier("Z")),
+        bindingStatement(
+          identifierExpression(lexicalIdentifier("Y")),
+          identifierExpression(lexicalIdentifier("A")),
+        ),
+        bindingStatement(
+          identifierExpression(lexicalIdentifier("B")),
+          identifierExpression(lexicalIdentifier("Z")),
+        ),
       ),
     );
 

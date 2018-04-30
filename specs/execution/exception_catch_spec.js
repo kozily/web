@@ -5,6 +5,7 @@ import {
   bindingStatement,
 } from "../../app/oz/machine/statements";
 import { lexicalIdentifier } from "../../app/oz/machine/lexical";
+import { identifierExpression } from "../../app/oz/machine/expressions";
 import {
   buildSingleThreadedState,
   buildSemanticStatement,
@@ -24,7 +25,10 @@ describe("Reducing catch statements", () => {
     const statement = buildSemanticStatement(
       exceptionCatchStatement(
         lexicalIdentifier("X"),
-        bindingStatement(lexicalIdentifier("X"), lexicalIdentifier("Y")),
+        bindingStatement(
+          identifierExpression(lexicalIdentifier("X")),
+          identifierExpression(lexicalIdentifier("Y")),
+        ),
       ),
     );
 

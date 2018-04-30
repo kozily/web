@@ -6,6 +6,7 @@ import {
   bindingStatement,
 } from "../../app/oz/machine/statements";
 import { lexicalIdentifier } from "../../app/oz/machine/lexical";
+import { identifierExpression } from "../../app/oz/machine/expressions";
 
 describe("Printing a sequence statement", () => {
   beforeEach(() => {
@@ -15,7 +16,10 @@ describe("Printing a sequence statement", () => {
   it("Returns the appropriate string", () => {
     const statement = sequenceStatement(
       skipStatement(),
-      bindingStatement(lexicalIdentifier("X"), lexicalIdentifier("Y")),
+      bindingStatement(
+        identifierExpression(lexicalIdentifier("X")),
+        identifierExpression(lexicalIdentifier("Y")),
+      ),
     );
     const result = print(statement, 2);
 

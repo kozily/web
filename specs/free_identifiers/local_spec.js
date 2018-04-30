@@ -5,6 +5,7 @@ import {
   bindingStatement,
 } from "../../app/oz/machine/statements";
 import { lexicalIdentifier } from "../../app/oz/machine/lexical";
+import { identifierExpression } from "../../app/oz/machine/expressions";
 
 describe("Collecting free identifiers in a local statement", () => {
   beforeEach(() => {
@@ -14,7 +15,10 @@ describe("Collecting free identifiers in a local statement", () => {
   it("collects all identifiers from the substatement except the local identifiers", () => {
     const statement = localStatement(
       lexicalIdentifier("A"),
-      bindingStatement(lexicalIdentifier("A"), lexicalIdentifier("B")),
+      bindingStatement(
+        identifierExpression(lexicalIdentifier("A")),
+        identifierExpression(lexicalIdentifier("B")),
+      ),
     );
 
     expect(collectFreeIdentifiers(statement)).toEqual(Immutable.Set(["B"]));
