@@ -16,6 +16,7 @@ import exceptionCatch from "./exception_catch";
 import thread from "./thread";
 import byNeed from "./by_need";
 import cellCreation from "./cell_creation";
+import cellExchange from "./cell_exchange";
 import portCreation from "./port_creation";
 import portSend from "./port_send";
 import nameCreation from "./name_creation";
@@ -42,6 +43,7 @@ export const collectors = {
     [statementTypes.thread]: thread,
     [statementTypes.byNeed]: byNeed,
     [statementTypes.cellCreation]: cellCreation,
+    [statementTypes.cellExchange]: cellExchange,
     [statementTypes.portCreation]: portCreation,
     [statementTypes.portSend]: portSend,
     [statementTypes.nameCreation]: nameCreation,

@@ -52,7 +52,7 @@ describe("Reducing cell creation statements", () => {
     );
 
     expect(reduce(state, statement, 0)).toEqual(
-      buildSystemExceptionState(state, 0, failureException(0)),
+      buildSystemExceptionState(state, 0, failureException()),
     );
   });
 

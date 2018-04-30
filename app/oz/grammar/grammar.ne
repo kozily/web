@@ -9,6 +9,7 @@
   STM_SPECIAL_PROCEDURES = [
     "ByNeed",
     "NewCell",
+    "Exchange",
     "NewPort",
     "Send",
     "NewName",
@@ -157,6 +158,7 @@ stm_simple ->
   | stm_thread {% id %}
   | stm_by_need {% id %}
   | stm_cell_creation {% id %}
+  | stm_cell_exchange {% id %}
   | stm_port_creation {% id %}
   | stm_port_send {% id %}
   | stm_name_creation {% id %}
@@ -320,6 +322,18 @@ stm_cell_creation -> "{" _ "NewCell" __ exp_expression __ ids_identifier _ "}" {
       type: "cellCreationSyntax",
       value: d[4],
       cell: d[6],
+    };
+  }
+%}
+
+stm_cell_exchange -> "{" _ "Exchange" __ exp_expression __ ids_identifier __ exp_expression _ "}" {%
+  function(d) {
+    return {
+      node: "statement",
+      type: "cellExchangeSyntax",
+      cell: d[4],
+      current: d[6],
+      next: d[8],
     };
   }
 %}
