@@ -532,6 +532,8 @@ exp_terminal_no_literals ->
   | exp_terminal_name_creation {% id %}
   | exp_terminal_cell_creation {% id %}
   | exp_terminal_port_creation {% id %}
+  | exp_at_cell {% id %}
+  | exp_colon_equals_cell {% id %}
 
 exp_terminal ->
     exp_terminal_no_literals {% id %}
@@ -603,6 +605,10 @@ exp_terminal_string -> lit_string_syntax {%
     return litBuildString(d[0], expWrap("literal"));
   }
 %}
+
+exp_at_cell -> "@" ids_identifier {% expBuildExpressionWrapper(1, "identifier") %}
+
+exp_colon_equals_cell -> exp_expression _ ":=" _ exp_expression {% expBuildOperatorExpression(0, 4, [2]) %}
 
 exp_terminal_paren -> "(" _ exp_expression _ ")" {% nth(2) %}
 
