@@ -431,6 +431,7 @@ exp_terminal ->
   | exp_terminal_literal {% id %}
   | exp_terminal_paren {% id %}
   | exp_terminal_function {% id %}
+  | exp_terminal_local {% id %}
 
 exp_terminal_identifier -> ids_identifier {% expBuildExpressionWrapper(0, "identifier") %}
 
@@ -446,6 +447,21 @@ exp_terminal_function -> "{" _ exp_expression (__ exp_expression):* _ "}" {%
     });
 
     return expBuildFunctionExpression(functionExpression, functionArguments);
+  }
+%}
+
+exp_terminal_local -> "local" __ stm_local_identifier_list __ "in" __ (stm_sequence __):? exp_expression __ "end" {%
+  function(d) {
+    var identifiers = d[2];
+    var statement = d[6] ? d[6][0] : undefined;
+    var expression = d[7];
+    return {
+      node: "expression",
+      type: "local",
+      identifiers: identifiers,
+      statement: statement,
+      expression: expression,
+    };
   }
 %}
 

@@ -8,6 +8,7 @@ export const kernelExpressionTypes = {
 
 export const compilableExpressionTypes = {
   function: "function",
+  local: "local",
 };
 
 export const literalExpression = literal => {
@@ -42,6 +43,16 @@ export const functionExpression = (fun, args = []) => {
     type: compilableExpressionTypes.function,
     fun,
     args,
+  });
+};
+
+export const localExpression = (identifiers, expression, statement) => {
+  return Immutable.fromJS({
+    node: "expression",
+    type: compilableExpressionTypes.local,
+    identifiers,
+    expression,
+    statement,
   });
 };
 
