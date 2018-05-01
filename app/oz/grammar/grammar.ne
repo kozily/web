@@ -73,10 +73,10 @@
     };
   }
 
-  function expBuildFunctionCallExpression(fun, args) {
+  function expBuildFunctionExpression(fun, args) {
     return {
       node: "expression",
-      type: "functionCall",
+      type: "function",
       fun: fun,
       args: args,
     };
@@ -423,7 +423,7 @@ exp_terminal ->
     exp_terminal_identifier {% id %}
   | exp_terminal_literal {% id %}
   | exp_terminal_paren {% id %}
-  | exp_terminal_function_call {% id %}
+  | exp_terminal_function {% id %}
 
 exp_terminal_identifier -> ids_identifier {% expBuildExpressionWrapper(0, "identifier") %}
 
@@ -431,14 +431,14 @@ exp_terminal_literal -> lit_value {% expBuildExpressionWrapper(0, "literal") %}
 
 exp_terminal_paren -> "(" _ exp_expression _ ")" {% nth(2) %}
 
-exp_terminal_function_call -> "{" _ exp_expression (__ exp_expression):* _ "}" {%
+exp_terminal_function -> "{" _ exp_expression (__ exp_expression):* _ "}" {%
   function(d) {
     var functionExpression = d[2];
     var functionArguments = d[3].map(function(arg) {
       return arg[1];
     });
 
-    return expBuildFunctionCallExpression(functionExpression, functionArguments);
+    return expBuildFunctionExpression(functionExpression, functionArguments);
   }
 %}
 

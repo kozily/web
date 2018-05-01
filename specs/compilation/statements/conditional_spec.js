@@ -1,6 +1,6 @@
 import Immutable from "immutable";
 import { compile } from "../../../app/oz/compilation";
-import { identifierExpression } from "../../../app/oz/machine/expressions";
+import { functionExpression } from "../../../app/oz/machine/expressions";
 import {
   conditionalStatementSyntax,
   skipStatementSyntax,
@@ -10,46 +10,61 @@ import {
   conditionalStatement,
   skipStatement,
   bindingStatement,
+  localStatement,
+  sequenceStatement,
+  procedureApplicationStatement,
 } from "../../../app/oz/machine/statements";
-import { lexicalIdentifier } from "../../../app/oz/machine/lexical";
+import { identifier, auxExpression, auxExpressionIdentifier } from "../helpers";
 
 describe("Compiling conditional statements", () => {
   beforeEach(() => {
     jasmine.addCustomEqualityTester(Immutable.is);
   });
 
-  it("compiles appropriately", () => {
+  it("compiles unexpandable expressions", () => {
     const statement = conditionalStatementSyntax(
-      identifierExpression(lexicalIdentifier("X")),
+      identifier("X"),
       skipStatementSyntax(),
       skipStatementSyntax(),
     );
 
     expect(compile(statement)).toEqual(
-      conditionalStatement(
-        identifierExpression(lexicalIdentifier("X")),
-        skipStatement(),
-        skipStatement(),
+      conditionalStatement(identifier("X"), skipStatement(), skipStatement()),
+    );
+  });
+
+  it("compiles expandable expresions", () => {
+    const statement = conditionalStatementSyntax(
+      functionExpression(identifier("Get")),
+      skipStatementSyntax(),
+      skipStatementSyntax(),
+    );
+
+    expect(compile(statement)).toEqual(
+      localStatement(
+        auxExpressionIdentifier(),
+        sequenceStatement(
+          procedureApplicationStatement(identifier("Get"), [auxExpression()]),
+          conditionalStatement(
+            auxExpression(),
+            skipStatement(),
+            skipStatement(),
+          ),
+        ),
       ),
     );
   });
 
   it("compiles appropriately conditionals without else", () => {
     const statement = conditionalStatementSyntax(
-      identifierExpression(lexicalIdentifier("X")),
-      bindingStatementSyntax(
-        identifierExpression(lexicalIdentifier("A")),
-        identifierExpression(lexicalIdentifier("B")),
-      ),
+      identifier("X"),
+      bindingStatementSyntax(identifier("A"), identifier("B")),
     );
 
     expect(compile(statement)).toEqual(
       conditionalStatement(
-        identifierExpression(lexicalIdentifier("X")),
-        bindingStatement(
-          identifierExpression(lexicalIdentifier("A")),
-          identifierExpression(lexicalIdentifier("B")),
-        ),
+        identifier("X"),
+        bindingStatement(identifier("A"), identifier("B")),
         skipStatement(),
       ),
     );

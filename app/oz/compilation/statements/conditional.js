@@ -8,9 +8,13 @@ export default (recurse, statement) => {
     ? recurse(falseStatement)
     : skipStatement();
 
-  return conditionalStatement(
-    statement.get("condition"),
-    compiledTrueStatement,
-    compiledFalseStatement,
+  const compiledCondition = recurse(statement.get("condition"));
+
+  return compiledCondition.augmentStatement(
+    conditionalStatement(
+      compiledCondition.resultingExpression,
+      compiledTrueStatement,
+      compiledFalseStatement,
+    ),
   );
 };

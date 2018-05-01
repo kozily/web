@@ -3,7 +3,10 @@ import {
   kernelLiteralTypes,
   compilableLiteralTypes,
 } from "../machine/literals";
-import { kernelExpressionTypes } from "../machine/expressions";
+import {
+  kernelExpressionTypes,
+  compilableExpressionTypes,
+} from "../machine/expressions";
 import skip from "./statements/skip";
 import binding from "./statements/binding";
 import sequence from "./statements/sequence";
@@ -23,10 +26,11 @@ import byNeed from "./statements/by_need";
 import number from "./literals/number";
 import record from "./literals/record";
 import procedure from "./literals/procedure";
-import functionCompiler from "./literals/function";
+import functionLiteral from "./literals/function";
 import literalExpression from "./expressions/literal";
 import identifierExpression from "./expressions/identifier";
 import operatorExpression from "./expressions/operator";
+import functionExpression from "./expressions/function";
 
 export const compilers = {
   statement: {
@@ -51,12 +55,13 @@ export const compilers = {
     [kernelLiteralTypes.number]: number,
     [kernelLiteralTypes.record]: record,
     [kernelLiteralTypes.procedure]: procedure,
-    [compilableLiteralTypes.function]: functionCompiler,
+    [compilableLiteralTypes.function]: functionLiteral,
   },
   expression: {
     [kernelExpressionTypes.literal]: literalExpression,
     [kernelExpressionTypes.identifier]: identifierExpression,
     [kernelExpressionTypes.operator]: operatorExpression,
+    [compilableExpressionTypes.function]: functionExpression,
   },
 };
 

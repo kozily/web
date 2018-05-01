@@ -1,6 +1,8 @@
 import { exceptionRaiseStatement } from "../../machine/statements";
 
 export default (recurse, node) => {
-  const identifier = recurse(node.get("identifier"));
-  return exceptionRaiseStatement(identifier);
+  const compilation = recurse(node.get("identifier"));
+  return compilation.augmentStatement(
+    exceptionRaiseStatement(compilation.resultingExpression),
+  );
 };

@@ -13,14 +13,22 @@ export default (recurse, literal) => {
   const resultIdentifier = makeAuxiliaryIdentifier("res");
   const procedureArgs = functionArgs.push(resultIdentifier);
 
+  const compiledExpression = recurse(
+    functionExpression,
+    identifierExpression(resultIdentifier),
+  );
+
   const resultStatement = bindingStatement(
     identifierExpression(resultIdentifier),
-    recurse(functionExpression),
+    compiledExpression.resultingExpression,
   );
 
   const procedureStatement = functionStatement
-    ? sequenceStatement(recurse(functionStatement), resultStatement)
-    : resultStatement;
+    ? sequenceStatement(
+        recurse(functionStatement),
+        compiledExpression.augmentStatement(resultStatement),
+      )
+    : compiledExpression.augmentStatement(resultStatement);
 
   return literalProcedure(procedureArgs, procedureStatement);
 };

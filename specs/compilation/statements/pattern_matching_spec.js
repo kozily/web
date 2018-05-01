@@ -1,6 +1,6 @@
 import Immutable from "immutable";
 import { compile } from "../../../app/oz/compilation";
-import { identifierExpression } from "../../../app/oz/machine/expressions";
+import { functionExpression } from "../../../app/oz/machine/expressions";
 import {
   patternMatchingStatementSyntax,
   skipStatementSyntax,
@@ -10,9 +10,12 @@ import {
   patternMatchingStatement,
   skipStatement,
   bindingStatement,
+  localStatement,
+  sequenceStatement,
+  procedureApplicationStatement,
 } from "../../../app/oz/machine/statements";
-import { lexicalIdentifier } from "../../../app/oz/machine/lexical";
 import { literalRecord } from "../../../app/oz/machine/literals";
+import { identifier, auxExpression, auxExpressionIdentifier } from "../helpers";
 
 describe("Compiling patternMatching statements", () => {
   beforeEach(() => {
@@ -21,7 +24,7 @@ describe("Compiling patternMatching statements", () => {
 
   it("compiles appropriately simple cases", () => {
     const statement = patternMatchingStatementSyntax(
-      identifierExpression(lexicalIdentifier("X")),
+      identifier("X"),
       [
         {
           pattern: literalRecord("person"),
@@ -33,7 +36,7 @@ describe("Compiling patternMatching statements", () => {
 
     expect(compile(statement)).toEqual(
       patternMatchingStatement(
-        identifierExpression(lexicalIdentifier("X")),
+        identifier("X"),
         literalRecord("person"),
         skipStatement(),
         skipStatement(),
@@ -43,28 +46,19 @@ describe("Compiling patternMatching statements", () => {
 
   it("compiles appropriately multiple pattern cases", () => {
     const statement = patternMatchingStatementSyntax(
-      identifierExpression(lexicalIdentifier("X")),
+      identifier("X"),
       [
         {
           pattern: literalRecord("person"),
-          statement: bindingStatementSyntax(
-            identifierExpression(lexicalIdentifier("A")),
-            identifierExpression(lexicalIdentifier("B")),
-          ),
+          statement: bindingStatementSyntax(identifier("A"), identifier("B")),
         },
         {
           pattern: literalRecord("animal"),
-          statement: bindingStatementSyntax(
-            identifierExpression(lexicalIdentifier("B")),
-            identifierExpression(lexicalIdentifier("C")),
-          ),
+          statement: bindingStatementSyntax(identifier("B"), identifier("C")),
         },
         {
           pattern: literalRecord("mineral"),
-          statement: bindingStatementSyntax(
-            identifierExpression(lexicalIdentifier("C")),
-            identifierExpression(lexicalIdentifier("D")),
-          ),
+          statement: bindingStatementSyntax(identifier("C"), identifier("D")),
         },
       ],
       skipStatementSyntax(),
@@ -72,26 +66,17 @@ describe("Compiling patternMatching statements", () => {
 
     expect(compile(statement)).toEqual(
       patternMatchingStatement(
-        identifierExpression(lexicalIdentifier("X")),
+        identifier("X"),
         literalRecord("person"),
-        bindingStatement(
-          identifierExpression(lexicalIdentifier("A")),
-          identifierExpression(lexicalIdentifier("B")),
-        ),
+        bindingStatement(identifier("A"), identifier("B")),
         patternMatchingStatement(
-          identifierExpression(lexicalIdentifier("X")),
+          identifier("X"),
           literalRecord("animal"),
-          bindingStatement(
-            identifierExpression(lexicalIdentifier("B")),
-            identifierExpression(lexicalIdentifier("C")),
-          ),
+          bindingStatement(identifier("B"), identifier("C")),
           patternMatchingStatement(
-            identifierExpression(lexicalIdentifier("X")),
+            identifier("X"),
             literalRecord("mineral"),
-            bindingStatement(
-              identifierExpression(lexicalIdentifier("C")),
-              identifierExpression(lexicalIdentifier("D")),
-            ),
+            bindingStatement(identifier("C"), identifier("D")),
             skipStatement(),
           ),
         ),
@@ -100,28 +85,47 @@ describe("Compiling patternMatching statements", () => {
   });
 
   it("compiles appropriately when not having else clause", () => {
+    const statement = patternMatchingStatementSyntax(identifier("X"), [
+      {
+        pattern: literalRecord("person"),
+        statement: bindingStatementSyntax(identifier("A"), identifier("B")),
+      },
+    ]);
+
+    expect(compile(statement)).toEqual(
+      patternMatchingStatement(
+        identifier("X"),
+        literalRecord("person"),
+        bindingStatement(identifier("A"), identifier("B")),
+        skipStatement(),
+      ),
+    );
+  });
+
+  it("compiles expandable expressions", () => {
     const statement = patternMatchingStatementSyntax(
-      identifierExpression(lexicalIdentifier("X")),
+      functionExpression(identifier("Get")),
       [
         {
           pattern: literalRecord("person"),
-          statement: bindingStatementSyntax(
-            identifierExpression(lexicalIdentifier("A")),
-            identifierExpression(lexicalIdentifier("B")),
-          ),
+          statement: bindingStatementSyntax(identifier("A"), identifier("B")),
         },
       ],
     );
 
     expect(compile(statement)).toEqual(
-      patternMatchingStatement(
-        identifierExpression(lexicalIdentifier("X")),
-        literalRecord("person"),
-        bindingStatement(
-          identifierExpression(lexicalIdentifier("A")),
-          identifierExpression(lexicalIdentifier("B")),
+      localStatement(
+        auxExpressionIdentifier(),
+        sequenceStatement(
+          procedureApplicationStatement(identifier("Get"), [auxExpression()]),
+
+          patternMatchingStatement(
+            auxExpression(),
+            literalRecord("person"),
+            bindingStatement(identifier("A"), identifier("B")),
+            skipStatement(),
+          ),
         ),
-        skipStatement(),
       ),
     );
   });

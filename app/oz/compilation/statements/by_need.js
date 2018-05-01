@@ -1,7 +1,9 @@
 import { byNeedStatement } from "../../machine/statements";
 
 export default (recurse, node) => {
-  const procedure = recurse(node.get("procedure"));
+  const procedureCompilation = recurse(node.get("procedure"));
   const neededIdentifier = node.get("neededIdentifier");
-  return byNeedStatement(procedure, neededIdentifier);
+  return procedureCompilation.augmentStatement(
+    byNeedStatement(procedureCompilation.resultingExpression, neededIdentifier),
+  );
 };

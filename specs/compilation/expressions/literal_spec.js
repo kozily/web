@@ -17,7 +17,13 @@ describe("Compiling literal expressions", () => {
   it("compiles appropriately", () => {
     const expression = literalExpression(literalNumber(10));
 
-    expect(compile(expression)).toEqual(expression);
+    const compilation = compile(expression);
+
+    expect(compilation.resultingExpression).toEqual(expression);
+
+    const resultingStatement = compilation.augmentStatement(skipStatement());
+
+    expect(resultingStatement).toEqual(skipStatement());
   });
 
   it("compiles recursive literals appropriately", () => {
@@ -25,10 +31,16 @@ describe("Compiling literal expressions", () => {
       literalProcedure([lexicalIdentifier("A")], skipStatementSyntax()),
     );
 
-    expect(compile(expression)).toEqual(
+    const compilation = compile(expression);
+
+    expect(compilation.resultingExpression).toEqual(
       literalExpression(
         literalProcedure([lexicalIdentifier("A")], skipStatement()),
       ),
     );
+
+    const resultingStatement = compilation.augmentStatement(skipStatement());
+
+    expect(resultingStatement).toEqual(skipStatement());
   });
 });

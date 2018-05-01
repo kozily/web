@@ -7,7 +7,7 @@ export const kernelExpressionTypes = {
 };
 
 export const compilableExpressionTypes = {
-  functionCall: "functionCall",
+  function: "function",
 };
 
 export const literalExpression = literal => {
@@ -39,8 +39,13 @@ export const operatorExpression = (operator, lhs, rhs) => {
 export const functionExpression = (fun, args = []) => {
   return Immutable.fromJS({
     node: "expression",
-    type: compilableExpressionTypes.functionCall,
+    type: compilableExpressionTypes.function,
     fun,
     args,
   });
 };
+
+export const isBindable = expression =>
+  expression.get("type") === kernelExpressionTypes.identifier ||
+  (expression.get("type") === kernelExpressionTypes.operator &&
+    expression.get("operator") === ".");

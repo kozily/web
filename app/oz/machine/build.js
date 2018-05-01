@@ -216,6 +216,6 @@ export const makeAuxiliaryIdentifier = (namespace = "") => {
   return lexicalIdentifier(`@${namespace}${argumentIndex++}`);
 };
 
-export const getLastAuxiliaryIdentifier = (namespace = "") => {
-  return lexicalIdentifier(`@${namespace}${argumentIndex - 1}`);
+export const getLastAuxiliaryIdentifier = (namespace = "", ago = 1) => {
+  return lexicalIdentifier(`@${namespace}${argumentIndex - ago}`);
 };
