@@ -182,5 +182,63 @@ describe("Parsing case statements", () => {
         ),
       );
     });
+
+    it("handles any identifier in generic tuples", () => {
+      expect(parse("case X of vector(10 _ 20#_) then skip end")).toEqual(
+        simpleCaseWithPattern(
+          literalTuple("vector", [
+            literalNumber(10),
+            lexicalIdentifier("_"),
+            literalTuple("#", [literalNumber(20), lexicalIdentifier("_")]),
+          ]),
+        ),
+      );
+    });
+
+    it("handles any identifier as identifier", () => {
+      expect(parse("case X of _ then skip end")).toEqual(
+        simpleCaseWithPattern(lexicalIdentifier("_")),
+      );
+    });
+
+    it("handles any identifier in feture record", () => {
+      expect(parse("case X of person(age:30 name:_) then skip end")).toEqual(
+        simpleCaseWithPattern(
+          literalRecord("person", {
+            age: literalNumber(30),
+            name: lexicalIdentifier("_"),
+          }),
+        ),
+      );
+    });
+
+    it("handles any identifier in features of nested record", () => {
+      expect(
+        parse(
+          "case X of person(name:_ address:address(number:_)) then skip end",
+        ),
+      ).toEqual(
+        simpleCaseWithPattern(
+          literalRecord("person", {
+            name: lexicalIdentifier("_"),
+            address: literalRecord("address", {
+              number: lexicalIdentifier("_"),
+            }),
+          }),
+        ),
+      );
+    });
+
+    it("handles any identifier in lists", () => {
+      expect(parse("case X of [10 _ H|_] then skip end")).toEqual(
+        simpleCaseWithPattern(
+          literalList([
+            literalNumber(10),
+            lexicalIdentifier("_"),
+            literalListItem(lexicalIdentifier("H"), lexicalIdentifier("_")),
+          ]),
+        ),
+      );
+    });
   });
 });

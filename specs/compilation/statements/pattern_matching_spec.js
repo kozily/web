@@ -129,4 +129,22 @@ describe("Compiling patternMatching statements", () => {
       ),
     );
   });
+
+  it("compiles appropriately when using any identifier", () => {
+    const statement = patternMatchingStatementSyntax(identifier("X"), [
+      {
+        pattern: literalRecord("person"),
+        statement: bindingStatementSyntax(identifier("_"), identifier("B")),
+      },
+    ]);
+
+    expect(compile(statement)).toEqual(
+      patternMatchingStatement(
+        identifier("X"),
+        literalRecord("person"),
+        bindingStatement(identifier("_"), identifier("B")),
+        skipStatement(),
+      ),
+    );
+  });
 });

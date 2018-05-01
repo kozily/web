@@ -62,6 +62,12 @@ export const collectFreeIdentifiers = node => {
   if (!node) {
     return Immutable.Set();
   }
-  const collector = collectors[node.get("node")][node.get("type")];
+  const nodeValue = node.get("node");
+  if (nodeValue === "identifier") {
+    const identifier = node.get("identifier");
+    return identifier === "_" ? Immutable.Set() : Immutable.Set.of(identifier);
+  }
+  const collector = collectors[nodeValue][node.get("type")];
+
   return collector(collectFreeIdentifiers, node);
 };
