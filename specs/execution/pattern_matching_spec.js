@@ -10,7 +10,8 @@ import {
 } from "../../app/oz/machine/statements";
 import { buildBlockedState } from "./helpers";
 import { lexicalIdentifier } from "../../app/oz/machine/lexical";
-import { literalNumber, literalRecord } from "../../app/oz/machine/literals";
+import { literalNumber } from "../../app/oz/machine/literals";
+import { valueNumber } from "../../app/oz/machine/values";
 import {
   buildSingleThreadedState,
   buildSemanticStatement,
@@ -27,232 +28,119 @@ describe("Reducing case statements", () => {
     jasmine.addCustomEqualityTester(Immutable.is);
   });
 
-  it("when pattern matches", () => {
-    const state = buildSingleThreadedState({
-      semanticStatements: [buildSemanticStatement(skipStatement())],
-      sigma: buildSigma(
-        buildEquivalenceClass(
-          literalRecord("person", {
-            name: buildVariable("n", 0),
-            age: buildVariable("a", 0),
-          }),
-          buildVariable("x", 0),
+  describe("when the expression has a value", () => {
+    it("executes correctly when the pattern matches and new identifiers are bound", () => {
+      const state = buildSingleThreadedState({
+        semanticStatements: [buildSemanticStatement(skipStatement())],
+        sigma: buildSigma(
+          buildEquivalenceClass(valueNumber(10), buildVariable("x", 0)),
         ),
-        buildEquivalenceClass(undefined, buildVariable("n", 0)),
-        buildEquivalenceClass(undefined, buildVariable("a", 0)),
-      ),
-    });
+      });
 
-    const statement = buildSemanticStatement(
-      patternMatchingStatement(
-        identifierExpression(lexicalIdentifier("X")),
-        literalRecord("person", {
-          name: lexicalIdentifier("Name"),
-          age: lexicalIdentifier("Age"),
-        }),
-        sequenceStatement(skipStatement(), skipStatement()),
-        skipStatement(),
-      ),
-      buildEnvironment({
-        X: buildVariable("x", 0),
-      }),
-    );
-
-    const lastIndex = getLastEnvironmentIndex();
-    expect(reduce(state, statement, 0)).toEqual(
-      buildSingleThreadedState({
-        semanticStatements: [
-          buildSemanticStatement(
-            sequenceStatement(skipStatement(), skipStatement()),
-            buildEnvironment({
-              X: buildVariable("x", 0),
-              Name: buildVariable("n", 0),
-              Age: buildVariable("a", 0),
-            }),
-            {
-              environmentIndex: lastIndex + 1,
-            },
-          ),
-          buildSemanticStatement(skipStatement(), buildEnvironment(), {
-            environmentIndex: lastIndex,
-          }),
-        ],
-        sigma: state.get("sigma"),
-      }),
-    );
-  });
-
-  it("when pattern matches with no features", () => {
-    const state = buildSingleThreadedState({
-      semanticStatements: [buildSemanticStatement(skipStatement())],
-      sigma: buildSigma(
-        buildEquivalenceClass(literalRecord("person"), buildVariable("x", 0)),
-      ),
-    });
-
-    const statement = buildSemanticStatement(
-      patternMatchingStatement(
-        identifierExpression(lexicalIdentifier("X")),
-        literalRecord("person"),
-        sequenceStatement(skipStatement(), skipStatement()),
-        skipStatement(),
-      ),
-      buildEnvironment({
-        X: buildVariable("x", 0),
-      }),
-    );
-
-    const lastIndex = getLastEnvironmentIndex();
-    expect(reduce(state, statement, 0)).toEqual(
-      buildSingleThreadedState({
-        semanticStatements: [
-          buildSemanticStatement(
-            sequenceStatement(skipStatement(), skipStatement()),
-            buildEnvironment({
-              X: buildVariable("x", 0),
-            }),
-            { environmentIndex: lastIndex + 1 },
-          ),
-          buildSemanticStatement(skipStatement(), buildEnvironment(), {
-            environmentIndex: lastIndex,
-          }),
-        ],
-        sigma: state.get("sigma"),
-      }),
-    );
-  });
-
-  it("when pattern does not match due to wrong features", () => {
-    const state = buildSingleThreadedState({
-      semanticStatements: [buildSemanticStatement(skipStatement())],
-      sigma: buildSigma(
-        buildEquivalenceClass(
-          literalRecord("person", {
-            name: buildVariable("n", 0),
-            age: buildVariable("a", 0),
-          }),
-          buildVariable("x", 0),
+      const statement = buildSemanticStatement(
+        patternMatchingStatement(
+          identifierExpression(lexicalIdentifier("X")),
+          lexicalIdentifier("Y"),
+          sequenceStatement(skipStatement(), skipStatement()),
+          skipStatement(),
         ),
-        buildEquivalenceClass(undefined, buildVariable("n", 0)),
-        buildEquivalenceClass(undefined, buildVariable("a", 0)),
-      ),
+        buildEnvironment({
+          X: buildVariable("x", 0),
+        }),
+      );
+
+      const lastIndex = getLastEnvironmentIndex();
+      expect(reduce(state, statement, 0)).toEqual(
+        buildSingleThreadedState({
+          semanticStatements: [
+            buildSemanticStatement(
+              sequenceStatement(skipStatement(), skipStatement()),
+              buildEnvironment({
+                X: buildVariable("x", 0),
+                Y: buildVariable("x", 0),
+              }),
+              { environmentIndex: lastIndex + 1 },
+            ),
+            buildSemanticStatement(skipStatement(), buildEnvironment(), {
+              environmentIndex: lastIndex,
+            }),
+          ],
+          sigma: state.get("sigma"),
+        }),
+      );
     });
 
-    const statement = buildSemanticStatement(
-      patternMatchingStatement(
-        identifierExpression(lexicalIdentifier("X")),
-        literalRecord("person", {
-          names: lexicalIdentifier("Name"),
-          age: lexicalIdentifier("Age"),
-        }),
-        sequenceStatement(skipStatement(), skipStatement()),
-        skipStatement(),
-      ),
-      buildEnvironment({
-        X: buildVariable("x", 0),
-      }),
-    );
-
-    expect(reduce(state, statement, 0)).toEqual(
-      buildSingleThreadedState({
-        semanticStatements: [
-          buildSemanticStatement(
-            skipStatement(),
-            buildEnvironment({
-              X: buildVariable("x", 0),
-            }),
-          ),
-          buildSemanticStatement(skipStatement()),
-        ],
-        sigma: state.get("sigma"),
-      }),
-    );
-  });
-
-  it("when pattern does not match due to wrong label", () => {
-    const state = buildSingleThreadedState({
-      semanticStatements: [buildSemanticStatement(skipStatement())],
-      sigma: buildSigma(
-        buildEquivalenceClass(
-          literalRecord("people", {
-            name: buildVariable("n", 0),
-            age: buildVariable("a", 0),
-          }),
-          buildVariable("x", 0),
+    it("executes correctly when the pattern matches and no new identifiers are bound", () => {
+      const state = buildSingleThreadedState({
+        semanticStatements: [buildSemanticStatement(skipStatement())],
+        sigma: buildSigma(
+          buildEquivalenceClass(valueNumber(10), buildVariable("x", 0)),
         ),
-        buildEquivalenceClass(undefined, buildVariable("n", 0)),
-        buildEquivalenceClass(undefined, buildVariable("a", 0)),
-      ),
+      });
+
+      const statement = buildSemanticStatement(
+        patternMatchingStatement(
+          identifierExpression(lexicalIdentifier("X")),
+          literalNumber(10),
+          sequenceStatement(skipStatement(), skipStatement()),
+          skipStatement(),
+        ),
+        buildEnvironment({
+          X: buildVariable("x", 0),
+        }),
+      );
+
+      expect(reduce(state, statement, 0)).toEqual(
+        buildSingleThreadedState({
+          semanticStatements: [
+            buildSemanticStatement(
+              sequenceStatement(skipStatement(), skipStatement()),
+              buildEnvironment({
+                X: buildVariable("x", 0),
+              }),
+            ),
+            buildSemanticStatement(skipStatement(), buildEnvironment()),
+          ],
+          sigma: state.get("sigma"),
+        }),
+      );
     });
 
-    const statement = buildSemanticStatement(
-      patternMatchingStatement(
-        identifierExpression(lexicalIdentifier("X")),
-        literalRecord("person", {
-          name: lexicalIdentifier("Name"),
-          age: lexicalIdentifier("Age"),
+    it("executes correctly when the pattern does not match", () => {
+      const state = buildSingleThreadedState({
+        semanticStatements: [buildSemanticStatement(skipStatement())],
+        sigma: buildSigma(
+          buildEquivalenceClass(valueNumber(10), buildVariable("x", 0)),
+        ),
+      });
+
+      const statement = buildSemanticStatement(
+        patternMatchingStatement(
+          identifierExpression(lexicalIdentifier("X")),
+          literalNumber(15),
+          sequenceStatement(skipStatement(), skipStatement()),
+          skipStatement(),
+        ),
+        buildEnvironment({
+          X: buildVariable("x", 0),
         }),
-        sequenceStatement(skipStatement(), skipStatement()),
-        skipStatement(),
-      ),
-      buildEnvironment({
-        X: buildVariable("x", 0),
-      }),
-    );
+      );
 
-    expect(reduce(state, statement, 0)).toEqual(
-      buildSingleThreadedState({
-        semanticStatements: [
-          buildSemanticStatement(
-            skipStatement(),
-            buildEnvironment({
-              X: buildVariable("x", 0),
-            }),
-          ),
-          buildSemanticStatement(skipStatement()),
-        ],
-        sigma: state.get("sigma"),
-      }),
-    );
-  });
-
-  it("when pattern does not match due to variable not being a record", () => {
-    const state = buildSingleThreadedState({
-      semanticStatements: [buildSemanticStatement(skipStatement())],
-      sigma: buildSigma(
-        buildEquivalenceClass(literalNumber(2), buildVariable("x", 0)),
-      ),
+      expect(reduce(state, statement, 0)).toEqual(
+        buildSingleThreadedState({
+          semanticStatements: [
+            buildSemanticStatement(
+              skipStatement(),
+              buildEnvironment({
+                X: buildVariable("x", 0),
+              }),
+            ),
+            buildSemanticStatement(skipStatement(), buildEnvironment()),
+          ],
+          sigma: state.get("sigma"),
+        }),
+      );
     });
-
-    const statement = buildSemanticStatement(
-      patternMatchingStatement(
-        identifierExpression(lexicalIdentifier("X")),
-        literalRecord("person", {
-          name: lexicalIdentifier("Name"),
-          age: lexicalIdentifier("Age"),
-        }),
-        sequenceStatement(skipStatement(), skipStatement()),
-        skipStatement(),
-      ),
-      buildEnvironment({
-        X: buildVariable("x", 0),
-      }),
-    );
-
-    expect(reduce(state, statement, 0)).toEqual(
-      buildSingleThreadedState({
-        semanticStatements: [
-          buildSemanticStatement(
-            skipStatement(),
-            buildEnvironment({
-              X: buildVariable("x", 0),
-            }),
-          ),
-          buildSemanticStatement(skipStatement()),
-        ],
-        sigma: state.get("sigma"),
-      }),
-    );
   });
 
   describe("when the case identifier is unbound", () => {
@@ -267,7 +155,7 @@ describe("Reducing case statements", () => {
       const statement = buildSemanticStatement(
         patternMatchingStatement(
           identifierExpression(lexicalIdentifier("X")),
-          literalRecord("person"),
+          lexicalIdentifier("Y"),
           sequenceStatement(skipStatement(), skipStatement()),
           skipStatement(),
         ),
@@ -298,7 +186,7 @@ describe("Reducing case statements", () => {
             identifierExpression(lexicalIdentifier("X")),
             identifierExpression(lexicalIdentifier("X")),
           ),
-          literalRecord("person"),
+          lexicalIdentifier("Y"),
           sequenceStatement(skipStatement(), skipStatement()),
           skipStatement(),
         ),
@@ -311,67 +199,5 @@ describe("Reducing case statements", () => {
         buildBlockedState(state, statement, 0, buildVariable("x", 0)),
       );
     });
-  });
-
-  it("when pattern matches incrementing the environment index", () => {
-    const lastIndex = getLastEnvironmentIndex();
-    const state = buildSingleThreadedState({
-      semanticStatements: [
-        buildSemanticStatement(skipStatement(), buildEnvironment(), {
-          environmentIndex: lastIndex,
-        }),
-      ],
-      sigma: buildSigma(
-        buildEquivalenceClass(
-          literalRecord("person", {
-            name: buildVariable("n", 0),
-            age: buildVariable("a", 0),
-          }),
-          buildVariable("x", 0),
-        ),
-        buildEquivalenceClass(undefined, buildVariable("n", 0)),
-        buildEquivalenceClass(undefined, buildVariable("a", 0)),
-      ),
-    });
-
-    const statement = buildSemanticStatement(
-      patternMatchingStatement(
-        identifierExpression(lexicalIdentifier("X")),
-        literalRecord("person", {
-          name: lexicalIdentifier("Name"),
-          age: lexicalIdentifier("Age"),
-        }),
-        sequenceStatement(skipStatement(), skipStatement()),
-        skipStatement(),
-      ),
-      buildEnvironment({
-        X: buildVariable("x", 0),
-      }),
-      {
-        environmentIndex: lastIndex,
-      },
-    );
-
-    expect(reduce(state, statement, 0)).toEqual(
-      buildSingleThreadedState({
-        semanticStatements: [
-          buildSemanticStatement(
-            sequenceStatement(skipStatement(), skipStatement()),
-            buildEnvironment({
-              X: buildVariable("x", 0),
-              Name: buildVariable("n", 0),
-              Age: buildVariable("a", 0),
-            }),
-            {
-              environmentIndex: lastIndex + 1,
-            },
-          ),
-          buildSemanticStatement(skipStatement(), buildEnvironment(), {
-            environmentIndex: lastIndex,
-          }),
-        ],
-        sigma: state.get("sigma"),
-      }),
-    );
   });
 });

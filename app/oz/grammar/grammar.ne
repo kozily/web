@@ -746,13 +746,17 @@ lit_procedure_args ->
 ##############################################################################
 # PAT - PATTERNS
 ##############################################################################
- pat_pattern ->
-    lit_record {% id %}
+pat_pattern ->
+    ids_identifier {% id %}
+  | lit_char {% id %}
+  | lit_integer {% id %}
+  | lit_float {% id %}
   | lit_atom {% id %}
+  | lit_string {% id %}
   | lit_boolean {% id %}
+  | lit_record {% id %}
   | lit_tuple {% id %}
   | lit_list {% id %}
-
 
 ##############################################################################
 # LIB - UTILITIES

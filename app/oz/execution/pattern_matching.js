@@ -1,7 +1,7 @@
-import Immutable from "immutable";
 import { buildSemanticStatement } from "../machine/build";
 import { blockCurrentThread } from "../machine/threads";
 import { evaluate } from "../expression";
+import { patternMatch } from "../pattern_match";
 import {
   getLastEnvironmentIndex,
   makeNewEnvironmentIndex,
@@ -29,47 +29,33 @@ export default function(state, semanticStatement, activeThreadIndex) {
     );
   }
 
-  const value = evaluation.get("value");
+  const { match, additionalBindings, sigma: augmentedSigma } = patternMatch(
+    evaluation,
+    pattern,
+    sigma,
+  );
 
-  if (
-    value.get("type") === "record" &&
-    value.getIn(["value", "label"]) === pattern.getIn(["value", "label"])
-  ) {
-    const valueFeatures = value.getIn(["value", "features"]);
-    const patternFeatures = pattern.getIn(["value", "features"]);
-
-    if (
-      Immutable.is(
-        valueFeatures.keySeq().toSet(),
-        patternFeatures.keySeq().toSet(),
+  if (match) {
+    const newSemanticStatement = additionalBindings.isEmpty()
+      ? buildSemanticStatement(trueStatement, environment)
+      : buildSemanticStatement(
+          trueStatement,
+          environment.merge(additionalBindings),
+          { environmentIndex: makeNewEnvironmentIndex() },
+        );
+    return state
+      .updateIn(["threads", activeThreadIndex, "stack"], stack =>
+        stack.push(newSemanticStatement),
       )
-    ) {
-      const newIndex = makeNewEnvironmentIndex();
-      const newEnvironment = patternFeatures.reduce(
-        (result, identifier, feature) => {
-          return result.set(
-            identifier.get("identifier"),
-            valueFeatures.get(feature),
-          );
-        },
-        environment,
-      );
-
-      return state.updateIn(["threads", activeThreadIndex, "stack"], stack =>
-        stack.push(
-          buildSemanticStatement(trueStatement, newEnvironment, {
-            environmentIndex: newIndex,
-          }),
-        ),
-      );
-    }
+      .set("sigma", augmentedSigma);
   }
 
+  const newSemanticStatement = buildSemanticStatement(
+    falseStatement,
+    environment,
+    { environmentIndex: lastIndex },
+  );
   return state.updateIn(["threads", activeThreadIndex, "stack"], stack =>
-    stack.push(
-      buildSemanticStatement(falseStatement, environment, {
-        environmentIndex: lastIndex,
-      }),
-    ),
+    stack.push(newSemanticStatement),
   );
 }
