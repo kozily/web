@@ -1,17 +1,19 @@
 import Immutable from "immutable";
 
-export const expressionTypes = {
+export const kernelExpressionTypes = {
   operator: "operator",
   identifier: "identifier",
   literal: "literal",
 };
 
-export const allExpressionTypes = Object.keys(expressionTypes);
+export const compilableExpressionTypes = {
+  function: "function",
+};
 
 export const literalExpression = literal => {
   return Immutable.fromJS({
     node: "expression",
-    type: "literal",
+    type: kernelExpressionTypes.literal,
     literal: literal,
   });
 };
@@ -19,7 +21,7 @@ export const literalExpression = literal => {
 export const identifierExpression = identifier => {
   return Immutable.fromJS({
     node: "expression",
-    type: "identifier",
+    type: kernelExpressionTypes.identifier,
     identifier,
   });
 };
@@ -27,9 +29,23 @@ export const identifierExpression = identifier => {
 export const operatorExpression = (operator, lhs, rhs) => {
   return Immutable.fromJS({
     node: "expression",
-    type: "operator",
+    type: kernelExpressionTypes.operator,
     operator,
     lhs,
     rhs,
   });
 };
+
+export const functionExpression = (fun, args = []) => {
+  return Immutable.fromJS({
+    node: "expression",
+    type: compilableExpressionTypes.function,
+    fun,
+    args,
+  });
+};
+
+export const isBindable = expression =>
+  expression.get("type") === kernelExpressionTypes.identifier ||
+  (expression.get("type") === kernelExpressionTypes.operator &&
+    expression.get("operator") === ".");

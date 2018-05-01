@@ -1,11 +1,11 @@
 import Immutable from "immutable";
 import { valueTypes } from "../machine/values";
-import number from "./number";
-import record from "./record";
-import procedure from "./procedure";
-import builtIn from "./built_in";
-import mutable from "./mutable";
-import nameCreation from "./name_creation";
+import number from "./values/number";
+import record from "./values/record";
+import procedure from "./values/procedure";
+import builtIn from "./values/built_in";
+import mutable from "./values/mutable";
+import nameCreation from "./values/name_creation";
 
 export const checkers = {
   [valueTypes.number]: number,

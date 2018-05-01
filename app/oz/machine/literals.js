@@ -1,17 +1,19 @@
 import Immutable from "immutable";
 
-export const literalTypes = {
+export const kernelLiteralTypes = {
   number: "number",
   record: "record",
   procedure: "procedure",
 };
 
-export const allLiteralTypes = Object.keys(literalTypes);
+export const compilableLiteralTypes = {
+  function: "function",
+};
 
 export const literalNumber = value => {
   return Immutable.fromJS({
     node: "literal",
-    type: "number",
+    type: kernelLiteralTypes.number,
     value,
   });
 };
@@ -19,7 +21,7 @@ export const literalNumber = value => {
 export const literalProcedure = (args = [], body) => {
   return Immutable.fromJS({
     node: "literal",
-    type: "procedure",
+    type: kernelLiteralTypes.procedure,
     value: {
       args,
       body,
@@ -27,10 +29,22 @@ export const literalProcedure = (args = [], body) => {
   });
 };
 
+export const literalFunction = (args = [], expression, statement) => {
+  return Immutable.fromJS({
+    node: "literal",
+    type: compilableLiteralTypes.function,
+    value: {
+      args,
+      expression,
+      statement,
+    },
+  });
+};
+
 export const literalRecord = (label, features = {}) => {
   return Immutable.fromJS({
     node: "literal",
-    type: "record",
+    type: kernelLiteralTypes.record,
     value: {
       label,
       features,

@@ -10,7 +10,7 @@ import {
   buildVariable,
   getLastAuxiliaryIdentifier,
 } from "../../app/oz/machine/build";
-import { evaluate } from "../../app/oz/expression";
+import { evaluate } from "../../app/oz/evaluation";
 import { patternMatch } from "../../app/oz/pattern_match";
 
 describe("Pattern matching against an identifier", () => {

@@ -1,21 +1,21 @@
 import { statementTypes } from "../machine/statements";
-import skip from "./skip";
-import sequence from "./sequence";
-import local from "./local";
-import binding from "./binding";
-import conditional from "./conditional";
-import patternMatching from "./pattern_matching";
-import procedureApplication from "./procedure_application";
-import exceptionContext from "./exception_context";
-import exceptionRaise from "./exception_raise";
-import exceptionCatch from "./exception_catch";
-import thread from "./thread";
-import byNeed from "./by_need";
-import cellCreation from "./cell_creation";
-import cellExchange from "./cell_exchange";
-import portCreation from "./port_creation";
-import portSend from "./port_send";
-import nameCreation from "./name_creation";
+import skip from "./statements/skip";
+import sequence from "./statements/sequence";
+import local from "./statements/local";
+import binding from "./statements/binding";
+import conditional from "./statements/conditional";
+import patternMatching from "./statements/pattern_matching";
+import procedureApplication from "./statements/procedure_application";
+import exceptionContext from "./statements/exception_context";
+import exceptionRaise from "./statements/exception_raise";
+import exceptionCatch from "./statements/exception_catch";
+import thread from "./statements/thread";
+import byNeed from "./statements/by_need";
+import cellCreation from "./statements/cell_creation";
+import cellExchange from "./statements/cell_exchange";
+import portCreation from "./statements/port_creation";
+import portSend from "./statements/port_send";
+import nameCreation from "./statements/name_creation";
 
 export const executors = {
   statement: {

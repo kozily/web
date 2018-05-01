@@ -73,6 +73,15 @@
     };
   }
 
+  function expBuildFunctionExpression(fun, args) {
+    return {
+      node: "expression",
+      type: "function",
+      fun: fun,
+      args: args,
+    };
+  }
+
   function idsBuildIdentifier(d) {
     return {
       node: "identifier",
@@ -120,6 +129,18 @@
       node: "literal",
       type: "procedure",
       value: { args: (args || []), body: body },
+    };
+  }
+
+  function litBuildFunction(args, expression, statement) {
+    return {
+      node: "literal",
+      type: "function",
+      value: {
+        args: (args || []),
+        expression: expression,
+        statement: statement,
+      },
     };
   }
 
@@ -402,12 +423,24 @@ exp_terminal ->
     exp_terminal_identifier {% id %}
   | exp_terminal_literal {% id %}
   | exp_terminal_paren {% id %}
+  | exp_terminal_function {% id %}
 
 exp_terminal_identifier -> ids_identifier {% expBuildExpressionWrapper(0, "identifier") %}
 
 exp_terminal_literal -> lit_value {% expBuildExpressionWrapper(0, "literal") %}
 
 exp_terminal_paren -> "(" _ exp_expression _ ")" {% nth(2) %}
+
+exp_terminal_function -> "{" _ exp_expression (__ exp_expression):* _ "}" {%
+  function(d) {
+    var functionExpression = d[2];
+    var functionArguments = d[3].map(function(arg) {
+      return arg[1];
+    });
+
+    return expBuildFunctionExpression(functionExpression, functionArguments);
+  }
+%}
 
 ##############################################################################
 # IDS - IDENTIFIERS
@@ -447,6 +480,7 @@ lit_value ->
   | lit_list {% id %}
   | lit_tuple {% id %}
   | lit_procedure {% id %}
+  | lit_function {% id %}
 
 ##############################################################################
 # Records
@@ -571,6 +605,7 @@ lit_tuple_cons_item ->
   | lit_float {% id %}
   | lit_list {% id %}
   | lit_procedure {% id %}
+  | lit_function {% id %}
 
 ##############################################################################
 # List
@@ -737,6 +772,26 @@ lit_procedure -> "proc" _ "{" _ "$" lit_procedure_args:? _ "}" _  stm_sequence _
 lit_procedure_args ->
     __ ids_identifier {% function(d) { return [d[1]] } %}
   | lit_procedure_args __ ids_identifier {%
+    function(d) {
+      return d[0].concat(d[2])
+    }
+  %}
+
+##############################################################################
+# Functions
+##############################################################################
+lit_function -> "fun" _ "{" _ "$" lit_function_args:? _ "}" __  (stm_sequence __):? exp_expression __ "end" {%
+  function(d) {
+    var args = d[5];
+    var statement = d[9] ? d[9][0] : undefined;
+    var expression = d[10];
+    return litBuildFunction(args, expression, statement);
+  }
+%}
+
+lit_function_args ->
+    __ ids_identifier {% function(d) { return [d[1]] } %}
+  | lit_function_args __ ids_identifier {%
     function(d) {
       return d[0].concat(d[2])
     }

@@ -1,6 +1,8 @@
 import Immutable from "immutable";
 import { valueCreators } from "../../app/oz/value_creation";
-import { allLiteralTypes } from "../../app/oz/machine/literals";
+import { kernelLiteralTypes } from "../../app/oz/machine/literals";
+
+const allLiteralTypes = Object.keys(kernelLiteralTypes);
 
 describe("Creating values", () => {
   beforeEach(() => {

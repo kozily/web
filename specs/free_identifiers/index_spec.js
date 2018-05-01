@@ -1,8 +1,11 @@
 import Immutable from "immutable";
 import { collectors } from "../../app/oz/free_identifiers";
 import { allStatementTypes } from "../../app/oz/machine/statements";
-import { allLiteralTypes } from "../../app/oz/machine/literals";
-import { allExpressionTypes } from "../../app/oz/machine/expressions";
+import { kernelLiteralTypes } from "../../app/oz/machine/literals";
+import { kernelExpressionTypes } from "../../app/oz/machine/expressions";
+
+const allLiteralTypes = Object.keys(kernelLiteralTypes);
+const allExpressionTypes = Object.keys(kernelExpressionTypes);
 
 describe("Collecting free identifiers", () => {
   beforeEach(() => {
