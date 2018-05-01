@@ -28,4 +28,12 @@ describe("Collecting free identifiers in a record literal", () => {
 
     expect(collectFreeIdentifiers(literal)).toEqual(Immutable.Set(["A", "N"]));
   });
+
+  it("collects nested identifiers when the identifier has more than one letter", () => {
+    const literal = literalRecord("person", {
+      age: lexicalIdentifier("Age"),
+    });
+
+    expect(collectFreeIdentifiers(literal)).toEqual(Immutable.Set.of("Age"));
+  });
 });

@@ -73,4 +73,12 @@ describe("Parsing record literals", () => {
       }),
     );
   });
+
+  it("handles literals with identifiers having multiple letters", () => {
+    expect(parse("person(age:Age)")).toEqual(
+      literalRecord("person", {
+        age: lexicalIdentifier("Age"),
+      }),
+    );
+  });
 });
