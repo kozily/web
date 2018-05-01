@@ -6,7 +6,7 @@ export default (recurse, literal) => {
     .valueSeq()
     .flatMap(feature => {
       if (feature.get("node") === "identifier") {
-        return Immutable.Set(feature.get("identifier"));
+        return Immutable.Set.of(feature.get("identifier"));
       }
 
       return recurse(feature);
