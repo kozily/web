@@ -8,7 +8,7 @@ module.exports = (config) => {
     preprocessors: {
       'specs/**/*_spec.js': ['webpack', 'sourcemap'],
     },
-    reporters: ['mocha'],
+    reporters: ['progress'],
     browsers: ['PhantomJS'],
     webpack: {
       devtool: 'inline-source-map',

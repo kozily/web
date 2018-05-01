@@ -1,15 +1,28 @@
 import Immutable from "immutable";
 import { compilers } from "../../app/oz/compilation";
 import { allStatementSyntaxTypes } from "../../app/oz/machine/statementSyntax";
-import { allLiteralTypes } from "../../app/oz/machine/literals";
-import { allExpressionTypes } from "../../app/oz/machine/expressions";
+import {
+  kernelLiteralTypes,
+  compilableLiteralTypes,
+} from "../../app/oz/machine/literals";
+import {
+  kernelExpressionTypes,
+  compilableExpressionTypes,
+} from "../../app/oz/machine/expressions";
+
+const allLiteralTypes = Object.keys(kernelLiteralTypes).concat(
+  Object.keys(compilableLiteralTypes),
+);
+const allExpressionTypes = Object.keys(kernelExpressionTypes).concat(
+  Object.keys(compilableExpressionTypes),
+);
 
 describe("Compiling", () => {
   beforeEach(() => {
     jasmine.addCustomEqualityTester(Immutable.is);
   });
 
-  it("has a compiler for all types", () => {
+  it("has a compiler for all statement types", () => {
     const typesWithCompiler = Immutable.Set(Object.keys(compilers.statement));
     const types = Immutable.Set(allStatementSyntaxTypes);
 

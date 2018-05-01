@@ -1,9 +1,12 @@
 import Immutable from "immutable";
 import { printers } from "../../app/oz/print";
 import { allStatementTypes } from "../../app/oz/machine/statements";
-import { allLiteralTypes } from "../../app/oz/machine/literals";
+import { kernelLiteralTypes } from "../../app/oz/machine/literals";
 import { allValueTypes } from "../../app/oz/machine/values";
-import { allExpressionTypes } from "../../app/oz/machine/expressions";
+import { kernelExpressionTypes } from "../../app/oz/machine/expressions";
+
+const allLiteralTypes = Object.keys(kernelLiteralTypes);
+const allExpressionTypes = Object.keys(kernelExpressionTypes);
 
 describe("Printing", () => {
   beforeEach(() => {

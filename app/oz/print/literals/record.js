@@ -1,3 +1,4 @@
+import printIdentifier from "../identifier";
 import { valueTypes } from "../../machine/values";
 
 const printLabel = label => {
@@ -14,7 +15,7 @@ const printValue = (recurse, node) => {
     return recurse(node);
   }
 
-  const printed = node.get("identifier");
+  const printed = printIdentifier(node.get("identifier"));
   return {
     abbreviated: printed,
     full: printed,

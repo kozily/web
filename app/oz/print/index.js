@@ -1,24 +1,24 @@
 import { statementTypes } from "../machine/statements";
 import { valueTypes } from "../machine/values";
-import { literalTypes } from "../machine/literals";
-import { expressionTypes } from "../machine/expressions";
-import skip from "./skip";
-import binding from "./binding";
-import sequence from "./sequence";
-import conditional from "./conditional";
-import local from "./local";
-import patternMatching from "./pattern_matching";
-import procedureApplication from "./procedure_application";
-import exceptionContext from "./exception_context";
-import exceptionRaise from "./exception_raise";
-import exceptionCatch from "./exception_catch";
-import thread from "./thread";
-import byNeed from "./by_need";
-import cellCreation from "./cell_creation";
-import cellExchange from "./cell_exchange";
-import portCreation from "./port_creation";
-import portSend from "./port_send";
-import nameCreation from "./name_creation";
+import { kernelLiteralTypes } from "../machine/literals";
+import { kernelExpressionTypes } from "../machine/expressions";
+import skip from "./statements/skip";
+import binding from "./statements/binding";
+import sequence from "./statements/sequence";
+import conditional from "./statements/conditional";
+import local from "./statements/local";
+import patternMatching from "./statements/pattern_matching";
+import procedureApplication from "./statements/procedure_application";
+import exceptionContext from "./statements/exception_context";
+import exceptionRaise from "./statements/exception_raise";
+import exceptionCatch from "./statements/exception_catch";
+import thread from "./statements/thread";
+import byNeed from "./statements/by_need";
+import cellCreation from "./statements/cell_creation";
+import cellExchange from "./statements/cell_exchange";
+import portCreation from "./statements/port_creation";
+import portSend from "./statements/port_send";
+import nameCreation from "./statements/name_creation";
 import numberLiteral from "./literals/number";
 import recordLiteral from "./literals/record";
 import procedureLiteral from "./literals/procedure";
@@ -28,9 +28,9 @@ import procedureValue from "./values/procedure";
 import builtInValue from "./values/built_in";
 import mutableValue from "./values/mutable";
 import nameCreationValue from "./values/name_creation";
-import literalExpression from "./literal_expression";
-import identifierExpression from "./identifier_expression";
-import operatorExpression from "./operator_expression";
+import literalExpression from "./expressions/literal";
+import identifierExpression from "./expressions/identifier";
+import operatorExpression from "./expressions/operator";
 
 export const printers = {
   statement: {
@@ -53,9 +53,9 @@ export const printers = {
     [statementTypes.nameCreation]: nameCreation,
   },
   literal: {
-    [literalTypes.number]: numberLiteral,
-    [literalTypes.record]: recordLiteral,
-    [literalTypes.procedure]: procedureLiteral,
+    [kernelLiteralTypes.number]: numberLiteral,
+    [kernelLiteralTypes.record]: recordLiteral,
+    [kernelLiteralTypes.procedure]: procedureLiteral,
   },
   value: {
     [valueTypes.number]: numberValue,
@@ -66,9 +66,9 @@ export const printers = {
     [valueTypes.nameCreation]: nameCreationValue,
   },
   expression: {
-    [expressionTypes.literal]: literalExpression,
-    [expressionTypes.identifier]: identifierExpression,
-    [expressionTypes.operator]: operatorExpression,
+    [kernelExpressionTypes.literal]: literalExpression,
+    [kernelExpressionTypes.identifier]: identifierExpression,
+    [kernelExpressionTypes.operator]: operatorExpression,
   },
 };
 

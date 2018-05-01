@@ -1,10 +1,12 @@
+import printIdentifier from "../identifier";
+
 export default (recurse, node, identation) => {
   const ident = new Array(identation + 1).join(" ");
   const value = node.get("value");
 
   const printedArgs = value
     .get("args")
-    .map(x => x.get("identifier"))
+    .map(x => printIdentifier(x.get("identifier")))
     .join(" ");
   const printedContext = value
     .get("context")

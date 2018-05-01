@@ -2,7 +2,7 @@ import Immutable from "immutable";
 import { literalExpression } from "../../app/oz/machine/expressions";
 import { literalNumber, literalAtom } from "../../app/oz/machine/literals";
 import { buildSigma, buildEnvironment } from "../../app/oz/machine/build";
-import { evaluate } from "../../app/oz/expression";
+import { evaluate } from "../../app/oz/evaluation";
 import { patternMatch } from "../../app/oz/pattern_match";
 
 describe("Pattern matching against a number", () => {
