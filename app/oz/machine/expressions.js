@@ -10,6 +10,7 @@ export const compilableExpressionTypes = {
   function: "function",
   local: "local",
   conditional: "conditional",
+  exceptionContext: "exceptionContext",
 };
 
 export const literalExpression = literal => {
@@ -64,6 +65,20 @@ export const conditionalExpression = (condition, trueClause, falseClause) => {
     condition,
     trueClause,
     falseClause,
+  });
+};
+
+export const exceptionContextExpression = (
+  tryClause,
+  exceptionClause,
+  exceptionIdentifier,
+) => {
+  return Immutable.fromJS({
+    node: "expression",
+    type: compilableExpressionTypes.exceptionContext,
+    tryClause,
+    exceptionClause,
+    exceptionIdentifier,
   });
 };
 

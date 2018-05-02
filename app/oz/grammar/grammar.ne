@@ -433,6 +433,7 @@ exp_terminal ->
   | exp_terminal_function {% id %}
   | exp_terminal_local {% id %}
   | exp_terminal_conditional {% id %}
+  | exp_terminal_try {% id %}
 
 exp_terminal_identifier -> ids_identifier {% expBuildExpressionWrapper(0, "identifier") %}
 
@@ -485,6 +486,28 @@ exp_terminal_conditional -> "if" __ exp_expression __ "then" __ (stm_sequence __
       trueClause: trueClause,
       falseClause: falseClause,
     }
+  }
+%}
+
+exp_terminal_try -> "try" __ (stm_sequence __):? exp_expression __ "catch" __ ids_identifier __ "then" __ (stm_sequence __):? exp_expression __ "end" {%
+  function(d) {
+    var tryClause = {
+      statement: d[2] ? d[2][0] : undefined,
+      expression: d[3],
+    };
+    var exceptionIdentifier = d[7];
+    var exceptionClause = {
+      statement: d[11] ? d[11][0] : undefined,
+      expression: d[12],
+    };
+
+    return {
+      node: "expression",
+      type: "exceptionContext",
+      tryClause: tryClause,
+      exceptionClause: exceptionClause,
+      exceptionIdentifier: exceptionIdentifier,
+    };
   }
 %}
 
