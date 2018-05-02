@@ -219,3 +219,7 @@ export const makeAuxiliaryIdentifier = (namespace = "") => {
 export const getLastAuxiliaryIdentifier = (namespace = "", ago = 1) => {
   return lexicalIdentifier(`@${namespace}${argumentIndex - ago}`);
 };
+
+export const resetAuxiliaryIdentifierIndex = () => {
+  argumentIndex = 0;
+};

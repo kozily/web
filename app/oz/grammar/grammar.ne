@@ -431,6 +431,10 @@ exp_terminal ->
   | exp_terminal_literal {% id %}
   | exp_terminal_paren {% id %}
   | exp_terminal_function {% id %}
+  | exp_terminal_local {% id %}
+  | exp_terminal_conditional {% id %}
+  | exp_terminal_try {% id %}
+  | exp_terminal_pattern_matching {% id %}
 
 exp_terminal_identifier -> ids_identifier {% expBuildExpressionWrapper(0, "identifier") %}
 
@@ -446,6 +450,95 @@ exp_terminal_function -> "{" _ exp_expression (__ exp_expression):* _ "}" {%
     });
 
     return expBuildFunctionExpression(functionExpression, functionArguments);
+  }
+%}
+
+exp_terminal_local -> "local" __ stm_local_identifier_list __ "in" __ (stm_sequence __):? exp_expression __ "end" {%
+  function(d) {
+    var identifiers = d[2];
+    var statement = d[6] ? d[6][0] : undefined;
+    var expression = d[7];
+    return {
+      node: "expression",
+      type: "local",
+      identifiers: identifiers,
+      statement: statement,
+      expression: expression,
+    };
+  }
+%}
+
+exp_terminal_conditional -> "if" __ exp_expression __ "then" __ (stm_sequence __):? exp_expression __ ("else" __ (stm_sequence __):? exp_expression __):? "end" {%
+  function(d, position, reject) {
+    var condition = d[2];
+    var trueClause = {
+      statement: d[6] ? d[6][0]: undefined,
+      expression: d[7],
+    };
+
+    var falseClause = d[9]
+      ? { statement: d[9][2] ? d[9][2][0] : undefined, expression: d[9][3] }
+      : undefined;
+
+    return {
+      node: "expression",
+      type: "conditional",
+      condition: condition,
+      trueClause: trueClause,
+      falseClause: falseClause,
+    }
+  }
+%}
+
+exp_terminal_try -> "try" __ (stm_sequence __):? exp_expression __ "catch" __ ids_identifier __ "then" __ (stm_sequence __):? exp_expression __ "end" {%
+  function(d) {
+    var tryClause = {
+      statement: d[2] ? d[2][0] : undefined,
+      expression: d[3],
+    };
+    var exceptionIdentifier = d[7];
+    var exceptionClause = {
+      statement: d[11] ? d[11][0] : undefined,
+      expression: d[12],
+    };
+
+    return {
+      node: "expression",
+      type: "exceptionContext",
+      tryClause: tryClause,
+      exceptionClause: exceptionClause,
+      exceptionIdentifier: exceptionIdentifier,
+    };
+  }
+%}
+
+exp_terminal_pattern_matching -> "case" __ exp_expression __ "of" __ pat_pattern __ "then" __ (stm_sequence __):? exp_expression __ ("[]" __ pat_pattern __ "then" __ (stm_sequence __):? exp_expression __ ):* ("else" __ (stm_sequence __):? exp_expression __):? "end" {%
+  function(d, position, reject) {
+    var identifier = d[2];
+    var initialClause = {
+      pattern: d[6],
+      statement: d[10] ? d[10][0] : undefined,
+      expression: d[11],
+    };
+    var clauses = d[13].reduce(function(result, clause) {
+      result.push({
+        pattern: clause[2],
+        statement: clause[6] ? clause[6][0] : undefined,
+        expression: clause[7]
+      });
+      return result;
+    }, [initialClause]);
+    var falseClause = d[14] 
+      ? { statement: d[14][2] ? d[14][2][0] : undefined, expression: d[14][3] }
+      : undefined;
+
+    return {
+      node: "expression",
+      type: "patternMatching",
+      identifier: identifier,
+      clauses: clauses,
+      falseClause: falseClause,
+    };
   }
 %}
 

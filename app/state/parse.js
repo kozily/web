@@ -2,7 +2,10 @@ import Immutable from "immutable";
 import parser from "../oz/parser";
 import { compile } from "../oz/compilation";
 import { collectFreeIdentifiers } from "../oz/free_identifiers";
-import { defaultEnvironment } from "../oz/machine/build";
+import {
+  defaultEnvironment,
+  resetAuxiliaryIdentifierIndex,
+} from "../oz/machine/build";
 
 const defaultIdentifiers = Immutable.Set(defaultEnvironment().keySeq());
 
@@ -23,6 +26,7 @@ export const reducer = (previousState = initialState, action) => {
   switch (action.type) {
     case "CHANGE_SOURCE_CODE": {
       try {
+        resetAuxiliaryIdentifierIndex();
         const ast = parser(action.payload);
         const compilation = compile(ast);
         const freeIdentifiers = collectFreeIdentifiers(compilation).subtract(

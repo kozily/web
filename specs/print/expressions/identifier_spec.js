@@ -23,4 +23,12 @@ describe("Printing an identifier expression", () => {
     expect(result.abbreviated).toEqual("`@system`");
     expect(result.full).toEqual("`@system`");
   });
+
+  it("returns the appropriate string with the any identifier", () => {
+    const expression = identifierExpression(lexicalIdentifier("_"));
+    const result = print(expression, 2);
+
+    expect(result.abbreviated).toEqual("_");
+    expect(result.full).toEqual("_");
+  });
 });

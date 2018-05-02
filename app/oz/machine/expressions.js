@@ -8,6 +8,10 @@ export const kernelExpressionTypes = {
 
 export const compilableExpressionTypes = {
   function: "function",
+  local: "local",
+  conditional: "conditional",
+  exceptionContext: "exceptionContext",
+  patternMatching: "patternMatching",
 };
 
 export const literalExpression = literal => {
@@ -42,6 +46,50 @@ export const functionExpression = (fun, args = []) => {
     type: compilableExpressionTypes.function,
     fun,
     args,
+  });
+};
+
+export const localExpression = (identifiers, expression, statement) => {
+  return Immutable.fromJS({
+    node: "expression",
+    type: compilableExpressionTypes.local,
+    identifiers,
+    expression,
+    statement,
+  });
+};
+
+export const conditionalExpression = (condition, trueClause, falseClause) => {
+  return Immutable.fromJS({
+    node: "expression",
+    type: compilableExpressionTypes.conditional,
+    condition,
+    trueClause,
+    falseClause,
+  });
+};
+
+export const exceptionContextExpression = (
+  tryClause,
+  exceptionClause,
+  exceptionIdentifier,
+) => {
+  return Immutable.fromJS({
+    node: "expression",
+    type: compilableExpressionTypes.exceptionContext,
+    tryClause,
+    exceptionClause,
+    exceptionIdentifier,
+  });
+};
+
+export const patternMatchingExpression = (identifier, clauses, falseClause) => {
+  return Immutable.fromJS({
+    node: "expression",
+    type: compilableExpressionTypes.patternMatching,
+    identifier,
+    clauses,
+    falseClause,
   });
 };
 

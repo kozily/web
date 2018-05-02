@@ -31,6 +31,10 @@ import literalExpression from "./expressions/literal";
 import identifierExpression from "./expressions/identifier";
 import operatorExpression from "./expressions/operator";
 import functionExpression from "./expressions/function";
+import localExpression from "./expressions/local";
+import conditionalExpression from "./expressions/conditional";
+import patternMatchingExpression from "./expressions/pattern_matching";
+import exceptionContextExpression from "./expressions/exception_context";
 
 export const compilers = {
   statement: {
@@ -62,6 +66,10 @@ export const compilers = {
     [kernelExpressionTypes.identifier]: identifierExpression,
     [kernelExpressionTypes.operator]: operatorExpression,
     [compilableExpressionTypes.function]: functionExpression,
+    [compilableExpressionTypes.local]: localExpression,
+    [compilableExpressionTypes.conditional]: conditionalExpression,
+    [compilableExpressionTypes.exceptionContext]: exceptionContextExpression,
+    [compilableExpressionTypes.patternMatching]: patternMatchingExpression,
   },
 };
 
