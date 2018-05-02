@@ -35,6 +35,7 @@ import localExpression from "./expressions/local";
 import conditionalExpression from "./expressions/conditional";
 import patternMatchingExpression from "./expressions/pattern_matching";
 import exceptionContextExpression from "./expressions/exception_context";
+import threadExpression from "./expressions/thread";
 
 export const compilers = {
   statement: {
@@ -70,6 +71,7 @@ export const compilers = {
     [compilableExpressionTypes.conditional]: conditionalExpression,
     [compilableExpressionTypes.exceptionContext]: exceptionContextExpression,
     [compilableExpressionTypes.patternMatching]: patternMatchingExpression,
+    [compilableExpressionTypes.thread]: threadExpression,
   },
 };
 

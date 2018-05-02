@@ -435,6 +435,7 @@ exp_terminal ->
   | exp_terminal_conditional {% id %}
   | exp_terminal_try {% id %}
   | exp_terminal_pattern_matching {% id %}
+  | exp_terminal_thread {% id %}
 
 exp_terminal_identifier -> ids_identifier {% expBuildExpressionWrapper(0, "identifier") %}
 
@@ -528,7 +529,7 @@ exp_terminal_pattern_matching -> "case" __ exp_expression __ "of" __ pat_pattern
       });
       return result;
     }, [initialClause]);
-    var falseClause = d[14] 
+    var falseClause = d[14]
       ? { statement: d[14][2] ? d[14][2][0] : undefined, expression: d[14][3] }
       : undefined;
 
@@ -538,6 +539,19 @@ exp_terminal_pattern_matching -> "case" __ exp_expression __ "of" __ pat_pattern
       identifier: identifier,
       clauses: clauses,
       falseClause: falseClause,
+    };
+  }
+%}
+
+exp_terminal_thread -> "thread" __ (stm_sequence __):? exp_expression __ "end" {%
+  function(d, position, reject) {
+    var statement = d[2] ? d[2][0] : undefined;
+    var expression = d[3];
+    return {
+      node: "expression",
+      type: "thread",
+      statement: statement,
+      expression: expression,
     };
   }
 %}

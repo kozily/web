@@ -12,6 +12,7 @@ export const compilableExpressionTypes = {
   conditional: "conditional",
   exceptionContext: "exceptionContext",
   patternMatching: "patternMatching",
+  thread: "thread",
 };
 
 export const literalExpression = literal => {
@@ -90,6 +91,15 @@ export const patternMatchingExpression = (identifier, clauses, falseClause) => {
     identifier,
     clauses,
     falseClause,
+  });
+};
+
+export const threadExpression = (expression, statement) => {
+  return Immutable.fromJS({
+    node: "expression",
+    type: compilableExpressionTypes.thread,
+    expression,
+    statement,
   });
 };
 
