@@ -16,6 +16,7 @@ export const compilableExpressionTypes = {
   nameCreation: "nameCreation",
   cellCreation: "cellCreation",
   portCreation: "portCreation",
+  atCell: "atCell",
 };
 
 export const literalExpression = literal => {
@@ -126,6 +127,14 @@ export const portCreationExpression = value => {
     node: "expression",
     type: compilableExpressionTypes.portCreation,
     value,
+  });
+};
+
+export const atCellExpression = cell => {
+  return Immutable.fromJS({
+    node: "expression",
+    type: compilableExpressionTypes.atCell,
+    cell,
   });
 };
 

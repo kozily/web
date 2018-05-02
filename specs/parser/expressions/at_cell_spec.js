@@ -1,5 +1,8 @@
 import Immutable from "immutable";
-import { identifierExpression } from "../../../app/oz/machine/expressions";
+import {
+  identifierExpression,
+  atCellExpression,
+} from "../../../app/oz/machine/expressions";
 import { lexicalIdentifier } from "../../../app/oz/machine/lexical";
 import { parserFor } from "../../../app/oz/parser";
 import expressionsGrammar from "../../../app/oz/grammar/expressions.ne";
@@ -13,11 +16,13 @@ describe("Parsing at cell expressions", () => {
 
   it("parses at cell successfully", () => {
     expect(parse("@OneVariable")).toEqual(
-      identifierExpression(lexicalIdentifier("OneVariable")),
+      atCellExpression(identifierExpression(lexicalIdentifier("OneVariable"))),
     );
   });
 
   it("parses at cell successfully", () => {
-    expect(parse("@C")).toEqual(identifierExpression(lexicalIdentifier("C")));
+    expect(parse("@C")).toEqual(
+      atCellExpression(identifierExpression(lexicalIdentifier("C"))),
+    );
   });
 });

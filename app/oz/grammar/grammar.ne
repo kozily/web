@@ -606,7 +606,15 @@ exp_terminal_string -> lit_string_syntax {%
   }
 %}
 
-exp_at_cell -> "@" ids_identifier {% expBuildExpressionWrapper(1, "identifier") %}
+exp_at_cell -> "@" exp_expression {%
+  function(d) {
+    return {
+      node: "expression",
+      type: "atCell",
+      cell: d[1]
+    };
+  }
+%}
 
 exp_colon_equals_cell -> exp_expression _ ":=" _ exp_expression {% expBuildOperatorExpression(0, 4, [2]) %}
 

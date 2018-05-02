@@ -39,6 +39,7 @@ import threadExpression from "./expressions/thread";
 import nameCreationExpression from "./expressions/name_creation";
 import cellCreationExpression from "./expressions/cell_creation";
 import portCreationExpression from "./expressions/port_creation";
+import atCellExpression from "./expressions/atCell";
 
 export const compilers = {
   statement: {
@@ -78,6 +79,7 @@ export const compilers = {
     [compilableExpressionTypes.nameCreation]: nameCreationExpression,
     [compilableExpressionTypes.cellCreation]: cellCreationExpression,
     [compilableExpressionTypes.portCreation]: portCreationExpression,
+    [compilableExpressionTypes.atCell]: atCellExpression,
   },
 };
 
