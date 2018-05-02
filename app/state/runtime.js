@@ -1,7 +1,11 @@
 import Immutable from "immutable";
 import parser from "../oz/parser";
 import { compile } from "../oz/compilation";
-import { buildState, buildFromKernelAST } from "../oz/machine/build";
+import {
+  buildState,
+  buildFromKernelAST,
+  resetAuxiliaryIdentifierIndex,
+} from "../oz/machine/build";
 import { executeSingleStep } from "../oz/runtime";
 import { resetEnvironmentIndex } from "../oz/machine/environment";
 
@@ -47,9 +51,10 @@ export const toggleShowSystemVariables = () => {
 export const reducer = (previousState = initialState, action) => {
   switch (action.type) {
     case "RUNTIME_RUN": {
+      resetAuxiliaryIdentifierIndex();
+      resetEnvironmentIndex();
       const ast = parser(previousState.get("source"));
       const kernel = compile(ast);
-      resetEnvironmentIndex();
       const runtime = buildFromKernelAST(kernel);
       return previousState
         .set("steps", Immutable.List.of(runtime))
