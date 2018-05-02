@@ -11,6 +11,7 @@ describe("Parsing char literals", () => {
   });
 
   it("handles numeric characters correctly", () => {
+    expect(parse("0")).toEqual(literalNumber(0));
     expect(parse("40")).toEqual(literalNumber(40));
     expect(parse("255")).toEqual(literalNumber(255));
   });

@@ -767,6 +767,7 @@ lit_string_syntax -> "\"" ([^"\\] | lib_pseudo_char):* "\"" {%
 ##############################################################################
 lit_char ->
     lit_numeric_char {% litBuildNumber %}
+  | lit_zero_char {% litBuildNumber %}
   | lit_quoted_char {% litBuildNumber %}
   | lit_escaped_char {% litBuildNumber %}
 
@@ -778,6 +779,12 @@ lit_numeric_char -> [1-9] [0-9]:* {%
     } else {
       return value;
     }
+  }
+%}
+
+lit_zero_char -> "0" {%
+  function(d) {
+    return 0;
   }
 %}
 
