@@ -1,10 +1,10 @@
 import { identifierExpression } from "../../machine/expressions";
 import { makeAuxiliaryIdentifier } from "../../machine/build";
+import { localStatement } from "../../machine/statements";
 import {
-  localStatement,
-  bindingStatement,
-  sequenceStatement,
-} from "../../machine/statements";
+  compileStatementAndExpression,
+  makeStatementAugmentation,
+} from "./helpers";
 
 export default (recurse, node, resultingIdentifier) => {
   const auxiliaryIdentifier = makeAuxiliaryIdentifier("exp");
@@ -13,39 +13,24 @@ export default (recurse, node, resultingIdentifier) => {
     ? resultingIdentifier
     : identifierExpression(auxiliaryIdentifier);
 
-  const compiledExpression = recurse(
-    node.get("expression"),
-    resultingIdentifier,
+  const compiledBody = compileStatementAndExpression(
+    recurse,
+    node,
+    resultingExpression,
   );
-
-  const finalBinding = compiledExpression.augmentStatement(
-    bindingStatement(
-      resultingExpression,
-      compiledExpression.resultingExpression,
-    ),
-  );
-
-  const childStatement = node.get("statement")
-    ? sequenceStatement(recurse(node.get("statement")), finalBinding)
-    : finalBinding;
 
   const resultingStatement = node
     .get("identifiers")
     .reduceRight(
       (child, identifier) => localStatement(identifier, child),
-      childStatement,
+      compiledBody,
     );
 
-  const augmentStatement = statement => {
-    if (resultingIdentifier) {
-      return resultingStatement;
-    }
-
-    return localStatement(
-      auxiliaryIdentifier,
-      sequenceStatement(resultingStatement, statement),
-    );
-  };
+  const augmentStatement = makeStatementAugmentation(
+    resultingIdentifier,
+    auxiliaryIdentifier,
+    resultingStatement,
+  );
 
   return {
     resultingExpression,

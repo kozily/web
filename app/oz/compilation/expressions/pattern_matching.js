@@ -1,29 +1,10 @@
 import { identifierExpression } from "../../machine/expressions";
 import { makeAuxiliaryIdentifier } from "../../machine/build";
+import { patternMatchingStatement } from "../../machine/statements";
 import {
-  localStatement,
-  bindingStatement,
-  sequenceStatement,
-  patternMatchingStatement,
-  skipStatement,
-} from "../../machine/statements";
-
-const compileStatementAndExpression = (
-  recurse,
-  statement,
-  expression,
-  resultingExpression,
-) => {
-  const compiledExpression = recurse(expression, resultingExpression);
-
-  const binding = compiledExpression.augmentStatement(
-    bindingStatement(
-      resultingExpression,
-      compiledExpression.resultingExpression,
-    ),
-  );
-  return statement ? sequenceStatement(recurse(statement), binding) : binding;
-};
+  compileStatementAndExpression,
+  makeStatementAugmentation,
+} from "./helpers";
 
 export default (recurse, node, resultingIdentifier) => {
   const auxiliaryIdentifier = makeAuxiliaryIdentifier("exp");
@@ -32,17 +13,11 @@ export default (recurse, node, resultingIdentifier) => {
     ? resultingIdentifier
     : identifierExpression(auxiliaryIdentifier);
 
-  const falseStatement = node.getIn(["falseClause", "statement"]);
-  const falseExpression = node.getIn(["falseClause", "expression"]);
-
-  const compiledFinalFalseStatement = falseExpression
-    ? compileStatementAndExpression(
-        recurse,
-        falseStatement,
-        falseExpression,
-        resultingExpression,
-      )
-    : skipStatement();
+  const compiledFalseStatement = compileStatementAndExpression(
+    recurse,
+    node.get("falseClause"),
+    resultingExpression,
+  );
 
   const expressionCompilation = recurse(node.get("identifier"));
 
@@ -51,8 +26,7 @@ export default (recurse, node, resultingIdentifier) => {
     .reduceRight((result, clause) => {
       const compiledClause = compileStatementAndExpression(
         recurse,
-        clause.get("statement"),
-        clause.get("expression"),
+        clause,
         resultingExpression,
       );
       return patternMatchingStatement(
@@ -61,22 +35,17 @@ export default (recurse, node, resultingIdentifier) => {
         compiledClause,
         result,
       );
-    }, compiledFinalFalseStatement);
+    }, compiledFalseStatement);
 
   const resultingStatement = expressionCompilation.augmentStatement(
     rawResultingStatement,
   );
 
-  const augmentStatement = statement => {
-    if (resultingIdentifier) {
-      return resultingStatement;
-    }
-
-    return localStatement(
-      auxiliaryIdentifier,
-      sequenceStatement(resultingStatement, statement),
-    );
-  };
+  const augmentStatement = makeStatementAugmentation(
+    resultingIdentifier,
+    auxiliaryIdentifier,
+    resultingStatement,
+  );
 
   return {
     resultingExpression,

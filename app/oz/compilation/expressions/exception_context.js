@@ -1,29 +1,10 @@
 import { identifierExpression } from "../../machine/expressions";
 import { makeAuxiliaryIdentifier } from "../../machine/build";
+import { exceptionContextStatement } from "../../machine/statements";
 import {
-  localStatement,
-  bindingStatement,
-  sequenceStatement,
-  exceptionContextStatement,
-  skipStatement,
-} from "../../machine/statements";
-
-const compileStatementAndExpression = (
-  recurse,
-  statement,
-  expression,
-  resultingExpression,
-) => {
-  const compiledExpression = recurse(expression, resultingExpression);
-
-  const binding = compiledExpression.augmentStatement(
-    bindingStatement(
-      resultingExpression,
-      compiledExpression.resultingExpression,
-    ),
-  );
-  return statement ? sequenceStatement(recurse(statement), binding) : binding;
-};
+  compileStatementAndExpression,
+  makeStatementAugmentation,
+} from "./helpers";
 
 export default (recurse, node, resultingIdentifier) => {
   const auxiliaryIdentifier = makeAuxiliaryIdentifier("exp");
@@ -32,27 +13,17 @@ export default (recurse, node, resultingIdentifier) => {
     ? resultingIdentifier
     : identifierExpression(auxiliaryIdentifier);
 
-  const tryStatement = node.getIn(["tryClause", "statement"]);
-  const tryExpression = node.getIn(["tryClause", "expression"]);
-
   const compiledTryStatement = compileStatementAndExpression(
     recurse,
-    tryStatement,
-    tryExpression,
+    node.get("tryClause"),
     resultingExpression,
   );
 
-  const exceptionStatement = node.getIn(["exceptionClause", "statement"]);
-  const exceptionExpression = node.getIn(["exceptionClause", "expression"]);
-
-  const compiledExceptionStatement = exceptionExpression
-    ? compileStatementAndExpression(
-        recurse,
-        exceptionStatement,
-        exceptionExpression,
-        resultingExpression,
-      )
-    : skipStatement();
+  const compiledExceptionStatement = compileStatementAndExpression(
+    recurse,
+    node.get("exceptionClause"),
+    resultingExpression,
+  );
 
   const resultingStatement = exceptionContextStatement(
     compiledTryStatement,
@@ -60,16 +31,11 @@ export default (recurse, node, resultingIdentifier) => {
     compiledExceptionStatement,
   );
 
-  const augmentStatement = statement => {
-    if (resultingIdentifier) {
-      return resultingStatement;
-    }
-
-    return localStatement(
-      auxiliaryIdentifier,
-      sequenceStatement(resultingStatement, statement),
-    );
-  };
+  const augmentStatement = makeStatementAugmentation(
+    resultingIdentifier,
+    auxiliaryIdentifier,
+    resultingStatement,
+  );
 
   return {
     resultingExpression,

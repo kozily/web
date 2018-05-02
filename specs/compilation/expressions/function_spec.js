@@ -56,22 +56,22 @@ describe("Compiling function expressions", () => {
 
       expect(resultingStatement).toEqual(
         localStatement(
-          auxExpressionIdentifier(1),
+          auxExpressionIdentifier(2),
           sequenceStatement(
-            procedureApplicationStatement(identifier("GetFunction"), [
-              auxExpression(1),
-            ]),
             localStatement(
-              auxExpressionIdentifier(2),
+              auxExpressionIdentifier(1),
               sequenceStatement(
+                procedureApplicationStatement(identifier("GetFunction"), [
+                  auxExpression(1),
+                ]),
                 procedureApplicationStatement(auxExpression(1), [
                   identifier("A"),
                   identifier("B"),
                   auxExpression(2),
                 ]),
-                skipStatement(),
               ),
             ),
+            skipStatement(),
           ),
         ),
       );
@@ -88,21 +88,21 @@ describe("Compiling function expressions", () => {
 
       expect(resultingStatement).toEqual(
         localStatement(
-          auxExpressionIdentifier(1),
+          auxExpressionIdentifier(2),
           sequenceStatement(
-            procedureApplicationStatement(identifier("GetArg"), [
-              auxExpression(1),
-            ]),
             localStatement(
-              auxExpressionIdentifier(2),
+              auxExpressionIdentifier(1),
               sequenceStatement(
+                procedureApplicationStatement(identifier("GetArg"), [
+                  auxExpression(1),
+                ]),
                 procedureApplicationStatement(identifier("Sum"), [
                   auxExpression(1),
                   auxExpression(2),
                 ]),
-                skipStatement(),
               ),
             ),
+            skipStatement(),
           ),
         ),
       );
