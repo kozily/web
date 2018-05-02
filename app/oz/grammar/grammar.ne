@@ -434,6 +434,7 @@ exp_terminal ->
   | exp_terminal_local {% id %}
   | exp_terminal_conditional {% id %}
   | exp_terminal_try {% id %}
+  | exp_terminal_pattern_matching {% id %}
 
 exp_terminal_identifier -> ids_identifier {% expBuildExpressionWrapper(0, "identifier") %}
 
@@ -507,6 +508,36 @@ exp_terminal_try -> "try" __ (stm_sequence __):? exp_expression __ "catch" __ id
       tryClause: tryClause,
       exceptionClause: exceptionClause,
       exceptionIdentifier: exceptionIdentifier,
+    };
+  }
+%}
+
+exp_terminal_pattern_matching -> "case" __ exp_expression __ "of" __ pat_pattern __ "then" __ (stm_sequence __):? exp_expression __ ("[]" __ pat_pattern __ "then" __ (stm_sequence __):? exp_expression __ ):* ("else" __ (stm_sequence __):? exp_expression __):? "end" {%
+  function(d, position, reject) {
+    var identifier = d[2];
+    var initialClause = {
+      pattern: d[6],
+      statement: d[10] ? d[10][0] : undefined,
+      expression: d[11],
+    };
+    var clauses = d[13].reduce(function(result, clause) {
+      result.push({
+        pattern: clause[2],
+        statement: clause[6] ? clause[6][0] : undefined,
+        expression: clause[7]
+      });
+      return result;
+    }, [initialClause]);
+    var falseClause = d[14] 
+      ? { statement: d[14][2] ? d[14][2][0] : undefined, expression: d[14][3] }
+      : undefined;
+
+    return {
+      node: "expression",
+      type: "patternMatching",
+      identifier: identifier,
+      clauses: clauses,
+      falseClause: falseClause,
     };
   }
 %}

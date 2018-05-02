@@ -11,6 +11,7 @@ export const compilableExpressionTypes = {
   local: "local",
   conditional: "conditional",
   exceptionContext: "exceptionContext",
+  patternMatching: "patternMatching",
 };
 
 export const literalExpression = literal => {
@@ -79,6 +80,16 @@ export const exceptionContextExpression = (
     tryClause,
     exceptionClause,
     exceptionIdentifier,
+  });
+};
+
+export const patternMatchingExpression = (identifier, clauses, falseClause) => {
+  return Immutable.fromJS({
+    node: "expression",
+    type: compilableExpressionTypes.patternMatching,
+    identifier,
+    clauses,
+    falseClause,
   });
 };
 

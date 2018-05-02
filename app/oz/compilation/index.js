@@ -33,6 +33,7 @@ import operatorExpression from "./expressions/operator";
 import functionExpression from "./expressions/function";
 import localExpression from "./expressions/local";
 import conditionalExpression from "./expressions/conditional";
+import patternMatchingExpression from "./expressions/pattern_matching";
 import exceptionContextExpression from "./expressions/exception_context";
 
 export const compilers = {
@@ -68,6 +69,7 @@ export const compilers = {
     [compilableExpressionTypes.local]: localExpression,
     [compilableExpressionTypes.conditional]: conditionalExpression,
     [compilableExpressionTypes.exceptionContext]: exceptionContextExpression,
+    [compilableExpressionTypes.patternMatching]: patternMatchingExpression,
   },
 };
 
