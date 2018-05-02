@@ -21,7 +21,7 @@ describe("Compiling local statement expressions", () => {
   });
 
   describe("when not providing a resulting identifier", () => {
-    it("compiles", () => {
+    it("compiles if the local statement has statements", () => {
       const expression = localExpression(
         [lexicalIdentifier("X"), lexicalIdentifier("Y")],
         literalExpression(literalNumber(10)),
@@ -56,10 +56,42 @@ describe("Compiling local statement expressions", () => {
         ),
       );
     });
+
+    it("compiles if the local statement doesn't have statements", () => {
+      const expression = localExpression(
+        [lexicalIdentifier("X"), lexicalIdentifier("Y")],
+        literalExpression(literalNumber(10)),
+      );
+
+      const compilation = compile(expression);
+
+      expect(compilation.resultingExpression).toEqual(auxExpression());
+
+      const resultingStatement = compilation.augmentStatement(skipStatement());
+
+      expect(resultingStatement).toEqual(
+        localStatement(
+          auxExpressionIdentifier(),
+          sequenceStatement(
+            localStatement(
+              lexicalIdentifier("X"),
+              localStatement(
+                lexicalIdentifier("Y"),
+                bindingStatement(
+                  auxExpression(),
+                  literalExpression(literalNumber(10)),
+                ),
+              ),
+            ),
+            skipStatement(),
+          ),
+        ),
+      );
+    });
   });
 
   describe("when providing a resulting identifier", () => {
-    it("compiles", () => {
+    it("compiles if the local statement has statements", () => {
       const expression = localExpression(
         [lexicalIdentifier("X"), lexicalIdentifier("Y")],
         literalExpression(literalNumber(10)),
@@ -83,6 +115,32 @@ describe("Compiling local statement expressions", () => {
                 identifier("R"),
                 literalExpression(literalNumber(10)),
               ),
+            ),
+          ),
+        ),
+      );
+    });
+
+    it("compiles if the local statement doesn't have statements", () => {
+      const expression = localExpression(
+        [lexicalIdentifier("X"), lexicalIdentifier("Y")],
+        literalExpression(literalNumber(10)),
+      );
+
+      const compilation = compile(expression, identifier("R"));
+
+      expect(compilation.resultingExpression).toEqual(identifier("R"));
+
+      const resultingStatement = compilation.augmentStatement(skipStatement());
+
+      expect(resultingStatement).toEqual(
+        localStatement(
+          lexicalIdentifier("X"),
+          localStatement(
+            lexicalIdentifier("Y"),
+            bindingStatement(
+              identifier("R"),
+              literalExpression(literalNumber(10)),
             ),
           ),
         ),

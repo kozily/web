@@ -13,7 +13,10 @@ export default (recurse, node, resultingIdentifier) => {
     ? resultingIdentifier
     : identifierExpression(auxiliaryIdentifier);
 
-  const compiledExpression = recurse(node.get("expression"));
+  const compiledExpression = recurse(
+    node.get("expression"),
+    resultingIdentifier,
+  );
 
   const finalBinding = compiledExpression.augmentStatement(
     bindingStatement(

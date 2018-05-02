@@ -432,6 +432,7 @@ exp_terminal ->
   | exp_terminal_paren {% id %}
   | exp_terminal_function {% id %}
   | exp_terminal_local {% id %}
+  | exp_terminal_conditional {% id %}
 
 exp_terminal_identifier -> ids_identifier {% expBuildExpressionWrapper(0, "identifier") %}
 
@@ -462,6 +463,28 @@ exp_terminal_local -> "local" __ stm_local_identifier_list __ "in" __ (stm_seque
       statement: statement,
       expression: expression,
     };
+  }
+%}
+
+exp_terminal_conditional -> "if" __ exp_expression __ "then" __ (stm_sequence __):? exp_expression __ ("else" __ (stm_sequence __):? exp_expression __):? "end" {%
+  function(d, position, reject) {
+    var condition = d[2];
+    var trueClause = {
+      statement: d[6] ? d[6][0]: undefined,
+      expression: d[7],
+    };
+
+    var falseClause = d[9]
+      ? { statement: d[9][2] ? d[9][2][0] : undefined, expression: d[9][3] }
+      : undefined;
+
+    return {
+      node: "expression",
+      type: "conditional",
+      condition: condition,
+      trueClause: trueClause,
+      falseClause: falseClause,
+    }
   }
 %}
 
