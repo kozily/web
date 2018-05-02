@@ -9,7 +9,11 @@ import {
   bindingStatement,
 } from "../../../app/oz/machine/statements";
 import { lexicalIdentifier } from "../../../app/oz/machine/lexical";
-import { literalRecord } from "../../../app/oz/machine/literals";
+import {
+  literalRecord,
+  literalTuple,
+  literalList,
+} from "../../../app/oz/machine/literals";
 
 describe("Collecting free identifiers in a pattern matching statement", () => {
   beforeEach(() => {
@@ -39,6 +43,92 @@ describe("Collecting free identifiers in a pattern matching statement", () => {
 
     expect(collectFreeIdentifiers(statement)).toEqual(
       Immutable.Set(["P", "Q", "Y", "Z", "N"]),
+    );
+  });
+
+  it("collects the appropriate identifiers skipping the any as feature in record", () => {
+    const statement = patternMatchingStatement(
+      identifierExpression(lexicalIdentifier("P")),
+      literalRecord("person", {
+        age: lexicalIdentifier("A"),
+        name: lexicalIdentifier("N"),
+        status: lexicalIdentifier("_"),
+      }),
+      bindingStatement(
+        identifierExpression(lexicalIdentifier("Y")),
+        identifierExpression(lexicalIdentifier("A")),
+      ),
+      bindingStatement(
+        identifierExpression(lexicalIdentifier("Z")),
+        identifierExpression(lexicalIdentifier("N")),
+      ),
+    );
+
+    expect(collectFreeIdentifiers(statement)).toEqual(
+      Immutable.Set(["P", "Y", "Z", "N"]),
+    );
+  });
+
+  it("collects the appropriate identifiers skipping the any as identifier", () => {
+    const statement = patternMatchingStatement(
+      identifierExpression(lexicalIdentifier("P")),
+      lexicalIdentifier("_"),
+      bindingStatement(
+        identifierExpression(lexicalIdentifier("Y")),
+        identifierExpression(lexicalIdentifier("A")),
+      ),
+      bindingStatement(
+        identifierExpression(lexicalIdentifier("Z")),
+        identifierExpression(lexicalIdentifier("N")),
+      ),
+    );
+
+    expect(collectFreeIdentifiers(statement)).toEqual(
+      Immutable.Set(["P", "Y", "A", "Z", "N"]),
+    );
+  });
+
+  it("collects the appropriate identifiers skipping the any as tuple", () => {
+    const statement = patternMatchingStatement(
+      identifierExpression(lexicalIdentifier("P")),
+      literalTuple("#", [
+        lexicalIdentifier("_"),
+        literalTuple("vector", [
+          lexicalIdentifier("A"),
+          lexicalIdentifier("_"),
+        ]),
+      ]),
+      bindingStatement(
+        identifierExpression(lexicalIdentifier("Y")),
+        identifierExpression(lexicalIdentifier("A")),
+      ),
+      bindingStatement(
+        identifierExpression(lexicalIdentifier("Z")),
+        identifierExpression(lexicalIdentifier("N")),
+      ),
+    );
+
+    expect(collectFreeIdentifiers(statement)).toEqual(
+      Immutable.Set(["P", "Y", "Z", "N"]),
+    );
+  });
+
+  it("collects the appropriate identifiers skipping the any as list", () => {
+    const statement = patternMatchingStatement(
+      identifierExpression(lexicalIdentifier("P")),
+      literalList([lexicalIdentifier("_"), lexicalIdentifier("A")]),
+      bindingStatement(
+        identifierExpression(lexicalIdentifier("Y")),
+        identifierExpression(lexicalIdentifier("A")),
+      ),
+      bindingStatement(
+        identifierExpression(lexicalIdentifier("Z")),
+        identifierExpression(lexicalIdentifier("N")),
+      ),
+    );
+
+    expect(collectFreeIdentifiers(statement)).toEqual(
+      Immutable.Set(["P", "Y", "Z", "N"]),
     );
   });
 });

@@ -1,7 +1,7 @@
 import { patternTypes } from "../machine/patterns";
-import identifier from "./identifier";
-import number from "./number";
-import record from "./record";
+import identifier from "./pattern/identifier";
+import number from "./pattern/number";
+import record from "./pattern/record";
 
 export const matchers = {
   [patternTypes.identifier]: identifier,

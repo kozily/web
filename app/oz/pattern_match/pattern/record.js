@@ -1,7 +1,7 @@
 import Immutable from "immutable";
-import { valueTypes } from "../machine/values";
-import { lookupVariableInSigma } from "../machine/sigma";
-import { buildEnvironment } from "../machine/build";
+import { valueTypes } from "../../machine/values";
+import { lookupVariableInSigma } from "../../machine/sigma";
+import { buildEnvironment } from "../../machine/build";
 
 const extractValueAndVariable = (thing, sigma) => {
   if (thing.get("node") === "value") {
@@ -61,12 +61,10 @@ export default (recurse, evaluation, pattern, sigma) => {
       recursiveMatch.additionalBindings,
     );
 
-    const accumulatedSigma = result.sigma.union(recursiveMatch.sigma);
-
     return {
       match: true,
       additionalBindings: accumulatedAdditionalBindings,
-      sigma: accumulatedSigma,
+      sigma: recursiveMatch.sigma,
     };
   }, initialReduction);
 

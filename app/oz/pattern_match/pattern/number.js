@@ -1,6 +1,6 @@
 import Immutable from "immutable";
-import { valueTypes } from "../machine/values";
-import { buildEnvironment } from "../machine/build";
+import { valueTypes } from "../../machine/values";
+import { buildEnvironment } from "../../machine/build";
 
 export default (recurse, evaluation, pattern, sigma) => {
   const value = evaluation.get("value");

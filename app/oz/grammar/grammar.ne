@@ -89,6 +89,13 @@
     };
   }
 
+  function anyBuildIdentifier(d) {
+    return {
+      node: "identifier",
+      identifier: d[0],
+    };
+  }
+
   function litBuildRecord(label, features) {
     return { node: "literal", type: "record", value: { label: label, features: features } };
   }
@@ -809,9 +816,109 @@ pat_pattern ->
   | lit_atom {% id %}
   | lit_string {% id %}
   | lit_boolean {% id %}
-  | lit_record {% id %}
-  | lit_tuple {% id %}
-  | lit_list {% id %}
+  | pat_record {% id %}
+  | pat_tuple {% id %}
+  | pat_list {% id %}
+  | any_identifier {% id %}
+
+pat_record -> lit_atom_syntax "(" _ pat_record_feature_list _ ")" {%
+  function(d, position, reject) {
+    var label = d[0];
+    var features = d[3].reduce(function(result, item) {
+      result[item.name] = item.value;
+      return result;
+    }, {});
+    return litBuildRecord(label, features);
+  }
+%}
+
+pat_record_feature_list ->
+    pat_record_feature_list __ pat_record_feature {% function(d) { return d[0].concat(d[2]); } %}
+  | pat_record_feature
+
+pat_record_feature -> lit_atom_syntax ":" pat_pattern {%
+  function(d, position, reject) {
+    return {name: d[0], value: d[2]};
+  }
+%}
+
+pat_tuple ->
+    pat_tuple_generic {% id %}
+  | pat_tuple_cons {% id %}
+
+pat_tuple_generic -> lit_atom_syntax "(" _ pat_list_items _ ")" {%
+  function(d, position, reject) {
+    var label = d[0];
+    var features = d[3].reduce(function(result, item, index) {
+      result[++index] = item;
+      return result;
+    }, {});
+    return litBuildRecord(label, features);
+  }
+%}
+
+pat_tuple_cons -> pat_tuple_cons_item ("#" pat_tuple_cons_item):+ {%
+  function(d) {
+    var label = "#";
+    var featureList = [d[0]].concat(d[1].map(function(item) {
+      return item[1];
+    }));
+    var features = featureList.reduce(function(result, item, index) {
+      result[++index] = item;
+      return result;
+    }, {});
+
+    return litBuildRecord(label, features);
+  }
+%}
+
+pat_tuple_cons_item ->
+    ids_identifier {% id %}
+  | lit_atom {% id %}
+  | lit_boolean {% id %}
+  | lit_string {% id %}
+  | lit_char {% id %}
+  | lit_integer {% id %}
+  | lit_float {% id %}
+  | pat_list {% id %}
+  | lit_procedure {% id %}
+  | any_identifier {% id %}
+
+pat_list ->
+    pat_empty_list {% id %}
+  | pat_list_with_items {% id %}
+  | pat_cons_list {% id %}
+
+pat_list_with_items -> "[" _ pat_list_items _ "]" {%
+  function(d) {
+    return litBuildList(d[2]);
+  }
+%}
+
+pat_empty_list -> "[" _ "]" {%
+  function(d) {
+    return litBuildList([]);
+  }
+%}
+
+pat_list_items ->
+    pat_pattern
+  | pat_list_items __ pat_pattern {%
+      function(d) {
+        return d[0].concat(d[2]);
+      }
+    %}
+
+pat_cons_list -> pat_pattern "|" (pat_list | ids_identifier | any_identifier) {%
+  function(d) {
+    return litBuildListItem(
+      d[0],
+      d[2][0]
+    );
+  }
+%}
+
+any_identifier -> "_" {% anyBuildIdentifier %}
 
 ##############################################################################
 # LIB - UTILITIES
