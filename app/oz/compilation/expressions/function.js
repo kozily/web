@@ -1,10 +1,8 @@
+import Immutable from "immutable";
 import { identifierExpression } from "../../machine/expressions";
 import { makeAuxiliaryIdentifier } from "../../machine/build";
-import {
-  procedureApplicationStatement,
-  localStatement,
-  sequenceStatement,
-} from "../../machine/statements";
+import { procedureApplicationStatement } from "../../machine/statements";
+import { makeStatementAugmentation } from "./helpers";
 
 export default (recurse, node, resultingIdentifier) => {
   const auxiliaryIdentifier = makeAuxiliaryIdentifier("exp");
@@ -16,29 +14,29 @@ export default (recurse, node, resultingIdentifier) => {
   const functionCompilation = recurse(node.get("fun"));
   const argsCompilations = node.get("args").map(x => recurse(x));
 
-  const augmentStatement = statement => {
-    const procedureApplication = procedureApplicationStatement(
-      functionCompilation.resultingExpression,
-      argsCompilations
-        .map(x => x.resultingExpression)
-        .push(resultingExpression),
-    );
+  const argsExpressions = argsCompilations
+    .map(x => x.resultingExpression)
+    .push(resultingExpression);
 
-    const augmentStatement = argsCompilations.reduce((f, item) => {
-      return statement => f(item.augmentStatement(statement));
-    }, functionCompilation.augmentStatement);
+  const resultingStatement = procedureApplicationStatement(
+    functionCompilation.resultingExpression,
+    argsExpressions,
+  );
 
-    if (resultingIdentifier) {
-      return augmentStatement(procedureApplication);
-    }
+  const allAugmentations = Immutable.List.of(functionCompilation)
+    .concat(argsCompilations)
+    .map(compilation => compilation.augmentStatement);
 
-    return augmentStatement(
-      localStatement(
-        auxiliaryIdentifier,
-        sequenceStatement(procedureApplication, statement),
-      ),
-    );
-  };
+  const augmentedResultingStatement = allAugmentations.reduce(
+    (statement, f) => f(statement),
+    resultingStatement,
+  );
+
+  const augmentStatement = makeStatementAugmentation(
+    resultingIdentifier,
+    auxiliaryIdentifier,
+    augmentedResultingStatement,
+  );
 
   return {
     resultingExpression,

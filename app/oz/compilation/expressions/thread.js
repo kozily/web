@@ -1,6 +1,6 @@
 import { identifierExpression } from "../../machine/expressions";
 import { makeAuxiliaryIdentifier } from "../../machine/build";
-import { localStatement } from "../../machine/statements";
+import { threadStatement } from "../../machine/statements";
 import {
   compileStatementAndExpression,
   makeStatementAugmentation,
@@ -13,18 +13,13 @@ export default (recurse, node, resultingIdentifier) => {
     ? resultingIdentifier
     : identifierExpression(auxiliaryIdentifier);
 
-  const compiledBody = compileStatementAndExpression(
+  const compiledThreadStatement = compileStatementAndExpression(
     recurse,
     node,
     resultingExpression,
   );
 
-  const resultingStatement = node
-    .get("identifiers")
-    .reduceRight(
-      (child, identifier) => localStatement(identifier, child),
-      compiledBody,
-    );
+  const resultingStatement = threadStatement(compiledThreadStatement);
 
   const augmentStatement = makeStatementAugmentation(
     resultingIdentifier,
