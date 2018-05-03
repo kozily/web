@@ -157,7 +157,7 @@
     };
   }
 
-  function litBuildFunction(args, expression, statement) {
+  function litBuildFunction(args, expression, statement, lazy) {
     return {
       node: "literal",
       type: "function",
@@ -165,6 +165,7 @@
         args: (args || []),
         expression: expression,
         statement: statement,
+        lazy: lazy,
       },
     };
   }
@@ -315,14 +316,15 @@ stm_procedure_declaration -> "proc" _ "{" _ ids_identifier lit_procedure_args:? 
   }
 %}
 
-stm_function_declaration -> "fun" _ "{" _ ids_identifier lit_function_args:? _ "}" __  (stm_sequence __):? exp_expression __ "end" {%
+stm_function_declaration -> "fun" __ ("lazy" __):? "{" _ ids_identifier lit_function_args:? _ "}" __  (stm_sequence __):? exp_expression __ "end" {%
   function(d) {
-    var lhs = expBuildExpressionWrapper(0, "identifier")([d[4]]);
+    var lhs = expBuildExpressionWrapper(0, "identifier")([d[5]]);
 
-    var args = d[5];
-    var statement = d[9] ? d[9][0] : undefined;
-    var expression = d[10];
-    var fun = litBuildFunction(args, expression, statement);
+    var args = d[6];
+    var statement = d[10] ? d[10][0] : undefined;
+    var expression = d[11];
+    var lazy = d[2] ? true : false;
+    var fun = litBuildFunction(args, expression, statement, lazy);
 
     var rhs = expBuildExpressionWrapper(0, "literal")([fun]);
 
@@ -1009,12 +1011,13 @@ lit_procedure_args ->
 ##############################################################################
 # Functions
 ##############################################################################
-lit_function -> "fun" _ "{" _ "$" lit_function_args:? _ "}" __  (stm_sequence __):? exp_expression __ "end" {%
+lit_function -> "fun" __ ("lazy" __):?  "{" _ "$" lit_function_args:? _ "}" __  (stm_sequence __):? exp_expression __ "end" {%
   function(d) {
-    var args = d[5];
-    var statement = d[9] ? d[9][0] : undefined;
-    var expression = d[10];
-    return litBuildFunction(args, expression, statement);
+    var args = d[6];
+    var statement = d[10] ? d[10][0] : undefined;
+    var expression = d[11];
+    var lazy = d[2] ? true : false;
+    return litBuildFunction(args, expression, statement, lazy);
   }
 %}
 
@@ -1129,7 +1132,7 @@ pat_list_items ->
       }
     %}
 
-pat_string -> lit_string_syntax {% 
+pat_string -> lit_string_syntax {%
   function(d) {
     return litBuildString(d[0]);
   }

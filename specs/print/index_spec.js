@@ -44,7 +44,7 @@ describe("Printing", () => {
     expect(expressionsWithPrinters).toEqual(values);
   });
 
-  fit("has a special printer for identifiers", () => {
+  it("has a special printer for identifiers", () => {
     const identifier = lexicalIdentifier("_");
     const result = print(identifier, 2);
     expect(result.abbreviated).toEqual("_");
