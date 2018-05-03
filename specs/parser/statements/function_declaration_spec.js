@@ -58,4 +58,20 @@ describe("Parsing function declaration statements", () => {
       ),
     );
   });
+
+  it("handles it correctly when lazy without args", () => {
+    expect(parse("fun lazy {FunctionName} 5 end")).toEqual(
+      bindingStatementSyntax(
+        identifierExpression(lexicalIdentifier("FunctionName")),
+        literalExpression(
+          literalFunction(
+            [],
+            literalExpression(literalNumber(5)),
+            undefined,
+            true,
+          ),
+        ),
+      ),
+    );
+  });
 });

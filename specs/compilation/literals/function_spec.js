@@ -17,9 +17,16 @@ import {
   sequenceStatement,
   bindingStatement,
   procedureApplicationStatement,
+  localStatement,
+  byNeedStatement,
 } from "../../../app/oz/machine/statements";
 import { lexicalIdentifier } from "../../../app/oz/machine/lexical";
 import { identifier } from "../helpers";
+
+const auxExpression = (...args) =>
+  identifierExpression(getLastAuxiliaryIdentifier(...args));
+
+const auxIdentifier = (...args) => getLastAuxiliaryIdentifier(...args);
 
 describe("Compiling function values", () => {
   beforeEach(() => {
@@ -47,6 +54,54 @@ describe("Compiling function values", () => {
           bindingStatement(
             identifierExpression(getLastAuxiliaryIdentifier("res")),
             literalExpression(literalNumber(5)),
+          ),
+        ),
+      ),
+    );
+
+    const resultingStatement = compilation.augmentStatement(skipStatement());
+    expect(resultingStatement).toEqual(skipStatement());
+  });
+
+  it("compiles appropriately when using a lazy function", () => {
+    const literal = literalFunction(
+      [lexicalIdentifier("A"), lexicalIdentifier("B")],
+      literalExpression(literalNumber(5)),
+      skipStatementSyntax(),
+      true,
+    );
+
+    const compilation = compile(literal);
+
+    expect(compilation.resultingExpression).toEqual(
+      literalProcedure(
+        [
+          lexicalIdentifier("A"),
+          lexicalIdentifier("B"),
+          auxIdentifier("res", 2),
+        ],
+        localStatement(
+          auxIdentifier("triggerProcedure", 1),
+          sequenceStatement(
+            bindingStatement(
+              auxExpression("triggerProcedure", 1),
+              literalExpression(
+                literalProcedure(
+                  [auxIdentifier("res", 2)],
+                  sequenceStatement(
+                    skipStatement(),
+                    bindingStatement(
+                      auxExpression("res", 2),
+                      literalExpression(literalNumber(5)),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            byNeedStatement(
+              auxExpression("triggerProcedure", 1),
+              auxIdentifier("res", 2),
+            ),
           ),
         ),
       ),

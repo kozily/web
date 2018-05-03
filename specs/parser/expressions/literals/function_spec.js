@@ -27,6 +27,12 @@ describe("Parsing function literal expressions", () => {
         functionExpression([], numberExpression(5)),
       );
     });
+
+    it("handles lazy specs", () => {
+      expect(parse("fun lazy {$} 5 end")).toEqual(
+        functionExpression([], numberExpression(5), undefined, true),
+      );
+    });
   });
 
   describe("with argumens", () => {
@@ -44,6 +50,17 @@ describe("Parsing function literal expressions", () => {
         functionExpression(
           [lexicalIdentifier("X"), lexicalIdentifier("Y")],
           numberExpression(5),
+        ),
+      );
+    });
+
+    it("handles lazy specs", () => {
+      expect(parse("fun lazy {$ X Y} 5 end")).toEqual(
+        functionExpression(
+          [lexicalIdentifier("X"), lexicalIdentifier("Y")],
+          numberExpression(5),
+          undefined,
+          true,
         ),
       );
     });
@@ -66,6 +83,17 @@ describe("Parsing function literal expressions", () => {
           [lexicalIdentifier("X"), lexicalIdentifier("Y")],
           numberExpression(5),
           sequenceStatementSyntax(skipStatementSyntax(), skipStatementSyntax()),
+        ),
+      );
+    });
+
+    it("handles lazy specs", () => {
+      expect(parse("fun lazy {$ X Y} skip skip 5 end")).toEqual(
+        functionExpression(
+          [lexicalIdentifier("X"), lexicalIdentifier("Y")],
+          numberExpression(5),
+          sequenceStatementSyntax(skipStatementSyntax(), skipStatementSyntax()),
+          true,
         ),
       );
     });

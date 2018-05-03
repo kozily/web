@@ -29,7 +29,12 @@ export const literalProcedure = (args = [], body) => {
   });
 };
 
-export const literalFunction = (args = [], expression, statement) => {
+export const literalFunction = (
+  args = [],
+  expression,
+  statement,
+  lazy = false,
+) => {
   return Immutable.fromJS({
     node: "literal",
     type: compilableLiteralTypes.function,
@@ -37,6 +42,7 @@ export const literalFunction = (args = [], expression, statement) => {
       args,
       expression,
       statement,
+      lazy,
     },
   });
 };
