@@ -33,7 +33,9 @@ describe("Compiling function values", () => {
       skipStatementSyntax(),
     );
 
-    expect(compile(literal)).toEqual(
+    const compilation = compile(literal);
+
+    expect(compilation.resultingExpression).toEqual(
       literalProcedure(
         [
           lexicalIdentifier("A"),
@@ -49,6 +51,9 @@ describe("Compiling function values", () => {
         ),
       ),
     );
+
+    const resultingStatement = compilation.augmentStatement(skipStatement());
+    expect(resultingStatement).toEqual(skipStatement());
   });
 
   it("compiles appropriately when using an expandable body", () => {
@@ -58,7 +63,9 @@ describe("Compiling function values", () => {
       skipStatementSyntax(),
     );
 
-    expect(compile(literal)).toEqual(
+    const compilation = compile(literal);
+
+    expect(compilation.resultingExpression).toEqual(
       literalProcedure(
         [
           lexicalIdentifier("A"),
@@ -73,5 +80,8 @@ describe("Compiling function values", () => {
         ),
       ),
     );
+
+    const resultingStatement = compilation.augmentStatement(skipStatement());
+    expect(resultingStatement).toEqual(skipStatement());
   });
 });

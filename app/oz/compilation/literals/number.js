@@ -1,3 +1,9 @@
 export default (recurse, node) => {
-  return node;
+  const resultingExpression = node;
+  const augmentStatement = statement => statement;
+
+  return {
+    resultingExpression,
+    augmentStatement,
+  };
 };

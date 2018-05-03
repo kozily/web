@@ -1,42 +1,74 @@
 import Immutable from "immutable";
 import { compile } from "../../../app/oz/compilation";
+import { literalRecord } from "../../../app/oz/machine/literals";
 import {
-  literalRecord,
-  literalProcedure,
-  literalNumber,
-} from "../../../app/oz/machine/literals";
-import { skipStatementSyntax } from "../../../app/oz/machine/statementSyntax";
-import { skipStatement } from "../../../app/oz/machine/statements";
+  identifierExpression,
+  functionExpression,
+} from "../../../app/oz/machine/expressions";
 import { lexicalIdentifier } from "../../../app/oz/machine/lexical";
+import {
+  skipStatement,
+  localStatement,
+  sequenceStatement,
+  procedureApplicationStatement,
+} from "../../../app/oz/machine/statements";
+import { auxExpression, auxExpressionIdentifier } from "../helpers";
 
 describe("Compiling record values", () => {
   beforeEach(() => {
     jasmine.addCustomEqualityTester(Immutable.is);
   });
 
-  it("compiles appropriately", () => {
-    const value = literalRecord("person", {
-      age: lexicalIdentifier("A"),
-      name: lexicalIdentifier("N"),
-    });
+  it("compiles featuresless records", () => {
+    const literal = literalRecord("person");
 
-    expect(compile(value)).toEqual(value);
+    const compilation = compile(literal);
+
+    expect(compilation.resultingExpression).toEqual(literal);
+
+    const resultingStatement = compilation.augmentStatement(skipStatement());
+    expect(resultingStatement).toEqual(skipStatement());
   });
 
-  it("compiles nested records appropriately", () => {
-    const value = literalRecord("person", {
-      operation: literalProcedure(
-        [lexicalIdentifier("A")],
-        skipStatementSyntax(),
-      ),
-      number: literalNumber(30),
+  it("compiles unexpandable expressions", () => {
+    const literal = literalRecord("person", {
+      age: identifierExpression(lexicalIdentifier("A")),
+      name: identifierExpression(lexicalIdentifier("N")),
     });
 
-    expect(compile(value)).toEqual(
+    const compilation = compile(literal);
+
+    expect(compilation.resultingExpression).toEqual(literal);
+
+    const resultingStatement = compilation.augmentStatement(skipStatement());
+    expect(resultingStatement).toEqual(skipStatement());
+  });
+
+  it("compiles expandable expressions", () => {
+    const literal = literalRecord("person", {
+      age: functionExpression(identifierExpression(lexicalIdentifier("Get"))),
+    });
+
+    const compilation = compile(literal);
+
+    expect(compilation.resultingExpression).toEqual(
       literalRecord("person", {
-        operation: literalProcedure([lexicalIdentifier("A")], skipStatement()),
-        number: literalNumber(30),
+        age: auxExpression(),
       }),
+    );
+
+    const resultingStatement = compilation.augmentStatement(skipStatement());
+    expect(resultingStatement).toEqual(
+      localStatement(
+        auxExpressionIdentifier(),
+        sequenceStatement(
+          procedureApplicationStatement(
+            identifierExpression(lexicalIdentifier("Get")),
+            [auxExpression()],
+          ),
+          skipStatement(),
+        ),
+      ),
     );
   });
 });

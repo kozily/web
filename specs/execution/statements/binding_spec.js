@@ -505,16 +505,16 @@ describe("Reducing binding statements", () => {
         bindingStatement(
           literalExpression(
             literalRecord("person", {
-              age: lexicalIdentifier("X"),
-              height: literalNumber(1.7),
-              gender: literalAtom("male"),
+              age: identifierExpression(lexicalIdentifier("X")),
+              height: literalExpression(literalNumber(1.7)),
+              gender: literalExpression(literalAtom("male")),
             }),
           ),
           literalExpression(
             literalRecord("person", {
-              age: lexicalIdentifier("Y"),
-              height: lexicalIdentifier("Z"),
-              gender: literalAtom("male"),
+              age: identifierExpression(lexicalIdentifier("Y")),
+              height: identifierExpression(lexicalIdentifier("Z")),
+              gender: literalExpression(literalAtom("male")),
             }),
           ),
         ),

@@ -1,5 +1,5 @@
 import Immutable from "immutable";
-import { createValue } from "../../../app/oz/machine/sigma";
+import { evaluate } from "../../../app/oz/evaluation";
 import { buildEnvironment, buildVariable } from "../../../app/oz/machine/build";
 import {
   literalNumber,
@@ -16,7 +16,7 @@ import {
   bindingStatement,
 } from "../../../app/oz/machine/statements";
 
-describe("Creating procedure values in the sigma", () => {
+describe("Evaluating literal procedures", () => {
   beforeEach(() => {
     jasmine.addCustomEqualityTester(Immutable.is);
   });
@@ -26,10 +26,10 @@ describe("Creating procedure values in the sigma", () => {
       X: buildVariable("x", 0),
       Y: buildVariable("y", 0),
     });
-
     const literal = literalProcedure([], skipStatement());
+    const result = evaluate(literal, environment);
 
-    expect(createValue(environment, literal)).toEqual(
+    expect(result.get("value")).toEqual(
       valueProcedure([], skipStatement(), {}),
     );
   });
@@ -39,13 +39,13 @@ describe("Creating procedure values in the sigma", () => {
       X: buildVariable("x", 0),
       Y: buildVariable("y", 0),
     });
-
     const literal = literalProcedure(
       [lexicalIdentifier("A"), lexicalIdentifier("B")],
       skipStatement(),
     );
+    const result = evaluate(literal, environment);
 
-    expect(createValue(environment, literal)).toEqual(
+    expect(result.get("value")).toEqual(
       valueProcedure(
         [lexicalIdentifier("A"), lexicalIdentifier("B")],
         skipStatement(),
@@ -59,7 +59,6 @@ describe("Creating procedure values in the sigma", () => {
       X: buildVariable("x", 0),
       Y: buildVariable("y", 0),
     });
-
     const literal = literalProcedure(
       [lexicalIdentifier("A"), lexicalIdentifier("B")],
       bindingStatement(
@@ -67,8 +66,9 @@ describe("Creating procedure values in the sigma", () => {
         literalExpression(literalNumber(5)),
       ),
     );
+    const result = evaluate(literal, environment);
 
-    expect(createValue(environment, literal)).toEqual(
+    expect(result.get("value")).toEqual(
       valueProcedure(
         [lexicalIdentifier("A"), lexicalIdentifier("B")],
         bindingStatement(

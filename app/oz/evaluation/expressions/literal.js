@@ -1,11 +1,4 @@
-import Immutable from "immutable";
-import { createValue } from "../../value_creation";
-
-export default (recurse, expression, environment) => {
+export default (recurse, expression, environment, sigma) => {
   const literal = expression.get("literal");
-  const value = createValue(environment, literal);
-
-  return Immutable.Map({
-    value,
-  });
+  return recurse(literal, environment, sigma);
 };

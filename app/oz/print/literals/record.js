@@ -11,15 +11,15 @@ const printLabel = label => {
 };
 
 const printValue = (recurse, node) => {
-  if (node.get("node") === "literal") {
-    return recurse(node);
+  if (node.get("node") === "identifier") {
+    const printed = printIdentifier(node.get("identifier"));
+    return {
+      abbreviated: printed,
+      full: printed,
+    };
   }
 
-  const printed = printIdentifier(node.get("identifier"));
-  return {
-    abbreviated: printed,
-    full: printed,
-  };
+  return recurse(node);
 };
 
 const isInteger = value => {

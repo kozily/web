@@ -10,6 +10,10 @@ import {
   literalNumber,
 } from "../../../app/oz/machine/literals";
 import { lexicalIdentifier } from "../../../app/oz/machine/lexical";
+import {
+  identifierExpression,
+  literalExpression,
+} from "../../../app/oz/machine/expressions";
 
 describe("Printing a record literal", () => {
   beforeEach(() => {
@@ -18,8 +22,8 @@ describe("Printing a record literal", () => {
 
   it("Returns the appropriate string for standard records", () => {
     const literal = literalRecord("person", {
-      name: lexicalIdentifier("N"),
-      age: literalNumber(30),
+      name: identifierExpression(lexicalIdentifier("N")),
+      age: literalExpression(literalNumber(30)),
     });
     const result = print(literal, 2);
 
@@ -45,8 +49,8 @@ describe("Printing a record literal", () => {
 
   it("Returns the appropriate string for generic tuples", () => {
     const literal = literalTuple("person", [
-      lexicalIdentifier("X"),
-      literalNumber(30),
+      identifierExpression(lexicalIdentifier("X")),
+      literalExpression(literalNumber(30)),
     ]);
     const result = print(literal, 2);
 
@@ -56,9 +60,9 @@ describe("Printing a record literal", () => {
 
   it("Returns the appropriate string for cons tuples", () => {
     const literal = literalTuple("#", [
-      lexicalIdentifier("X"),
-      literalNumber(30),
-      literalNumber(35),
+      identifierExpression(lexicalIdentifier("X")),
+      literalExpression(literalNumber(30)),
+      literalExpression(literalNumber(35)),
     ]);
     const result = print(literal, 2);
 
@@ -67,7 +71,10 @@ describe("Printing a record literal", () => {
   });
 
   it("Returns the appropriate string for lists", () => {
-    const literal = literalList([lexicalIdentifier("X"), literalNumber(30)]);
+    const literal = literalList([
+      identifierExpression(lexicalIdentifier("X")),
+      literalExpression(literalNumber(30)),
+    ]);
     const result = print(literal, 2);
 
     expect(result.abbreviated).toEqual("[X 30]");
@@ -75,19 +82,40 @@ describe("Printing a record literal", () => {
   });
 
   it("Returns the appropriate string for list conses", () => {
-    const literal = literalListItem(literalNumber(30), lexicalIdentifier("Y"));
+    const literal = literalListItem(
+      literalExpression(literalNumber(30)),
+      identifierExpression(lexicalIdentifier("Y")),
+    );
     const result = print(literal, 2);
 
     expect(result.abbreviated).toEqual("30|Y");
     expect(result.full).toEqual("30|Y");
   });
 
+  it("Returns the appropriate string for weird list conses", () => {
+    const literal = literalListItem(
+      literalExpression(literalNumber(10)),
+      literalExpression(
+        literalListItem(
+          literalExpression(literalNumber(20)),
+          literalExpression(literalNumber(30)),
+        ),
+      ),
+    );
+    const result = print(literal, 2);
+
+    expect(result.abbreviated).toEqual("10|20|30");
+    expect(result.full).toEqual("10|20|30");
+  });
+
   it("Returns the appropriate string for nested recursive structures", () => {
     const literal = literalRecord("person", {
-      age: literalNumber(30),
-      address: literalRecord("address", {
-        number: literalNumber(1300),
-      }),
+      age: literalExpression(literalNumber(30)),
+      address: literalExpression(
+        literalRecord("address", {
+          number: literalExpression(literalNumber(1300)),
+        }),
+      ),
     });
     const result = print(literal, 2);
 
