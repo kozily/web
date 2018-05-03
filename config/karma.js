@@ -1,6 +1,7 @@
 module.exports = config => {
   config.set({
     basePath: "..",
+    concurrency: 20,
     frameworks: ["jasmine"],
     files: ["specs/**/*_spec.js"],
     preprocessors: {

@@ -37,14 +37,14 @@ export const atomExpression = (...args) =>
 export const booleanExpression = (...args) =>
   literalExpression(literalBoolean(...args));
 
-export const listExpression = (...args) =>
-  literalExpression(literalList(...args));
-
 export const listItemExpression = (...args) =>
   literalExpression(literalListItem(...args));
 
 export const tupleExpression = (...args) =>
   literalExpression(literalTuple(...args));
 
+export const listExpression = (...args) =>
+  literalList(...args, literalExpression);
+
 export const stringExpression = (...args) =>
-  literalExpression(literalString(...args));
+  literalString(...args, literalExpression);

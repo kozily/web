@@ -1,9 +1,10 @@
 import Immutable from "immutable";
-import { printers } from "../../app/oz/print";
+import { printers, print } from "../../app/oz/print";
 import { allStatementTypes } from "../../app/oz/machine/statements";
 import { kernelLiteralTypes } from "../../app/oz/machine/literals";
 import { allValueTypes } from "../../app/oz/machine/values";
 import { kernelExpressionTypes } from "../../app/oz/machine/expressions";
+import { lexicalIdentifier } from "../../app/oz/machine/lexical";
 
 const allLiteralTypes = Object.keys(kernelLiteralTypes);
 const allExpressionTypes = Object.keys(kernelExpressionTypes);
@@ -41,5 +42,12 @@ describe("Printing", () => {
     const values = Immutable.Set(allExpressionTypes);
 
     expect(expressionsWithPrinters).toEqual(values);
+  });
+
+  fit("has a special printer for identifiers", () => {
+    const identifier = lexicalIdentifier("_");
+    const result = print(identifier, 2);
+    expect(result.abbreviated).toEqual("_");
+    expect(result.full).toEqual("_");
   });
 });

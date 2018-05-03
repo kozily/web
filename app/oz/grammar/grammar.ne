@@ -57,6 +57,17 @@
     };
   };
 
+  function expWrap(type) {
+    return function(d) {
+      var result =  {
+        node: "expression",
+        type: type,
+      };
+      result[type] = d;
+      return result;
+    };
+  }
+
   function expBuildOperatorExpression(lhsIndex, rhsIndex, operatorIndices) {
     return function(d) {
       var lhs = d[lhsIndex];
@@ -115,16 +126,23 @@
     });
   }
 
-  function litBuildList(items) {
+  function litBuildList(items, wrap) {
+    if (!wrap) {
+      wrap = function(x) { return x; };
+    }
     return items.reduceRight(function(result, item) {
-      return litBuildListItem(item, result);
-    }, litBuildRecord("nil", {}));
+      return wrap(litBuildListItem(item, result));
+    }, wrap(litBuildRecord("nil", {})));
   }
 
-  function litBuildString(d) {
-    return litBuildList(d[0].split("").map(function(s) {
-      return litBuildNumber([s.charCodeAt(0)])
-    }));
+  function litBuildString(value, wrap) {
+    if (!wrap) {
+      wrap = function(x) { return x; };
+    }
+    var numbers = value.split("").map(function(s) {
+      return wrap(litBuildNumber([s.charCodeAt(0)]))
+    });
+    return litBuildList(numbers, wrap);
   }
 
   function litBuildNumber(value) {
@@ -503,7 +521,7 @@ exp_terminal_no_literals ->
     exp_terminal_identifier {% id %}
   | exp_terminal_record {% expBuildExpressionWrapper(0, "literal") %}
   | exp_terminal_tuple {% expBuildExpressionWrapper(0, "literal") %}
-  | exp_terminal_list {% expBuildExpressionWrapper(0, "literal") %}
+  | exp_terminal_list {% id %}
   | exp_terminal_paren {% id %}
   | exp_terminal_function {% id %}
   | exp_terminal_local {% id %}
@@ -518,6 +536,7 @@ exp_terminal_no_literals ->
 exp_terminal ->
     exp_terminal_no_literals {% id %}
   | exp_terminal_literal {% id %}
+  | exp_terminal_string {% id %}
 
 exp_terminal_record -> lit_atom_syntax "(" _ exp_terminal_record_feature_list _ ")" {%
   function(d, position, reject) {
@@ -557,13 +576,13 @@ exp_terminal_list ->
 
 exp_terminal_list_with_items -> "[" _ exp_terminal_list_items _ "]" {%
   function(d) {
-    return litBuildList(d[2]);
+    return litBuildList(d[2], expWrap("literal"));
   }
 %}
 
 exp_terminal_empty_list -> "[" _ "]" {%
   function(d) {
-    return litBuildList([]);
+    return litBuildList([], expWrap("literal"));
   }
 %}
 
@@ -578,6 +597,12 @@ exp_terminal_list_items ->
 exp_terminal_identifier -> ids_identifier {% expBuildExpressionWrapper(0, "identifier") %}
 
 exp_terminal_literal -> lit_value {% expBuildExpressionWrapper(0, "literal") %}
+
+exp_terminal_string -> lit_string_syntax {%
+  function(d) {
+    return litBuildString(d[0], expWrap("literal"));
+  }
+%}
 
 exp_terminal_paren -> "(" _ exp_expression _ ")" {% nth(2) %}
 
@@ -758,7 +783,6 @@ any_identifier -> "_" {% anyBuildIdentifier %}
 lit_value ->
     lit_atom {% id %}
   | lit_boolean {% id %}
-  | lit_string {% id %}
   | lit_char {% id %}
   | lit_integer {% id %}
   | lit_float {% id %}
@@ -817,9 +841,6 @@ lit_false_literal -> "false" {%
 ##############################################################################
 # Strings
 ##############################################################################
-lit_string ->
-    lit_string_syntax {% litBuildString %}
-
 lit_string_syntax -> "\"" ([^"\\] | lib_pseudo_char):* "\"" {%
   function(d) {
     return d[1].join("");
@@ -1009,11 +1030,11 @@ pat_terminal ->
   | lit_integer {% id %}
   | lit_float {% id %}
   | lit_atom {% id %}
-  | lit_string {% id %}
   | lit_boolean {% id %}
   | pat_record {% id %}
   | pat_tuple {% id %}
   | pat_list {% id %}
+  | pat_string {% id %}
 
 pat_record -> lit_atom_syntax "(" _ pat_record_feature_list _ ")" {%
   function(d, position, reject) {
@@ -1070,6 +1091,12 @@ pat_list_items ->
         return d[0].concat(d[2]);
       }
     %}
+
+pat_string -> lit_string_syntax {% 
+  function(d) {
+    return litBuildString(d[0]);
+  }
+%}
 
 ##############################################################################
 # LIB - UTILITIES

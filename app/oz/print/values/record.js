@@ -77,13 +77,27 @@ const printConsListRecord = (recurse, label, features) => {
   return `${head}|${tail}`;
 };
 
-const printListRecord = (recurse, label, features) => {
+const isCompleteList = (label, features) => {
   const tail = features.get("2");
 
-  if (
-    tail.get("type") === valueTypes.record &&
-    tail.getIn(["value", "label"]) === "|"
-  ) {
+  if (tail.get("type") === valueTypes.record) {
+    const subLabel = tail.getIn(["value", "label"]);
+    const subFeatures = tail.getIn(["value", "features"]);
+
+    if (subLabel === "|") {
+      return isCompleteList(subLabel, subFeatures);
+    }
+
+    if (subLabel === "nil") {
+      return true;
+    }
+  }
+
+  return false;
+};
+
+const printListRecord = (recurse, label, features) => {
+  if (isCompleteList(label, features)) {
     return printCompleteListRecord(recurse, label, features);
   }
 

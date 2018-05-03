@@ -1,12 +1,10 @@
-import printIdentifier from "../identifier";
-
 export default (recurse, node, identation) => {
   const ident = new Array(identation + 1).join(" ");
   const value = node.get("value");
 
   const printedArgs = value
     .get("args")
-    .map(x => printIdentifier(x.get("identifier")))
+    .map(x => recurse(x).abbreviated)
     .join(" ");
   const fullBody = recurse(value.get("body"), identation + 2).full;
   const abbreviatedBody = recurse(value.get("body")).abbreviated;

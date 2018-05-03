@@ -16,7 +16,7 @@ describe("Parsing list literal expressions", () => {
   });
 
   it("handles empty lists correctly", () => {
-    const list = listExpression();
+    const list = listExpression([]);
     expect(parse("[]")).toEqual(list);
     expect(parse("[ ]")).toEqual(list);
   });

@@ -1,12 +1,9 @@
-import printIdentifier from "../identifier";
-
 export default (recurse, node, identation) => {
   const ident = new Array(identation + 1).join(" ");
   const triedStatement = recurse(node.get("triedStatement"), identation + 2)
     .full;
-  const exceptionIdentifier = printIdentifier(
-    node.getIn(["exceptionIdentifier", "identifier"]),
-  );
+  const exceptionIdentifier = recurse(node.get("exceptionIdentifier"))
+    .abbreviated;
   const exceptionStatement = recurse(
     node.get("exceptionStatement"),
     identation + 2,
