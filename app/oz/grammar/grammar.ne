@@ -179,6 +179,8 @@ stm_simple ->
   | stm_conditional {% id %}
   | stm_pattern_matching {% id %}
   | stm_procedure_application {% id %}
+  | stm_procedure_declaration {% id %}
+  | stm_function_declaration {% id %}
   | stm_try {% id %}
   | stm_raise {% id %}
   | stm_thread {% id %}
@@ -271,6 +273,45 @@ stm_procedure_application -> "{" _ exp_expression stm_procedure_application_args
       type: "procedureApplicationSyntax",
       procedure: d[2],
       args: d[3] || [],
+    };
+  }
+%}
+
+stm_procedure_declaration -> "proc" _ "{" _ ids_identifier lit_procedure_args:? _ "}" _  stm_sequence __ "end" {%
+  function(d) {
+    var lhs = expBuildExpressionWrapper(0, "identifier")([d[4]]);
+
+    var args = d[5];
+    var body = d[9];
+    var procedure = litBuildProcedure(args, body);
+
+    var rhs = expBuildExpressionWrapper(0, "literal")([procedure]);
+
+    return {
+      node: "statement",
+      type: "bindingSyntax",
+      lhs: lhs,
+      rhs: rhs,
+    };
+  }
+%}
+
+stm_function_declaration -> "fun" _ "{" _ ids_identifier lit_function_args:? _ "}" __  (stm_sequence __):? exp_expression __ "end" {%
+  function(d) {
+    var lhs = expBuildExpressionWrapper(0, "identifier")([d[4]]);
+
+    var args = d[5];
+    var statement = d[9] ? d[9][0] : undefined;
+    var expression = d[10];
+    var fun = litBuildFunction(args, expression, statement);
+
+    var rhs = expBuildExpressionWrapper(0, "literal")([fun]);
+
+    return {
+      node: "statement",
+      type: "bindingSyntax",
+      lhs: lhs,
+      rhs: rhs,
     };
   }
 %}
