@@ -5,7 +5,7 @@ import {
   buildEquivalenceClass,
   buildVariable,
 } from "../../../app/oz/machine/build";
-import { valueNameCreation } from "../../../app/oz/machine/values";
+import { valueName } from "../../../app/oz/machine/values";
 
 describe("Unifying new name references", () => {
   beforeEach(() => {
@@ -14,8 +14,8 @@ describe("Unifying new name references", () => {
 
   it("Fails when unifies the names references", () => {
     const sigma = buildSigma(
-      buildEquivalenceClass(valueNameCreation(), buildVariable("x", 0)),
-      buildEquivalenceClass(valueNameCreation(), buildVariable("y", 0)),
+      buildEquivalenceClass(valueName(), buildVariable("x", 0)),
+      buildEquivalenceClass(valueName(), buildVariable("y", 0)),
     );
 
     expect(() =>

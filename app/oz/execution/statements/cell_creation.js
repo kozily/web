@@ -26,14 +26,22 @@ export default function(state, semanticStatement, activeThreadIndex) {
     );
   }
 
-  const cell = statement.get("cell");
-  const cellIdentifier = cell.get("identifier");
-  const cellVariable = environment.get(cellIdentifier);
+  const cellExpression = statement.get("cell");
+  const cellEvaluation = evaluate(cellExpression, environment, sigma);
+
+  if (cellEvaluation.get("waitCondition")) {
+    return blockCurrentThread(
+      state,
+      semanticStatement,
+      activeThreadIndex,
+      cellEvaluation.get("waitCondition"),
+    );
+  }
 
   const mutableVariable = makeNewMutableVariable({ in: mu, for: "cell" });
 
   try {
-    const unifiedSigma = unify(sigma, cellVariable, mutableVariable);
+    const unifiedSigma = unify(sigma, cellEvaluation, mutableVariable);
 
     const { sigma: finalSigma, variable: valueVariable } = convertToVariable(
       valueEvaluation,

@@ -1,3 +1,4 @@
+import { blockCurrentThread } from "../../machine/threads";
 import { makeNewMutableVariable } from "../../machine/mu";
 import { unify } from "../../machine/sigma";
 import {
@@ -5,6 +6,7 @@ import {
   raiseSystemException,
 } from "../../machine/exceptions";
 import { buildMutableMapping } from "../../machine/build";
+import { evaluate } from "../../evaluation";
 
 export default function(state, semanticStatement, activeThreadIndex) {
   const sigma = state.get("sigma");
@@ -16,14 +18,22 @@ export default function(state, semanticStatement, activeThreadIndex) {
   const valueIdentifier = value.get("identifier");
   const valueVariable = environment.get(valueIdentifier);
 
-  const port = statement.get("port");
-  const portIdentifier = port.get("identifier");
-  const portVariable = environment.get(portIdentifier);
+  const portExpression = statement.get("port");
+  const portEvaluation = evaluate(portExpression, environment, sigma);
+
+  if (portEvaluation.get("waitCondition")) {
+    return blockCurrentThread(
+      state,
+      semanticStatement,
+      activeThreadIndex,
+      portEvaluation.get("waitCondition"),
+    );
+  }
 
   const mutableVariable = makeNewMutableVariable({ in: mu, for: "port" });
 
   try {
-    const unifiedSigma = unify(sigma, portVariable, mutableVariable);
+    const unifiedSigma = unify(sigma, portEvaluation, mutableVariable);
 
     return state
       .set("sigma", unifiedSigma)

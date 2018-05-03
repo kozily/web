@@ -27,7 +27,7 @@ import recordValue from "./values/record";
 import procedureValue from "./values/procedure";
 import builtInValue from "./values/built_in";
 import mutableValue from "./values/mutable";
-import nameCreationValue from "./values/name_creation";
+import nameValue from "./values/name";
 import literalExpression from "./expressions/literal";
 import identifierExpression from "./expressions/identifier";
 import operatorExpression from "./expressions/operator";
@@ -63,7 +63,7 @@ export const printers = {
     [valueTypes.procedure]: procedureValue,
     [valueTypes.builtIn]: builtInValue,
     [valueTypes.mutable]: mutableValue,
-    [valueTypes.nameCreation]: nameCreationValue,
+    [valueTypes.name]: nameValue,
   },
   expression: {
     [kernelExpressionTypes.literal]: literalExpression,

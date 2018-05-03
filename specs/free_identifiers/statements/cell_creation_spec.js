@@ -12,7 +12,7 @@ describe("Collecting free identifiers in a cell creation statement", () => {
   it("collects both value and cell identifiers", () => {
     const statement = cellCreationStatement(
       identifierExpression(lexicalIdentifier("X")),
-      lexicalIdentifier("Y"),
+      identifierExpression(lexicalIdentifier("Y")),
     );
     expect(collectFreeIdentifiers(statement)).toEqual(
       Immutable.Set(["X", "Y"]),

@@ -46,7 +46,7 @@ describe("Reducing cell creation statements", () => {
     const statement = buildSemanticStatement(
       cellCreationStatement(
         identifierExpression(lexicalIdentifier("X")),
-        lexicalIdentifier("Y"),
+        identifierExpression(lexicalIdentifier("Y")),
       ),
       buildEnvironment({
         X: buildVariable("x", 0),
@@ -75,7 +75,36 @@ describe("Reducing cell creation statements", () => {
           identifierExpression(lexicalIdentifier("X")),
           identifierExpression(lexicalIdentifier("X")),
         ),
-        lexicalIdentifier("Y"),
+        identifierExpression(lexicalIdentifier("Y")),
+      ),
+      buildEnvironment({
+        X: buildVariable("x", 0),
+        Y: buildVariable("y", 0),
+      }),
+    );
+
+    expect(execute(state, statement, 0)).toEqual(
+      buildBlockedState(state, statement, 0, buildVariable("x", 0)),
+    );
+  });
+
+  it("blocks the current thread if the cell expression blocks", () => {
+    const state = buildSingleThreadedState({
+      semanticStatements: [buildSemanticStatement(skipStatement())],
+      sigma: buildSigma(
+        buildEquivalenceClass(undefined, buildVariable("x", 0)),
+        buildEquivalenceClass(undefined, buildVariable("y", 0)),
+      ),
+    });
+
+    const statement = buildSemanticStatement(
+      cellCreationStatement(
+        identifierExpression(lexicalIdentifier("Y")),
+        operatorExpression(
+          "+",
+          identifierExpression(lexicalIdentifier("X")),
+          identifierExpression(lexicalIdentifier("X")),
+        ),
       ),
       buildEnvironment({
         X: buildVariable("x", 0),
@@ -100,7 +129,7 @@ describe("Reducing cell creation statements", () => {
     const statement = buildSemanticStatement(
       cellCreationStatement(
         identifierExpression(lexicalIdentifier("X")),
-        lexicalIdentifier("Y"),
+        identifierExpression(lexicalIdentifier("Y")),
       ),
       buildEnvironment({
         X: buildVariable("x", 0),
@@ -139,7 +168,7 @@ describe("Reducing cell creation statements", () => {
     const statement = buildSemanticStatement(
       cellCreationStatement(
         literalExpression(literalNumber(5)),
-        lexicalIdentifier("Y"),
+        identifierExpression(lexicalIdentifier("Y")),
       ),
       buildEnvironment({
         Y: buildVariable("y", 0),

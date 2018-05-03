@@ -4,7 +4,11 @@ import {
   skipStatement,
 } from "../../../app/oz/machine/statements";
 import { lexicalIdentifier } from "../../../app/oz/machine/lexical";
-import { buildSystemExceptionState } from "./helpers";
+import {
+  identifierExpression,
+  operatorExpression,
+} from "../../../app/oz/machine/expressions";
+import { buildSystemExceptionState, buildBlockedState } from "./helpers";
 import { failureException } from "../../../app/oz/machine/exceptions";
 import {
   valueNumber,
@@ -37,7 +41,10 @@ describe("Reducing port creation statements", () => {
     });
 
     const statement = buildSemanticStatement(
-      portCreationStatement(lexicalIdentifier("X"), lexicalIdentifier("Y")),
+      portCreationStatement(
+        lexicalIdentifier("X"),
+        identifierExpression(lexicalIdentifier("Y")),
+      ),
       buildEnvironment({
         X: buildVariable("x", 0),
         Y: buildVariable("y", 0),
@@ -46,6 +53,35 @@ describe("Reducing port creation statements", () => {
 
     expect(execute(state, statement, 0)).toEqual(
       buildSystemExceptionState(state, 0, failureException()),
+    );
+  });
+
+  it("blocks the current thread if the port expression blocks", () => {
+    const state = buildSingleThreadedState({
+      semanticStatements: [buildSemanticStatement(skipStatement())],
+      sigma: buildSigma(
+        buildEquivalenceClass(undefined, buildVariable("x", 0)),
+        buildEquivalenceClass(undefined, buildVariable("y", 0)),
+      ),
+    });
+
+    const statement = buildSemanticStatement(
+      portCreationStatement(
+        lexicalIdentifier("Y"),
+        operatorExpression(
+          "+",
+          identifierExpression(lexicalIdentifier("X")),
+          identifierExpression(lexicalIdentifier("X")),
+        ),
+      ),
+      buildEnvironment({
+        X: buildVariable("x", 0),
+        Y: buildVariable("y", 0),
+      }),
+    );
+
+    expect(execute(state, statement, 0)).toEqual(
+      buildBlockedState(state, statement, 0, buildVariable("x", 0)),
     );
   });
 
@@ -59,7 +95,10 @@ describe("Reducing port creation statements", () => {
     });
 
     const statement = buildSemanticStatement(
-      portCreationStatement(lexicalIdentifier("X"), lexicalIdentifier("Y")),
+      portCreationStatement(
+        lexicalIdentifier("X"),
+        identifierExpression(lexicalIdentifier("Y")),
+      ),
       buildEnvironment({
         X: buildVariable("x", 0),
         Y: buildVariable("y", 0),

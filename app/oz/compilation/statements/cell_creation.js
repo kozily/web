@@ -2,9 +2,14 @@ import { cellCreationStatement } from "../../machine/statements";
 
 export default (recurse, node) => {
   const valueCompilation = recurse(node.get("value"));
-  const cell = node.get("cell");
+  const cellCompilation = recurse(node.get("cell"));
 
   return valueCompilation.augmentStatement(
-    cellCreationStatement(valueCompilation.resultingExpression, cell),
+    cellCompilation.augmentStatement(
+      cellCreationStatement(
+        valueCompilation.resultingExpression,
+        cellCompilation.resultingExpression,
+      ),
+    ),
   );
 };

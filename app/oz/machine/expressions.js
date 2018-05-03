@@ -13,6 +13,9 @@ export const compilableExpressionTypes = {
   exceptionContext: "exceptionContext",
   patternMatching: "patternMatching",
   thread: "thread",
+  nameCreation: "nameCreation",
+  cellCreation: "cellCreation",
+  portCreation: "portCreation",
 };
 
 export const literalExpression = literal => {
@@ -100,6 +103,29 @@ export const threadExpression = (expression, statement) => {
     type: compilableExpressionTypes.thread,
     expression,
     statement,
+  });
+};
+
+export const nameCreationExpression = () => {
+  return Immutable.fromJS({
+    node: "expression",
+    type: compilableExpressionTypes.nameCreation,
+  });
+};
+
+export const cellCreationExpression = value => {
+  return Immutable.fromJS({
+    node: "expression",
+    type: compilableExpressionTypes.cellCreation,
+    value,
+  });
+};
+
+export const portCreationExpression = value => {
+  return Immutable.fromJS({
+    node: "expression",
+    type: compilableExpressionTypes.portCreation,
+    value,
   });
 };
 

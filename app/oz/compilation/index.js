@@ -36,6 +36,9 @@ import conditionalExpression from "./expressions/conditional";
 import patternMatchingExpression from "./expressions/pattern_matching";
 import exceptionContextExpression from "./expressions/exception_context";
 import threadExpression from "./expressions/thread";
+import nameCreationExpression from "./expressions/name_creation";
+import cellCreationExpression from "./expressions/cell_creation";
+import portCreationExpression from "./expressions/port_creation";
 
 export const compilers = {
   statement: {
@@ -72,6 +75,9 @@ export const compilers = {
     [compilableExpressionTypes.exceptionContext]: exceptionContextExpression,
     [compilableExpressionTypes.patternMatching]: patternMatchingExpression,
     [compilableExpressionTypes.thread]: threadExpression,
+    [compilableExpressionTypes.nameCreation]: nameCreationExpression,
+    [compilableExpressionTypes.cellCreation]: cellCreationExpression,
+    [compilableExpressionTypes.portCreation]: portCreationExpression,
   },
 };
 
