@@ -1,23 +1,18 @@
-module.exports = (config) => {
+module.exports = config => {
   config.set({
-    basePath: '..',
-    frameworks: ['jasmine'],
-    files: [
-      'specs/**/*_spec.js',
-    ],
+    basePath: "..",
+    frameworks: ["jasmine"],
+    files: ["specs/**/*_spec.js"],
     preprocessors: {
-      'specs/**/*_spec.js': ['webpack', 'sourcemap'],
+      "specs/**/*_spec.js": ["webpack", "sourcemap"],
     },
-    reporters: ['progress'],
-    browsers: ['PhantomJS'],
+    reporters: ["progress"],
+    browsers: ["PhantomJS"],
     webpack: {
-      devtool: 'inline-source-map',
+      devtool: "inline-source-map",
 
       resolve: {
-        extensions: [
-          '.js',
-          '.jsx',
-        ],
+        extensions: [".js", ".jsx"],
       },
 
       module: {
@@ -26,9 +21,9 @@ module.exports = (config) => {
             test: /\.jsx?$/,
             exclude: /node_modules/,
             use: [
-              'babel-loader',
+              "babel-loader",
               {
-                loader: 'eslint-loader',
+                loader: "eslint-loader",
                 options: {
                   failOnWarning: true,
                   failOnError: true,
@@ -38,13 +33,10 @@ module.exports = (config) => {
           },
           {
             test: /\.ne$/,
-            use: [
-              'nearley-loader',
-            ],
+            use: ["nearley-loader"],
           },
         ],
       },
     },
   });
 };
-

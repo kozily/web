@@ -429,10 +429,39 @@ exp_expression ->
     exp_comparison {% id %}
 
 exp_comparison ->
-    exp_sum {% id %}
+    exp_cons {% id %}
   | exp_comparison_term {% id %}
 
-exp_comparison_term -> exp_sum _ ("=="|"\\="|"<"|"<="|">"|">=") _ exp_sum {% expBuildOperatorExpression(0, 4, [2, 0]) %}
+exp_comparison_term -> exp_cons _ ("=="|"\\="|"<"|"<="|">"|">=") _ exp_cons {% expBuildOperatorExpression(0, 4, [2, 0]) %}
+
+exp_cons ->
+    exp_sum {% id %}
+  | exp_cons_list_term {% expBuildExpressionWrapper(0, "literal") %}
+  | exp_cons_tuple_term {% expBuildExpressionWrapper(0, "literal") %}
+
+exp_cons_list_term -> exp_sum _ "|" _ exp_cons {%
+  function(d) {
+    return litBuildRecord("|", {
+      1: d[0],
+      2: d[4],
+    });
+  }
+%}
+
+exp_cons_tuple_term -> exp_sum _ ("#" _ exp_sum _):+ {%
+  function(d) {
+    var label = "#";
+    var featureList = [d[0]].concat(d[2].map(function(item) {
+      return item[2];
+    }));
+    var features = featureList.reduce(function(result, item, index) {
+      result[++index] = item;
+      return result;
+    }, {});
+
+    return litBuildRecord(label, features);
+  }
+%}
 
 exp_sum ->
     exp_product {% id %}
@@ -450,7 +479,11 @@ exp_feature_selection ->
     exp_terminal {% id %}
   | exp_feature_selection_term {% id %}
 
-exp_feature_selection_term -> exp_feature_selection "." exp_feature_selection_rhs {% expBuildOperatorExpression(0, 2, [1]) %}
+exp_feature_selection_term -> exp_feature_selection_lhs "." exp_feature_selection_rhs {% expBuildOperatorExpression(0, 2, [1]) %}
+
+exp_feature_selection_lhs ->
+    exp_terminal_no_literals {% id %}
+  | exp_feature_selection_term {% id %}
 
 exp_feature_selection_rhs ->
     exp_terminal_identifier {% id %}
@@ -466,9 +499,11 @@ exp_feature_selection_tuple_integers -> [1-9] [0-9]:* {%
   }
 %}
 
-exp_terminal ->
+exp_terminal_no_literals ->
     exp_terminal_identifier {% id %}
-  | exp_terminal_literal {% id %}
+  | exp_terminal_record {% expBuildExpressionWrapper(0, "literal") %}
+  | exp_terminal_tuple {% expBuildExpressionWrapper(0, "literal") %}
+  | exp_terminal_list {% expBuildExpressionWrapper(0, "literal") %}
   | exp_terminal_paren {% id %}
   | exp_terminal_function {% id %}
   | exp_terminal_local {% id %}
@@ -479,6 +514,66 @@ exp_terminal ->
   | exp_terminal_name_creation {% id %}
   | exp_terminal_cell_creation {% id %}
   | exp_terminal_port_creation {% id %}
+
+exp_terminal ->
+    exp_terminal_no_literals {% id %}
+  | exp_terminal_literal {% id %}
+
+exp_terminal_record -> lit_atom_syntax "(" _ exp_terminal_record_feature_list _ ")" {%
+  function(d, position, reject) {
+    var label = d[0];
+    var features = d[3].reduce(function(result, item) {
+      result[item.name] = item.value;
+      return result;
+    }, {});
+    return litBuildRecord(label, features);
+  }
+%}
+
+exp_terminal_record_feature_list ->
+    exp_terminal_record_feature_list __ exp_terminal_record_feature {% function(d) { return d[0].concat(d[2]); } %}
+  | exp_terminal_record_feature
+
+exp_terminal_record_feature -> lit_atom_syntax ":" exp_expression {%
+  function(d, position, reject) {
+    return {name: d[0], value: d[2]};
+  }
+%}
+
+exp_terminal_tuple -> lit_atom_syntax "(" _ exp_terminal_list_items _ ")" {%
+  function(d, position, reject) {
+    var label = d[0];
+    var features = d[3].reduce(function(result, item, index) {
+      result[++index] = item;
+      return result;
+    }, {});
+    return litBuildRecord(label, features);
+  }
+%}
+
+exp_terminal_list ->
+    exp_terminal_empty_list {% id %}
+  | exp_terminal_list_with_items {% id %}
+
+exp_terminal_list_with_items -> "[" _ exp_terminal_list_items _ "]" {%
+  function(d) {
+    return litBuildList(d[2]);
+  }
+%}
+
+exp_terminal_empty_list -> "[" _ "]" {%
+  function(d) {
+    return litBuildList([]);
+  }
+%}
+
+exp_terminal_list_items ->
+    exp_expression
+  | exp_terminal_list_items __ exp_expression {%
+      function(d) {
+        return d[0].concat(d[2]);
+      }
+    %}
 
 exp_terminal_identifier -> ids_identifier {% expBuildExpressionWrapper(0, "identifier") %}
 
@@ -654,52 +749,21 @@ ids_identifier_quoted -> "`" ([^`\\] | lib_pseudo_char):* "`" {%
   }
 %}
 
+any_identifier -> "_" {% anyBuildIdentifier %}
+
 ##############################################################################
 # LIT - LITERALS
 ##############################################################################
 
 lit_value ->
-    lit_record {% id %}
-  | lit_atom {% id %}
+    lit_atom {% id %}
   | lit_boolean {% id %}
   | lit_string {% id %}
   | lit_char {% id %}
   | lit_integer {% id %}
   | lit_float {% id %}
-  | lit_list {% id %}
-  | lit_tuple {% id %}
   | lit_procedure {% id %}
   | lit_function {% id %}
-
-##############################################################################
-# Records
-##############################################################################
-lit_record -> lit_atom_syntax "(" _ lit_record_feature_list _ ")" {%
-  function(d, position, reject) {
-    var label = d[0];
-    var features = d[3].reduce(function(result, item) {
-      result[item.name] = item.value;
-      return result;
-    }, {});
-    return litBuildRecord(label, features);
-  }
-%}
-
-lit_record_feature_list ->
-    lit_record_feature_list __ lit_record_feature {% function(d) { return d[0].concat(d[2]); } %}
-  | lit_record_feature
-
-lit_record_feature -> lit_atom_syntax ":" lit_record_value {%
-  function(d, position, reject) {
-    return {name: d[0], value: d[2]};
-  }
-%}
-
-lit_record_value -> (ids_identifier|lit_value) {%
-  function(d) {
-    return d[0][0];
-  }
-%}
 
 ##############################################################################
 # Atoms
@@ -747,95 +811,6 @@ lit_true_literal -> "true" {%
 lit_false_literal -> "false" {%
   function (d) {
     return false;
-  }
-%}
-
-##############################################################################
-# Tuple
-##############################################################################
-
-lit_tuple ->
-    lit_tuple_generic {% id %}
-  | lit_tuple_cons {% id %}
-
-lit_tuple_generic -> lit_atom_syntax "(" _ lit_list_items _ ")" {%
-  function(d, position, reject) {
-    var label = d[0];
-    var features = d[3].reduce(function(result, item, index) {
-      result[++index] = item;
-      return result;
-    }, {});
-    return litBuildRecord(label, features);
-  }
-%}
-
-lit_tuple_cons -> lit_tuple_cons_item ("#" lit_tuple_cons_item):+ {%
-  function(d) {
-    var label = "#";
-    var featureList = [d[0]].concat(d[1].map(function(item) {
-      return item[1];
-    }));
-    var features = featureList.reduce(function(result, item, index) {
-      result[++index] = item;
-      return result;
-    }, {});
-
-    return litBuildRecord(label, features);
-  }
-%}
-
-lit_tuple_cons_item ->
-    ids_identifier {% id %}
-  | lit_atom {% id %}
-  | lit_boolean {% id %}
-  | lit_string {% id %}
-  | lit_char {% id %}
-  | lit_integer {% id %}
-  | lit_float {% id %}
-  | lit_list {% id %}
-  | lit_procedure {% id %}
-  | lit_function {% id %}
-
-##############################################################################
-# List
-##############################################################################
-lit_list ->
-    lit_empty_list {% id %}
-  | lit_list_with_items {% id %}
-  | lit_cons_list {% id %}
-
-lit_list_with_items -> "[" _ lit_list_items _ "]" {%
-  function(d) {
-    return litBuildList(d[2]);
-  }
-%}
-
-lit_empty_list -> "[" _ "]" {%
-  function(d) {
-    return litBuildList([]);
-  }
-%}
-
-lit_list_items ->
-    lit_list_item
-  | lit_list_items __ lit_list_item {%
-      function(d) {
-        return d[0].concat(d[2]);
-      }
-    %}
-
-lit_list_item -> (ids_identifier | lit_value) {%
-  function(d) {
-    return d[0][0];
-  }
-%}
-
-lit_cons_list -> lit_list_item "|" (lit_list | ids_identifier) {%
-  function(d) {
-    return litBuildListItem(
-      d[0],
-      d[2][0]
-    );
   }
 %}
 
@@ -997,8 +972,39 @@ lit_function_args ->
 ##############################################################################
 # PAT - PATTERNS
 ##############################################################################
+
 pat_pattern ->
+    pat_terminal {% id %}
+  | pat_cons_list_term {% id %}
+  | pat_cons_tuple_term {% id %}
+
+pat_cons_list_term -> pat_terminal _ "|" _ pat_pattern {%
+  function(d) {
+    return litBuildRecord("|", {
+      1: d[0],
+      2: d[4],
+    });
+  }
+%}
+
+pat_cons_tuple_term -> pat_terminal _ ("#" _ pat_terminal _):+ {%
+  function(d) {
+    var label = "#";
+    var featureList = [d[0]].concat(d[2].map(function(item) {
+      return item[2];
+    }));
+    var features = featureList.reduce(function(result, item, index) {
+      result[++index] = item;
+      return result;
+    }, {});
+
+    return litBuildRecord(label, features);
+  }
+%}
+
+pat_terminal ->
     ids_identifier {% id %}
+  | any_identifier {% id %}
   | lit_char {% id %}
   | lit_integer {% id %}
   | lit_float {% id %}
@@ -1008,7 +1014,6 @@ pat_pattern ->
   | pat_record {% id %}
   | pat_tuple {% id %}
   | pat_list {% id %}
-  | any_identifier {% id %}
 
 pat_record -> lit_atom_syntax "(" _ pat_record_feature_list _ ")" {%
   function(d, position, reject) {
@@ -1031,11 +1036,7 @@ pat_record_feature -> lit_atom_syntax ":" pat_pattern {%
   }
 %}
 
-pat_tuple ->
-    pat_tuple_generic {% id %}
-  | pat_tuple_cons {% id %}
-
-pat_tuple_generic -> lit_atom_syntax "(" _ pat_list_items _ ")" {%
+pat_tuple -> lit_atom_syntax "(" _ pat_list_items _ ")" {%
   function(d, position, reject) {
     var label = d[0];
     var features = d[3].reduce(function(result, item, index) {
@@ -1046,37 +1047,9 @@ pat_tuple_generic -> lit_atom_syntax "(" _ pat_list_items _ ")" {%
   }
 %}
 
-pat_tuple_cons -> pat_tuple_cons_item ("#" pat_tuple_cons_item):+ {%
-  function(d) {
-    var label = "#";
-    var featureList = [d[0]].concat(d[1].map(function(item) {
-      return item[1];
-    }));
-    var features = featureList.reduce(function(result, item, index) {
-      result[++index] = item;
-      return result;
-    }, {});
-
-    return litBuildRecord(label, features);
-  }
-%}
-
-pat_tuple_cons_item ->
-    ids_identifier {% id %}
-  | lit_atom {% id %}
-  | lit_boolean {% id %}
-  | lit_string {% id %}
-  | lit_char {% id %}
-  | lit_integer {% id %}
-  | lit_float {% id %}
-  | pat_list {% id %}
-  | lit_procedure {% id %}
-  | any_identifier {% id %}
-
 pat_list ->
     pat_empty_list {% id %}
   | pat_list_with_items {% id %}
-  | pat_cons_list {% id %}
 
 pat_list_with_items -> "[" _ pat_list_items _ "]" {%
   function(d) {
@@ -1097,17 +1070,6 @@ pat_list_items ->
         return d[0].concat(d[2]);
       }
     %}
-
-pat_cons_list -> pat_pattern "|" (pat_list | ids_identifier | any_identifier) {%
-  function(d) {
-    return litBuildListItem(
-      d[0],
-      d[2][0]
-    );
-  }
-%}
-
-any_identifier -> "_" {% anyBuildIdentifier %}
 
 ##############################################################################
 # LIB - UTILITIES

@@ -8,7 +8,8 @@ export const parserFor = grammar => {
     parser.feed(input);
 
     if (parser.results.length > 1) {
-      throw new Error("Ambiguous parse tree");
+      const results = JSON.stringify(parser.results);
+      throw new Error(`Ambiguous parse tree ${results}`);
     }
 
     return Immutable.fromJS(parser.results[0]);

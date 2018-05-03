@@ -56,7 +56,9 @@ describe("Parsing binding statements", () => {
         bindingStatementSyntax(
           identifierExpression(lexicalIdentifier("X")),
           literalExpression(
-            literalRecord("person", { name: lexicalIdentifier("N") }),
+            literalRecord("person", {
+              name: identifierExpression(lexicalIdentifier("N")),
+            }),
           ),
         ),
       );
@@ -67,7 +69,9 @@ describe("Parsing binding statements", () => {
         bindingStatementSyntax(
           identifierExpression(lexicalIdentifier("X")),
           literalExpression(
-            literalRecord("person", { name: lexicalIdentifier("N") }),
+            literalRecord("person", {
+              name: identifierExpression(lexicalIdentifier("N")),
+            }),
           ),
         ),
       );
@@ -78,7 +82,9 @@ describe("Parsing binding statements", () => {
         bindingStatementSyntax(
           identifierExpression(lexicalIdentifier("One Variable")),
           literalExpression(
-            literalRecord("person", { name: lexicalIdentifier("N") }),
+            literalRecord("person", {
+              name: identifierExpression(lexicalIdentifier("N")),
+            }),
           ),
         ),
       );

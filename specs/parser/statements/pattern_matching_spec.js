@@ -171,6 +171,38 @@ describe("Parsing case statements", () => {
       );
     });
 
+    it("handles hashed tuples", () => {
+      expect(parse("case X of 20#Z then skip end")).toEqual(
+        simpleCaseWithPattern(
+          literalTuple("#", [literalNumber(20), lexicalIdentifier("Z")]),
+        ),
+      );
+    });
+
+    it("handles repeated hashed tuples", () => {
+      expect(parse("case X of A#B#C then skip end")).toEqual(
+        simpleCaseWithPattern(
+          literalTuple("#", [
+            lexicalIdentifier("A"),
+            lexicalIdentifier("B"),
+            lexicalIdentifier("C"),
+          ]),
+        ),
+      );
+    });
+
+    it("handles repeated hashed tuples with literals", () => {
+      expect(parse("case X of 1#2#C then skip end")).toEqual(
+        simpleCaseWithPattern(
+          literalTuple("#", [
+            literalNumber(1),
+            literalNumber(2),
+            lexicalIdentifier("C"),
+          ]),
+        ),
+      );
+    });
+
     it("handles generic lists", () => {
       expect(parse("case X of [10 Y H|T] then skip end")).toEqual(
         simpleCaseWithPattern(
@@ -179,6 +211,36 @@ describe("Parsing case statements", () => {
             lexicalIdentifier("Y"),
             literalListItem(lexicalIdentifier("H"), lexicalIdentifier("T")),
           ]),
+        ),
+      );
+    });
+
+    it("handles piped lists", () => {
+      expect(parse("case X of H|T then skip end")).toEqual(
+        simpleCaseWithPattern(
+          literalListItem(lexicalIdentifier("H"), lexicalIdentifier("T")),
+        ),
+      );
+    });
+
+    it("handles repeated piped lists", () => {
+      expect(parse("case X of H1|H2|T then skip end")).toEqual(
+        simpleCaseWithPattern(
+          literalListItem(
+            lexicalIdentifier("H1"),
+            literalListItem(lexicalIdentifier("H2"), lexicalIdentifier("T")),
+          ),
+        ),
+      );
+    });
+
+    it("handles repeated piped lists with literals", () => {
+      expect(parse("case X of 1|2|T then skip end")).toEqual(
+        simpleCaseWithPattern(
+          literalListItem(
+            literalNumber(1),
+            literalListItem(literalNumber(2), lexicalIdentifier("T")),
+          ),
         ),
       );
     });
