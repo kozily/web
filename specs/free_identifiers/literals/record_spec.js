@@ -2,6 +2,10 @@ import Immutable from "immutable";
 import { collectFreeIdentifiers } from "../../../app/oz/free_identifiers";
 import { literalRecord, literalNumber } from "../../../app/oz/machine/literals";
 import { lexicalIdentifier } from "../../../app/oz/machine/lexical";
+import {
+  identifierExpression,
+  literalExpression,
+} from "../../../app/oz/machine/expressions";
 
 describe("Collecting free identifiers in a record literal", () => {
   beforeEach(() => {
@@ -10,8 +14,8 @@ describe("Collecting free identifiers in a record literal", () => {
 
   it("collects all the identifiers in the record", () => {
     const literal = literalRecord("person", {
-      age: lexicalIdentifier("A"),
-      name: lexicalIdentifier("N"),
+      age: identifierExpression(lexicalIdentifier("A")),
+      name: identifierExpression(lexicalIdentifier("N")),
     });
 
     expect(collectFreeIdentifiers(literal)).toEqual(Immutable.Set(["A", "N"]));
@@ -19,11 +23,13 @@ describe("Collecting free identifiers in a record literal", () => {
 
   it("collects all the nested identifiers in the values", () => {
     const literal = literalRecord("person", {
-      age: lexicalIdentifier("A"),
-      address: literalRecord("address", {
-        number: lexicalIdentifier("N"),
-        floor: literalNumber(3),
-      }),
+      age: identifierExpression(lexicalIdentifier("A")),
+      address: literalExpression(
+        literalRecord("address", {
+          number: identifierExpression(lexicalIdentifier("N")),
+          floor: literalExpression(literalNumber(3)),
+        }),
+      ),
     });
 
     expect(collectFreeIdentifiers(literal)).toEqual(Immutable.Set(["A", "N"]));
@@ -31,7 +37,7 @@ describe("Collecting free identifiers in a record literal", () => {
 
   it("collects nested identifiers when the identifier has more than one letter", () => {
     const literal = literalRecord("person", {
-      age: lexicalIdentifier("Age"),
+      age: identifierExpression(lexicalIdentifier("Age")),
     });
 
     expect(collectFreeIdentifiers(literal)).toEqual(Immutable.Set.of("Age"));

@@ -2,6 +2,7 @@ import { statementTypes } from "../machine/statements";
 import { valueTypes } from "../machine/values";
 import { kernelLiteralTypes } from "../machine/literals";
 import { kernelExpressionTypes } from "../machine/expressions";
+import identifier from "./identifier";
 import skip from "./statements/skip";
 import binding from "./statements/binding";
 import sequence from "./statements/sequence";
@@ -74,6 +75,9 @@ export const printers = {
 
 export const print = (node, identation = 0) => {
   if (!node) return { full: "Unbound", abbreviated: "Unbound" };
+  if (node.get("node") === "identifier") {
+    return identifier(print, node, identation);
+  }
   const printer = printers[node.get("node")][node.get("type")];
   return printer(print, node, identation);
 };

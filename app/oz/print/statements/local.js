@@ -1,8 +1,6 @@
-import printIdentifier from "../identifier";
-
 export default (recurse, node, identation) => {
   const ident = new Array(identation + 1).join(" ");
-  const identifier = printIdentifier(node.getIn(["identifier", "identifier"]));
+  const identifier = recurse(node.get("identifier")).abbreviated;
   const statement = recurse(node.get("statement"), identation + 2);
   return {
     abbreviated: `${ident}local ${identifier} in ... end`,

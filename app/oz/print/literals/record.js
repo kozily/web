@@ -1,4 +1,3 @@
-import printIdentifier from "../identifier";
 import { valueTypes } from "../../machine/values";
 
 const printLabel = label => {
@@ -11,15 +10,7 @@ const printLabel = label => {
 };
 
 const printValue = (recurse, node) => {
-  if (node.get("node") === "literal") {
-    return recurse(node);
-  }
-
-  const printed = printIdentifier(node.get("identifier"));
-  return {
-    abbreviated: printed,
-    full: printed,
-  };
+  return recurse(node);
 };
 
 const isInteger = value => {
@@ -56,8 +47,12 @@ const collectListRecordItems = (recurse, label, features) => {
 
   const firstItem = printValue(recurse, features.get("1")).abbreviated;
   const tail = features.get("2");
-  const tailLabel = tail.getIn(["value", "label"]);
-  const tailFeatures = tail.getIn(["value", "features"]);
+
+  const tailLiteral =
+    tail.get("node") === "expression" ? tail.get("literal") : tail;
+
+  const tailLabel = tailLiteral.getIn(["value", "label"]);
+  const tailFeatures = tailLiteral.getIn(["value", "features"]);
 
   return [firstItem].concat(
     collectListRecordItems(recurse, tailLabel, tailFeatures),
@@ -78,13 +73,39 @@ const printConsListRecord = (recurse, label, features) => {
   return `${head}|${tail}`;
 };
 
-const printListRecord = (recurse, label, features) => {
+const isLiteralCompleteList = literal => {
+  if (literal.get("type") === valueTypes.record) {
+    const subLabel = literal.getIn(["value", "label"]);
+    const subFeatures = literal.getIn(["value", "features"]);
+    if (subLabel === "|") {
+      return isCompleteList(subLabel, subFeatures);
+    }
+
+    if (subLabel === "nil") {
+      return true;
+    }
+  }
+
+  return false;
+};
+
+const isCompleteList = (label, features) => {
   const tail = features.get("2");
 
-  if (
-    tail.get("type") === valueTypes.record &&
-    tail.getIn(["value", "label"]) === "|"
-  ) {
+  if (tail.get("node") === "expression" && tail.get("type") === "literal") {
+    const literal = tail.get("literal");
+    return isLiteralCompleteList(literal);
+  }
+
+  if (tail.get("node") === "literal") {
+    return isLiteralCompleteList(tail);
+  }
+
+  return false;
+};
+
+const printListRecord = (recurse, label, features) => {
+  if (isCompleteList(label, features)) {
     return printCompleteListRecord(recurse, label, features);
   }
 

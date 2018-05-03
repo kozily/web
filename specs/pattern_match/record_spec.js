@@ -1,5 +1,8 @@
 import Immutable from "immutable";
-import { literalExpression } from "../../app/oz/machine/expressions";
+import {
+  literalExpression,
+  identifierExpression,
+} from "../../app/oz/machine/expressions";
 import { lexicalIdentifier } from "../../app/oz/machine/lexical";
 import {
   literalAtom,
@@ -37,8 +40,8 @@ describe("Pattern matching against a generic record", () => {
     const evaluation = evaluate(
       literalExpression(
         literalRecord("person", {
-          age: literalNumber(10),
-          gender: lexicalIdentifier("G"),
+          age: literalExpression(literalNumber(10)),
+          gender: identifierExpression(lexicalIdentifier("G")),
         }),
       ),
       environment,
@@ -77,9 +80,9 @@ describe("Pattern matching against a generic record", () => {
     const evaluation = evaluate(
       literalExpression(
         literalRecord("person", {
-          age: literalNumber(10),
-          gender: lexicalIdentifier("G"),
-          address: lexicalIdentifier("Address"),
+          age: literalExpression(literalNumber(10)),
+          gender: identifierExpression(lexicalIdentifier("G")),
+          address: identifierExpression(lexicalIdentifier("Address")),
         }),
       ),
       environment,
@@ -155,7 +158,7 @@ describe("Pattern matching against a generic record", () => {
     const evaluation = evaluate(
       literalExpression(
         literalRecord("person", {
-          age: literalNumber(15),
+          age: literalExpression(literalNumber(15)),
         }),
       ),
       environment,
@@ -178,7 +181,7 @@ describe("Pattern matching against a generic record", () => {
     const evaluation = evaluate(
       literalExpression(
         literalRecord("person", {
-          age: literalNumber(15),
+          age: literalExpression(literalNumber(15)),
         }),
       ),
       environment,
@@ -211,8 +214,8 @@ describe("Pattern matching against a generic record", () => {
     const evaluation = evaluate(
       literalExpression(
         literalRecord("person", {
-          age: literalNumber(15),
-          address: lexicalIdentifier("Address"),
+          age: literalExpression(literalNumber(15)),
+          address: identifierExpression(lexicalIdentifier("Address")),
         }),
       ),
       environment,

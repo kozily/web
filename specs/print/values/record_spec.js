@@ -82,6 +82,17 @@ describe("Printing a record value", () => {
     expect(result.full).toEqual("'|'(1:30 2:x0)");
   });
 
+  it("Returns the appropriate string for weird conses", () => {
+    const value = valueListItem(
+      valueNumber(1),
+      valueListItem(valueNumber(2), valueNumber(3)),
+    );
+    const result = print(value, 2);
+
+    expect(result.abbreviated).toEqual("1|2|3");
+    expect(result.full).toEqual("'|'(1:1 2:'|'(1:2 2:3))");
+  });
+
   it("Returns the appropriate string for nested recursive structures", () => {
     const value = valueRecord("person", {
       age: valueNumber(30),

@@ -30,5 +30,14 @@ export default (recurse, literal) => {
       )
     : compiledExpression.augmentStatement(resultStatement);
 
-  return literalProcedure(procedureArgs, procedureStatement);
+  const resultingExpression = literalProcedure(
+    procedureArgs,
+    procedureStatement,
+  );
+  const augmentStatement = statement => statement;
+
+  return {
+    resultingExpression,
+    augmentStatement,
+  };
 };

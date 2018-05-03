@@ -1,12 +1,20 @@
-export default identifier => {
+export default (recurse, node) => {
+  const identifier = node.get("identifier");
+
   if (identifier === "_") {
-    return identifier;
+    return {
+      abbreviated: identifier,
+      full: identifier,
+    };
   }
 
   const unquotedRegex = /^[A-Z][a-zA-Z0-9]*$/;
-  if (unquotedRegex.test(identifier)) {
-    return identifier;
-  }
+  const result = unquotedRegex.test(identifier)
+    ? identifier
+    : "`" + identifier + "`";
 
-  return "`" + identifier + "`";
+  return {
+    abbreviated: result,
+    full: result,
+  };
 };

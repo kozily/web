@@ -74,14 +74,14 @@ export const literalListItem = (head, tail) => {
   return literalTuple("|", [head, tail]);
 };
 
-export const literalList = (items = []) => {
+export const literalList = (items = [], wrap = x => x) => {
   return items.reduceRight(
-    (result, item) => literalListItem(item, result),
-    literalAtom("nil"),
+    (result, item) => wrap(literalListItem(item, result)),
+    wrap(literalAtom("nil")),
   );
 };
 
-export const literalString = value => {
-  const items = value.split("").map(s => literalNumber(s.charCodeAt(0)));
-  return literalList(items);
+export const literalString = (value, wrap = x => x) => {
+  const items = value.split("").map(s => wrap(literalNumber(s.charCodeAt(0))));
+  return literalList(items, wrap);
 };

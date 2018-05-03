@@ -1,20 +1,16 @@
 import Immutable from "immutable";
-import { lexicalIdentifier } from "../../../app/oz/machine/lexical";
-import { literalExpression } from "../../../app/oz/machine/expressions";
-import {
-  literalFunction,
-  literalNumber,
-} from "../../../app/oz/machine/literals";
+import { functionExpression, numberExpression } from "./helpers";
+import { lexicalIdentifier } from "../../../../app/oz/machine/lexical";
 import {
   sequenceStatementSyntax,
   skipStatementSyntax,
-} from "../../../app/oz/machine/statementSyntax.js";
-import { parserFor } from "../../../app/oz/parser";
-import literalGrammar from "../../../app/oz/grammar/literals.ne";
+} from "../../../../app/oz/machine/statementSyntax.js";
+import { parserFor } from "../../../../app/oz/parser";
+import grammar from "../../../../app/oz/grammar/expressions.ne";
 
-const parse = parserFor(literalGrammar);
+const parse = parserFor(grammar);
 
-describe("Parsing function literals", () => {
+describe("Parsing function literal expressions", () => {
   beforeEach(() => {
     jasmine.addCustomEqualityTester(Immutable.is);
   });
@@ -22,13 +18,13 @@ describe("Parsing function literals", () => {
   describe("without arguments", () => {
     it("handles standard spaced syntax", () => {
       expect(parse("fun {$} 5 end")).toEqual(
-        literalFunction([], literalExpression(literalNumber(5))),
+        functionExpression([], numberExpression(5)),
       );
     });
 
     it("handles weird spacing", () => {
       expect(parse("fun {  $\t\n} \n\t5\nend")).toEqual(
-        literalFunction([], literalExpression(literalNumber(5))),
+        functionExpression([], numberExpression(5)),
       );
     });
   });
@@ -36,18 +32,18 @@ describe("Parsing function literals", () => {
   describe("with argumens", () => {
     it("handles standard spaced syntax", () => {
       expect(parse("fun {$ X Y} 5 end")).toEqual(
-        literalFunction(
+        functionExpression(
           [lexicalIdentifier("X"), lexicalIdentifier("Y")],
-          literalExpression(literalNumber(5)),
+          numberExpression(5),
         ),
       );
     });
 
     it("handles weird spacing", () => {
       expect(parse("fun {  $\tX Y\n} \n\t5\n end")).toEqual(
-        literalFunction(
+        functionExpression(
           [lexicalIdentifier("X"), lexicalIdentifier("Y")],
-          literalExpression(literalNumber(5)),
+          numberExpression(5),
         ),
       );
     });
@@ -56,9 +52,9 @@ describe("Parsing function literals", () => {
   describe("with statements and expressions", () => {
     it("handles a single statement correctly", () => {
       expect(parse("fun {$ X Y} skip 5 end")).toEqual(
-        literalFunction(
+        functionExpression(
           [lexicalIdentifier("X"), lexicalIdentifier("Y")],
-          literalExpression(literalNumber(5)),
+          numberExpression(5),
           skipStatementSyntax(),
         ),
       );
@@ -66,9 +62,9 @@ describe("Parsing function literals", () => {
 
     it("handles multiple statements correctly", () => {
       expect(parse("fun {$ X Y} skip skip 5 end")).toEqual(
-        literalFunction(
+        functionExpression(
           [lexicalIdentifier("X"), lexicalIdentifier("Y")],
-          literalExpression(literalNumber(5)),
+          numberExpression(5),
           sequenceStatementSyntax(skipStatementSyntax(), skipStatementSyntax()),
         ),
       );

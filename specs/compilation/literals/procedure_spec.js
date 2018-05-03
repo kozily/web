@@ -11,16 +11,21 @@ describe("Compiling procedure values", () => {
   });
 
   it("compiles appropriately", () => {
-    const value = literalProcedure(
+    const literal = literalProcedure(
       [lexicalIdentifier("A", lexicalIdentifier("B"))],
       skipStatementSyntax(),
     );
 
-    expect(compile(value)).toEqual(
+    const compilation = compile(literal);
+
+    expect(compilation.resultingExpression).toEqual(
       literalProcedure(
         [lexicalIdentifier("A", lexicalIdentifier("B"))],
         skipStatement(),
       ),
     );
+
+    const resultingStatement = compilation.augmentStatement(skipStatement());
+    expect(resultingStatement).toEqual(skipStatement());
   });
 });

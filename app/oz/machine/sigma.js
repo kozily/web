@@ -6,8 +6,6 @@ import {
 } from "./build";
 import { unifyValue } from "../unification";
 
-export { createValue } from "../value_creation";
-
 const identifier2variable = identifier => {
   return identifier.charAt(0).toLowerCase() + identifier.substring(1);
 };

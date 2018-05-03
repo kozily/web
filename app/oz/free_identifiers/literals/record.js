@@ -5,10 +5,6 @@ export default (recurse, literal) => {
     .getIn(["value", "features"])
     .valueSeq()
     .flatMap(feature => {
-      if (feature.get("node") === "identifier") {
-        return Immutable.Set.of(feature.get("identifier"));
-      }
-
       return recurse(feature);
     });
 
