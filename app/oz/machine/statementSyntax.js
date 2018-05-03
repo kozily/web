@@ -17,6 +17,7 @@ export const statementSyntaxTypes = {
   portCreationSyntax: "portCreationSyntax",
   portSendSyntax: "portSendSyntax",
   nameCreationSyntax: "nameCreationSyntax",
+  colonEqualsCellSyntax: "colonEqualsCellSyntax",
 };
 
 export const allStatementSyntaxTypes = Object.keys(statementSyntaxTypes);
@@ -173,5 +174,15 @@ export const nameCreationStatementSyntax = name => {
     node: "statement",
     type: statementSyntaxTypes.nameCreationSyntax,
     name,
+  });
+};
+
+export const colonEqualsCellStatementSyntax = (lhs, rhs) => {
+  return Immutable.fromJS({
+    node: "statement",
+    type: statementSyntaxTypes.colonEqualsCellSyntax,
+    operator: ":=",
+    lhs,
+    rhs,
   });
 };

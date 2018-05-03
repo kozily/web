@@ -19,4 +19,15 @@ describe("Collecting free identifiers in a cell exchange statement", () => {
       Immutable.Set(["X", "Y", "Z"]),
     );
   });
+
+  it("collects all involved identifiers ignoring the any identifiers", () => {
+    const statement = cellExchangeStatement(
+      identifierExpression(lexicalIdentifier("X")),
+      lexicalIdentifier("_"),
+      identifierExpression(lexicalIdentifier("Z")),
+    );
+    expect(collectFreeIdentifiers(statement)).toEqual(
+      Immutable.Set(["X", "Z"]),
+    );
+  });
 });

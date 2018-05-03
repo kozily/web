@@ -23,6 +23,7 @@ import portSend from "./statements/port_send";
 import nameCreation from "./statements/name_creation";
 import thread from "./statements/thread";
 import byNeed from "./statements/by_need";
+import colonEqualsCellSyntax from "./statements/colon_equals_cell";
 import number from "./literals/number";
 import record from "./literals/record";
 import procedure from "./literals/procedure";
@@ -39,7 +40,8 @@ import threadExpression from "./expressions/thread";
 import nameCreationExpression from "./expressions/name_creation";
 import cellCreationExpression from "./expressions/cell_creation";
 import portCreationExpression from "./expressions/port_creation";
-import atCellExpression from "./expressions/atCell";
+import atCellExpression from "./expressions/at_cell";
+import colonEqualsCellExpression from "./expressions/colon_equals_cell";
 
 export const compilers = {
   statement: {
@@ -59,6 +61,7 @@ export const compilers = {
     [statementSyntaxTypes.portCreationSyntax]: portCreation,
     [statementSyntaxTypes.portSendSyntax]: portSend,
     [statementSyntaxTypes.nameCreationSyntax]: nameCreation,
+    [statementSyntaxTypes.colonEqualsCellSyntax]: colonEqualsCellSyntax,
   },
   literal: {
     [kernelLiteralTypes.number]: number,
@@ -80,6 +83,7 @@ export const compilers = {
     [compilableExpressionTypes.cellCreation]: cellCreationExpression,
     [compilableExpressionTypes.portCreation]: portCreationExpression,
     [compilableExpressionTypes.atCell]: atCellExpression,
+    [compilableExpressionTypes.colonEqualsCell]: colonEqualsCellExpression,
   },
 };
 

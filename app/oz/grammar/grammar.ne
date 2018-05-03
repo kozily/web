@@ -208,6 +208,7 @@ stm_simple ->
   | stm_port_creation {% id %}
   | stm_port_send {% id %}
   | stm_name_creation {% id %}
+  | stm_colon_equals_cell {% id %}
 
 stm_skip -> "skip" {%
   function (d) {
@@ -440,6 +441,18 @@ stm_name_creation-> "{" _ "NewName" __ exp_expression _ "}" {%
   }
 %}
 
+stm_colon_equals_cell-> exp_expression _ ":=" _ exp_expression {%
+  function(d) {
+    return {
+      node: "statement",
+      type: "colonEqualsCellSyntax",
+      operator: d[2],
+      lhs: d[0],
+      rhs: d[4]
+    };
+  }
+%}
+
 ##############################################################################
 # EXP - EXPRESSIONS
 ##############################################################################
@@ -606,7 +619,7 @@ exp_terminal_string -> lit_string_syntax {%
   }
 %}
 
-exp_at_cell -> "@" exp_expression {%
+exp_at_cell -> "@" exp_terminal {%
   function(d) {
     return {
       node: "expression",
@@ -616,7 +629,17 @@ exp_at_cell -> "@" exp_expression {%
   }
 %}
 
-exp_colon_equals_cell -> exp_expression _ ":=" _ exp_expression {% expBuildOperatorExpression(0, 4, [2]) %}
+exp_colon_equals_cell -> exp_expression _ ":=" _ exp_expression {%
+  function(d) {
+    return {
+      node: "expression",
+      type: "colonEqualsCell",
+      operator: d[2],
+      lhs: d[0],
+      rhs: d[4],
+    };
+  }
+%}
 
 exp_terminal_paren -> "(" _ exp_expression _ ")" {% nth(2) %}
 

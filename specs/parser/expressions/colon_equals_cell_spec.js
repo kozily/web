@@ -1,7 +1,7 @@
 import Immutable from "immutable";
 import {
   identifierExpression,
-  operatorExpression,
+  colonEqualsCellExpression,
 } from "../../../app/oz/machine/expressions";
 import { lexicalIdentifier } from "../../../app/oz/machine/lexical";
 import { parserFor } from "../../../app/oz/parser";
@@ -16,8 +16,7 @@ describe("Parsing colon equals cell expressions", () => {
 
   it("parses colon equals cell successfully", () => {
     expect(parse("C := X")).toEqual(
-      operatorExpression(
-        ":=",
+      colonEqualsCellExpression(
         identifierExpression(lexicalIdentifier("C")),
         identifierExpression(lexicalIdentifier("X")),
       ),

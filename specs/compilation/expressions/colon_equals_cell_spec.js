@@ -2,7 +2,7 @@ import Immutable from "immutable";
 import { compile } from "../../../app/oz/compilation";
 import {
   functionExpression,
-  atCellExpression,
+  colonEqualsCellExpression,
 } from "../../../app/oz/machine/expressions";
 import {
   localStatement,
@@ -13,14 +13,17 @@ import {
 } from "../../../app/oz/machine/statements";
 import { identifier, auxExpression, auxExpressionIdentifier } from "../helpers";
 
-describe("Compiling at cell expressions", () => {
+describe("Compiling colon equals cell expressions", () => {
   beforeEach(() => {
     jasmine.addCustomEqualityTester(Immutable.is);
   });
 
   describe("when not providing a resulting identifier", () => {
     it("compiles", () => {
-      const expression = atCellExpression(identifier("C"));
+      const expression = colonEqualsCellExpression(
+        identifier("C"),
+        identifier("Y"),
+      );
 
       const compilation = compile(expression);
 
@@ -35,7 +38,7 @@ describe("Compiling at cell expressions", () => {
             cellExchangeStatement(
               identifier("C"),
               auxExpressionIdentifier(),
-              auxExpression(),
+              identifier("Y"),
             ),
             skipStatement(),
           ),
@@ -44,30 +47,51 @@ describe("Compiling at cell expressions", () => {
     });
 
     it("compiles recursive expressions in the function position", () => {
-      const expression = atCellExpression(
-        functionExpression(identifier("GetFunction")),
+      const expression = colonEqualsCellExpression(
+        functionExpression(identifier("GetFunction1")),
+        functionExpression(identifier("GetFunction2")),
       );
 
       const compilation = compile(expression);
 
-      expect(compilation.resultingExpression).toEqual(auxExpression(2));
+      expect(compilation.resultingExpression).toEqual(auxExpression(3));
 
       const resultingStatement = compilation.augmentStatement(skipStatement());
 
+      //{GetFunction}:={GetFunction}
+      //Rc={Exchange E0 _ E1}
+      //Ac=local E0 in
+      //    {GetFunction E0}
+      //    local E1 in
+      //      {GetFunction E1}
+      //      local E2 in
+      //        {Exchange E0 E2 E1}
+      //        skip
+      //
+      //    end
+      //  end
       expect(resultingStatement).toEqual(
         localStatement(
-          auxExpressionIdentifier(2),
+          auxExpressionIdentifier(3),
           sequenceStatement(
             localStatement(
-              auxExpressionIdentifier(1),
+              auxExpressionIdentifier(2),
               sequenceStatement(
-                procedureApplicationStatement(identifier("GetFunction"), [
-                  auxExpression(1),
-                ]),
-                cellExchangeStatement(
-                  auxExpression(1),
-                  auxExpressionIdentifier(2),
+                procedureApplicationStatement(identifier("GetFunction1"), [
                   auxExpression(2),
+                ]),
+                localStatement(
+                  auxExpressionIdentifier(1),
+                  sequenceStatement(
+                    procedureApplicationStatement(identifier("GetFunction2"), [
+                      auxExpression(1),
+                    ]),
+                    cellExchangeStatement(
+                      auxExpression(2),
+                      auxExpressionIdentifier(3),
+                      auxExpression(1),
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -80,7 +104,10 @@ describe("Compiling at cell expressions", () => {
 
   describe("when providing a resulting identifier", () => {
     it("compiles", () => {
-      const expression = atCellExpression(identifier("C"));
+      const expression = colonEqualsCellExpression(
+        identifier("C"),
+        identifier("Y"),
+      );
 
       const compilation = compile(expression, identifier("R"));
 
@@ -92,14 +119,15 @@ describe("Compiling at cell expressions", () => {
         cellExchangeStatement(
           identifier("C"),
           identifier("R").get("identifier"),
-          identifier("R"),
+          identifier("Y"),
         ),
       );
     });
 
     it("compiles recursive expressions in function position", () => {
-      const expression = atCellExpression(
-        functionExpression(identifier("GetFunction")),
+      const expression = colonEqualsCellExpression(
+        functionExpression(identifier("GetFunction1")),
+        functionExpression(identifier("GetFunction2")),
       );
 
       const compilation = compile(expression, identifier("R"));
@@ -108,17 +136,37 @@ describe("Compiling at cell expressions", () => {
 
       const resultingStatement = compilation.augmentStatement(skipStatement());
 
+      //{GetFunction}:={GetFunction}
+      //Rc={Exchange E0 _ E1}
+      //Ac=local E0 in
+      //    {GetFunction E0}
+      //    local E1 in
+      //      {GetFunction E1}
+      //      local E2 in
+      //        {Exchange E0 R E1}
+      //        skip
+      //      end
+      //    end
+      //  end
       expect(resultingStatement).toEqual(
         localStatement(
-          auxExpressionIdentifier(1),
+          auxExpressionIdentifier(2),
           sequenceStatement(
-            procedureApplicationStatement(identifier("GetFunction"), [
-              auxExpression(1),
+            procedureApplicationStatement(identifier("GetFunction1"), [
+              auxExpression(2),
             ]),
-            cellExchangeStatement(
-              auxExpression(1),
-              identifier("R").get("identifier"),
-              identifier("R"),
+            localStatement(
+              auxExpressionIdentifier(1),
+              sequenceStatement(
+                procedureApplicationStatement(identifier("GetFunction2"), [
+                  auxExpression(1),
+                ]),
+                cellExchangeStatement(
+                  auxExpression(2),
+                  identifier("R").get("identifier"),
+                  auxExpression(1),
+                ),
+              ),
             ),
           ),
         ),
