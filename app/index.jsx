@@ -2,6 +2,9 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { AppContainer } from "react-hot-loader";
 import Application from "./ui/application";
+import * as OfflineSupport from "offline-plugin/runtime";
+
+OfflineSupport.install();
 
 ReactDOM.render(
   <AppContainer>

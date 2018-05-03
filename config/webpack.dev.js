@@ -1,35 +1,27 @@
-const webpack = require('webpack');
-const path = require('path');
-const HtmlPlugin = require('html-webpack-plugin');
-const CopyPlugin = require('copy-webpack-plugin');
+const webpack = require("webpack");
+const path = require("path");
+const HtmlPlugin = require("html-webpack-plugin");
+const CopyPlugin = require("copy-webpack-plugin");
 
 module.exports = {
-  entry: [
-    'react-hot-loader/patch',
-    './app/index.jsx',
-  ],
+  entry: ["react-hot-loader/patch", "./app/index.jsx"],
 
   resolve: {
-    extensions: [
-      '.js',
-      '.jsx'
-    ],
+    extensions: [".js", ".jsx"],
   },
 
   output: {
-    publicPath: 'http://localhost:8080/',
+    publicPath: "http://localhost:8080/",
   },
 
-  devtool: 'cheap-module-eval-source-map',
+  devtool: "cheap-module-eval-source-map",
 
   plugins: [
     new HtmlPlugin({
-      template: './app/index.html',
+      template: "./app/index.html",
     }),
 
-    new CopyPlugin([
-      {from: './app/favicons', to: './'},
-    ]),
+    new CopyPlugin([{ from: "./app/favicons", to: "./" }]),
   ],
 
   module: {
@@ -38,9 +30,9 @@ module.exports = {
         test: /\.jsx?$/,
         exclude: /node_modules/,
         use: [
-          'babel-loader',
+          "babel-loader",
           {
-            loader: 'eslint-loader',
+            loader: "eslint-loader",
             options: {
               failOnWarning: true,
               failOnError: true,
@@ -50,16 +42,14 @@ module.exports = {
       },
       {
         test: /\.ne$/,
-        use: [
-          'nearley-loader',
-        ],
+        use: ["nearley-loader"],
       },
       {
         test: /\.css$/,
         use: [
-          'style-loader',
+          "style-loader",
           {
-            loader: 'css-loader',
+            loader: "css-loader",
             options: {
               sourceMap: true,
             },
@@ -68,11 +58,8 @@ module.exports = {
       },
       {
         test: /\.(ttf|eot|svg|woff|woff2|png)/,
-        use: [
-          'file-loader',
-        ],
+        use: ["file-loader"],
       },
     ],
   },
 };
-
