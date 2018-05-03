@@ -6,7 +6,7 @@ export const valueTypes = {
   procedure: "procedure",
   builtIn: "builtIn",
   mutable: "mutable",
-  nameCreation: "nameCreation",
+  name: "name",
 };
 
 export const allValueTypes = Object.keys(valueTypes);
@@ -96,10 +96,10 @@ export const valueString = value => {
 
 var generateNewName = 0;
 
-export const valueNameCreation = () => {
+export const valueName = () => {
   return Immutable.fromJS({
     node: "value",
-    type: valueTypes.nameCreation,
+    type: valueTypes.name,
     name: ++generateNewName,
   });
 };

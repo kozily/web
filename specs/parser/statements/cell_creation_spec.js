@@ -13,7 +13,7 @@ describe("Parsing cell creation statements", () => {
     expect(parse("{NewCell X Y}")).toEqual(
       cellCreationStatementSyntax(
         identifierExpression(lexicalIdentifier("X")),
-        lexicalIdentifier("Y"),
+        identifierExpression(lexicalIdentifier("Y")),
       ),
     );
   });

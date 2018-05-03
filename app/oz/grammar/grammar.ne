@@ -265,14 +265,13 @@ stm_procedure_application -> "{" _ exp_expression stm_procedure_application_args
     var procedure = d[2];
     if (procedure.type === "identifier" && STM_SPECIAL_PROCEDURES.indexOf(procedure.identifier.identifier) !== -1) {
       return reject;
-    } else {
-      return {
-        node: "statement",
-        type: "procedureApplicationSyntax",
-        procedure: d[2],
-        args: d[3] || [],
-      };
     }
+    return {
+      node: "statement",
+      type: "procedureApplicationSyntax",
+      procedure: d[2],
+      args: d[3] || [],
+    };
   }
 %}
 
@@ -327,7 +326,7 @@ stm_by_need -> "{" _ "ByNeed" __ exp_expression __ ids_identifier _ "}" {%
   }
 %}
 
-stm_cell_creation -> "{" _ "NewCell" __ exp_expression __ ids_identifier _ "}" {%
+stm_cell_creation -> "{" _ "NewCell" __ exp_expression __ exp_expression _ "}" {%
   function(d) {
     return {
       node: "statement",
@@ -350,7 +349,7 @@ stm_cell_exchange -> "{" _ "Exchange" __ exp_expression __ ids_identifier __ exp
   }
 %}
 
-stm_port_creation -> "{" _ "NewPort" __ ids_identifier __ ids_identifier _ "}" {%
+stm_port_creation -> "{" _ "NewPort" __ ids_identifier __ exp_expression _ "}" {%
   function(d) {
     return {
       node: "statement",
@@ -372,7 +371,7 @@ stm_port_send -> "{" _ "Send" __ exp_expression __ exp_expression _ "}" {%
   }
 %}
 
-stm_name_creation-> "{" _ "NewName" __ ids_identifier _ "}" {%
+stm_name_creation-> "{" _ "NewName" __ exp_expression _ "}" {%
   function(d) {
     return {
       node: "statement",
@@ -436,6 +435,9 @@ exp_terminal ->
   | exp_terminal_try {% id %}
   | exp_terminal_pattern_matching {% id %}
   | exp_terminal_thread {% id %}
+  | exp_terminal_name_creation {% id %}
+  | exp_terminal_cell_creation {% id %}
+  | exp_terminal_port_creation {% id %}
 
 exp_terminal_identifier -> ids_identifier {% expBuildExpressionWrapper(0, "identifier") %}
 
@@ -444,8 +446,11 @@ exp_terminal_literal -> lit_value {% expBuildExpressionWrapper(0, "literal") %}
 exp_terminal_paren -> "(" _ exp_expression _ ")" {% nth(2) %}
 
 exp_terminal_function -> "{" _ exp_expression (__ exp_expression):* _ "}" {%
-  function(d) {
+  function(d, position, reject) {
     var functionExpression = d[2];
+    if (functionExpression.type === "identifier" && STM_SPECIAL_PROCEDURES.indexOf(functionExpression.identifier.identifier) !== -1) {
+      return reject;
+    }
     var functionArguments = d[3].map(function(arg) {
       return arg[1];
     });
@@ -552,6 +557,35 @@ exp_terminal_thread -> "thread" __ (stm_sequence __):? exp_expression __ "end" {
       type: "thread",
       statement: statement,
       expression: expression,
+    };
+  }
+%}
+
+exp_terminal_name_creation-> "{" _ "NewName" _ "}" {%
+  function(d) {
+    return {
+      node: "expression",
+      type: "nameCreation",
+    };
+  }
+%}
+
+exp_terminal_cell_creation -> "{" _ "NewCell" __ exp_expression _ "}" {%
+  function(d) {
+    return {
+      node: "expression",
+      type: "cellCreation",
+      value: d[4],
+    };
+  }
+%}
+
+exp_terminal_port_creation -> "{" _ "NewPort" __ ids_identifier _ "}" {%
+  function(d) {
+    return {
+      node: "expression",
+      type: "portCreation",
+      value: d[4],
     };
   }
 %}

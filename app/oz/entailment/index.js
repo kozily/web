@@ -5,7 +5,7 @@ import record from "./values/record";
 import procedure from "./values/procedure";
 import builtIn from "./values/built_in";
 import mutable from "./values/mutable";
-import nameCreation from "./values/name_creation";
+import name from "./values/name";
 
 export const checkers = {
   [valueTypes.number]: number,
@@ -13,7 +13,7 @@ export const checkers = {
   [valueTypes.procedure]: procedure,
   [valueTypes.builtIn]: builtIn,
   [valueTypes.mutable]: mutable,
-  [valueTypes.nameCreation]: nameCreation,
+  [valueTypes.name]: name,
 };
 
 export const entail = (args, sigma) => {

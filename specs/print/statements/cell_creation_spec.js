@@ -12,7 +12,7 @@ describe("Printing a cell creation statement", () => {
   it("Returns the appropriate string", () => {
     const statement = cellCreationStatement(
       identifierExpression(lexicalIdentifier("OneVariable")),
-      lexicalIdentifier("OtherVariable"),
+      identifierExpression(lexicalIdentifier("OtherVariable")),
     );
     const result = print(statement, 2);
 

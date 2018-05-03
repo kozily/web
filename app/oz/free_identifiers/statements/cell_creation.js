@@ -1,4 +1,6 @@
 export default (recurse, statement) => {
-  const cell = statement.getIn(["cell", "identifier"]);
-  return recurse(statement.get("value")).add(cell);
+  const cellIdentifiers = recurse(statement.get("cell"));
+  const valueIdentifiers = recurse(statement.get("value"));
+
+  return cellIdentifiers.union(valueIdentifiers);
 };

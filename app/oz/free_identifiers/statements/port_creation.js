@@ -1,8 +1,8 @@
 import Immutable from "immutable";
 
 export default (recurse, statement) => {
-  const port = statement.getIn(["port", "identifier"]);
+  const portIdentifiers = recurse(statement.get("port"));
   const value = statement.getIn(["value", "identifier"]);
 
-  return Immutable.Set.of(port, value);
+  return Immutable.Set.of(value).union(portIdentifiers);
 };

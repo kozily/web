@@ -4,8 +4,12 @@ import {
   skipStatement,
 } from "../../../app/oz/machine/statements";
 import { lexicalIdentifier } from "../../../app/oz/machine/lexical";
+import {
+  identifierExpression,
+  operatorExpression,
+} from "../../../app/oz/machine/expressions";
 import { failureException } from "../../../app/oz/machine/exceptions";
-import { valueNumber, valueNameCreation } from "../../../app/oz/machine/values";
+import { valueNumber, valueName } from "../../../app/oz/machine/values";
 import {
   buildSingleThreadedState,
   buildSemanticStatement,
@@ -14,7 +18,7 @@ import {
   buildVariable,
   buildEnvironment,
 } from "../../../app/oz/machine/build";
-import { buildSystemExceptionState } from "./helpers";
+import { buildSystemExceptionState, buildBlockedState } from "./helpers";
 import { execute } from "../../../app/oz/execution";
 
 describe("Reducing new name statements", () => {
@@ -31,7 +35,7 @@ describe("Reducing new name statements", () => {
     });
 
     const statement = buildSemanticStatement(
-      nameCreationStatement(lexicalIdentifier("Y")),
+      nameCreationStatement(identifierExpression(lexicalIdentifier("Y"))),
       buildEnvironment({
         Y: buildVariable("y", 0),
       }),
@@ -39,6 +43,32 @@ describe("Reducing new name statements", () => {
 
     expect(execute(state, statement, 0)).toEqual(
       buildSystemExceptionState(state, 0, failureException()),
+    );
+  });
+
+  it("blocks the current thread when the resulting expression blocks", () => {
+    const state = buildSingleThreadedState({
+      semanticStatements: [buildSemanticStatement(skipStatement())],
+      sigma: buildSigma(
+        buildEquivalenceClass(undefined, buildVariable("y", 0)),
+      ),
+    });
+
+    const statement = buildSemanticStatement(
+      nameCreationStatement(
+        operatorExpression(
+          "+",
+          identifierExpression(lexicalIdentifier("Y")),
+          identifierExpression(lexicalIdentifier("Y")),
+        ),
+      ),
+      buildEnvironment({
+        Y: buildVariable("y", 0),
+      }),
+    );
+
+    expect(execute(state, statement, 0)).toEqual(
+      buildBlockedState(state, statement, 0, buildVariable("y", 0)),
     );
   });
 
@@ -51,13 +81,13 @@ describe("Reducing new name statements", () => {
     });
 
     const statement = buildSemanticStatement(
-      nameCreationStatement(lexicalIdentifier("Y")),
+      nameCreationStatement(identifierExpression(lexicalIdentifier("Y"))),
       buildEnvironment({
         Y: buildVariable("y", 0),
       }),
     );
 
-    const sameValue = valueNameCreation();
+    const sameValue = valueName();
     const compareValueNewName = sameValue.update(
       "name",
       oldName => oldName + 1,
