@@ -30,7 +30,6 @@ export default function(state, semanticStatement, activeThreadIndex) {
 
   const currentValue = statement.get("current");
   const currentValueIdentifier = currentValue.get("identifier");
-  const currentValueVariable = environment.get(currentValueIdentifier);
 
   const nextValueExpression = statement.get("next");
   const nextValueEvaluation = evaluate(nextValueExpression, environment, sigma);
@@ -62,11 +61,14 @@ export default function(state, semanticStatement, activeThreadIndex) {
   );
 
   try {
-    const unifiedSigma = unify(
-      sigmaWithNextValue,
-      currentValueVariable,
-      currentImmutableVariable,
-    );
+    const unifiedSigma =
+      currentValueIdentifier === "_"
+        ? sigmaWithNextValue
+        : unify(
+            sigmaWithNextValue,
+            environment.get(currentValueIdentifier),
+            currentImmutableVariable,
+          );
     const updatedMu = updateMutableMapping(mu, nextMapping);
 
     return state.set("sigma", unifiedSigma).set("mu", updatedMu);

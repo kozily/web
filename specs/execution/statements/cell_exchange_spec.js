@@ -338,4 +338,56 @@ describe("Reducing cell exchange statements", () => {
       }),
     );
   });
+
+  it("executes correctly when the current variable is any identifier", () => {
+    const state = buildSingleThreadedState({
+      semanticStatements: [buildSemanticStatement(skipStatement())],
+      sigma: buildSigma(
+        buildEquivalenceClass(
+          valueMutableVariable("cell", 0),
+          buildVariable("x", 0),
+        ),
+        buildEquivalenceClass(valueNumber(10), buildVariable("z", 0)),
+        buildEquivalenceClass(valueNumber(5), buildVariable("v", 0)),
+      ),
+      mu: buildMu(
+        buildMutableMapping(
+          valueMutableVariable("cell", 0),
+          buildVariable("v", 0),
+        ),
+      ),
+    });
+
+    const statement = buildSemanticStatement(
+      cellExchangeStatement(
+        identifierExpression(lexicalIdentifier("X")),
+        lexicalIdentifier("_"),
+        identifierExpression(lexicalIdentifier("Z")),
+      ),
+      buildEnvironment({
+        X: buildVariable("x", 0),
+        Z: buildVariable("z", 0),
+      }),
+    );
+
+    expect(execute(state, statement, 0)).toEqual(
+      buildSingleThreadedState({
+        semanticStatements: [buildSemanticStatement(skipStatement())],
+        sigma: buildSigma(
+          buildEquivalenceClass(
+            valueMutableVariable("cell", 0),
+            buildVariable("x", 0),
+          ),
+          buildEquivalenceClass(valueNumber(10), buildVariable("z", 0)),
+          buildEquivalenceClass(valueNumber(5), buildVariable("v", 0)),
+        ),
+        mu: buildMu(
+          buildMutableMapping(
+            valueMutableVariable("cell", 0),
+            buildVariable("z", 0),
+          ),
+        ),
+      }),
+    );
+  });
 });

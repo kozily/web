@@ -208,6 +208,7 @@ stm_simple ->
   | stm_port_creation {% id %}
   | stm_port_send {% id %}
   | stm_name_creation {% id %}
+  | stm_colon_equals_cell {% id %}
 
 stm_skip -> "skip" {%
   function (d) {
@@ -440,6 +441,18 @@ stm_name_creation-> "{" _ "NewName" __ exp_expression _ "}" {%
   }
 %}
 
+stm_colon_equals_cell-> exp_expression _ ":=" _ exp_expression {%
+  function(d) {
+    return {
+      node: "statement",
+      type: "colonEqualsCellSyntax",
+      operator: d[2],
+      lhs: d[0],
+      rhs: d[4]
+    };
+  }
+%}
+
 ##############################################################################
 # EXP - EXPRESSIONS
 ##############################################################################
@@ -532,6 +545,8 @@ exp_terminal_no_literals ->
   | exp_terminal_name_creation {% id %}
   | exp_terminal_cell_creation {% id %}
   | exp_terminal_port_creation {% id %}
+  | exp_at_cell {% id %}
+  | exp_colon_equals_cell {% id %}
 
 exp_terminal ->
     exp_terminal_no_literals {% id %}
@@ -601,6 +616,28 @@ exp_terminal_literal -> lit_value {% expBuildExpressionWrapper(0, "literal") %}
 exp_terminal_string -> lit_string_syntax {%
   function(d) {
     return litBuildString(d[0], expWrap("literal"));
+  }
+%}
+
+exp_at_cell -> "@" exp_terminal {%
+  function(d) {
+    return {
+      node: "expression",
+      type: "atCell",
+      cell: d[1]
+    };
+  }
+%}
+
+exp_colon_equals_cell -> exp_expression _ ":=" _ exp_expression {%
+  function(d) {
+    return {
+      node: "expression",
+      type: "colonEqualsCell",
+      operator: d[2],
+      lhs: d[0],
+      rhs: d[4],
+    };
   }
 %}
 
